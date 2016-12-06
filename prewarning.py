@@ -418,6 +418,8 @@ class App(Frame):
 			self.sound_queue.put('sounds/' + self.default_language + '/' + str(self.team) + '.mp3')
 		if event.keysym == 't':
 			self.sound_queue.put(self.test_sound)
+		if event.keysym == 'i':
+			self.notify_ip()
 		elif event.keysym == 'c':
 			self.clear()
 		elif event.keysym == 'q':
