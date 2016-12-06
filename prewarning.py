@@ -1,7 +1,3 @@
-from _hashlib import new
-
-__author__ = 'croister'
-
 from tkinter import Tk, Frame, Label, X, Y, BOTH, TOP, BOTTOM, LEFT, RIGHT, CENTER, NSEW, N, S, E, W, Event
 from tkinter.ttk import Treeview, Style
 from time import strftime, sleep
@@ -19,6 +15,32 @@ from subprocess import call
 from configparser import ConfigParser
 from os import stat, path
 import socket
+from flask import Flask, render_template, redirect, request
+from collections import OrderedDict
+from natsort import natsorted
+
+
+__author__ = 'croister'
+
+
+class FlaskThread(Thread):
+	def __init__(self, webapp, app):
+		Thread.__init__(self, daemon=True)
+		self.webapp = webapp
+		self.app = app
+		self.webapp.add_url_rule('/', 'index', self.app.web_index)
+		self.webapp.add_url_rule('/prewarning/', 'prewarning', self.app.web_prewarning)
+		self.webapp.add_url_rule('/config/', 'config', self.app.web_config)
+		self.webapp.add_url_rule('/config/', 'config_post', self.app.web_config_post, methods=['POST'])
+		self.webapp.add_url_rule('/startlist/', 'startlist', self.app.web_startlist)
+		self.webapp.add_url_rule('/team/', 'team_default', self.app.web_startlist)
+		self.webapp.add_url_rule('/team/<team_nr>/', 'team', self.app.web_team)
+
+	def __del__(self):
+		self.wait()
+
+	def run(self):
+		self.webapp.run(debug=False, host='0.0.0.0', port=80)
 
 
 # class App(Frame, FileSystemEventHandler):
@@ -75,6 +97,7 @@ class App(Frame):
 		self.announce_ip = True
 
 		self.team_names = dict()
+		self.teams = dict()
 		self.runners = dict()
 
 		self.config_file = 'prewarning.ini'
@@ -129,6 +152,11 @@ class App(Frame):
 
 		self.file_watcher = Thread(target=self.check_files)
 		self.file_watcher.setDaemon(True)
+
+		self.webapp = None
+
+	def set_webapp(self, webapp):
+		self.webapp = webapp
 
 	def notify_ip(self):
 		s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -362,21 +390,24 @@ class App(Frame):
 		organiser_id = self.get_data(startlist, 'ns:Event/ns:Organiser/ns:Id', ns)
 		organiser_name = self.get_data(startlist, 'ns:Event/ns:Organiser/ns:Name', ns)
 
-		self.competition_date = event_date
+		if event_date is not None:
+			self.competition_date = event_date
 
 		print('Event: ' + str(event_name) + ' (' + str(event_id) + ') ' + str(event_date))
 		print('Organiser: ' + str(organiser_name) + ' (' + str(organiser_id) + ')')
 
 		self.team_names.clear()
+		self.teams.clear()
 		self.runners.clear()
 
-		teams = startlist.findall('ns:ClassStart/ns:TeamStart', ns)
-		for team in teams:
-			team_name = self.get_data(team, 'ns:Name', ns)
-			team_bib_number = self.get_data(team, 'ns:BibNumber', ns)
+		xml_teams = startlist.findall('ns:ClassStart/ns:TeamStart', ns)
+		for xml_team in xml_teams:
+			team_name = self.get_data(xml_team, 'ns:Name', ns)
+			team_bib_number = self.get_data(xml_team, 'ns:BibNumber', ns)
 			self.team_names[team_bib_number] = team_name
 
-			team_members = team.findall('ns:TeamMemberStart', ns)
+			team = dict()
+			team_members = xml_team.findall('ns:TeamMemberStart', ns)
 			for team_member in team_members:
 				team_member_id = self.get_data(team_member, 'ns:Person/ns:Id', ns)
 				team_member_name_family = self.get_data(team_member, 'ns:Person/ns:Name/ns:Family', ns)
@@ -394,6 +425,19 @@ class App(Frame):
 																	'team_bib_number': team_bib_number,
 																	'bib_number': team_member_bib_number,
 																	'control_card': team_member_control_card}
+					if team_member_leg not in team:
+						team[team_member_leg] = dict()
+					leg = team[team_member_leg]
+					leg[team_member_leg_order] = self.runners[team_member_control_card]
+
+			team = OrderedDict(natsorted(team.items()))
+			self.teams[team_bib_number] = team
+			# for leg in team.items():
+			# 	for subleg in leg:
+			#
+
+		self.team_names = OrderedDict(natsorted(self.team_names.items()))
+		self.teams = OrderedDict(natsorted(self.teams.items()))
 		self.start_list_file_time = stat(self.add_path(self.start_list_file)).st_mtime
 		# print('Teams: ' + str(self.team_names))
 		# print('Runners: ' + str(self.runners))
@@ -401,6 +445,45 @@ class App(Frame):
 
 		# print(self.intro_sound)
 		call(['mpg123', '-q', self.add_path(self.startlist_update_sound)])
+
+	def web_index(self):
+		return render_template('index.html')
+
+	def web_prewarning(self):
+		return render_template('prewarning.html')
+
+	def web_config(self):
+		config = ConfigParser()
+		config.read(self.add_path(self.config_file))
+		# config_dict = {s: dict(config.items(s)) for s in config.sections()}
+		return render_template('config.html', config=config)
+
+	def web_config_post(self):
+		config = ConfigParser()
+		config.read(self.add_path(self.config_file))
+		value_changed = False
+		for section in config.sections():
+			print(section)
+			for key, old_value in config.items(section):
+				name = "%s@%s" % (key, section)
+				value = request.form[name]
+				print("\t%s: %s" % (key, value))
+				if value != old_value:
+					print("\t\tchanged!")
+					config.set(section, key, value)
+					value_changed = True
+		if value_changed:
+			with open(self.add_path(self.config_file), 'w') as configfile:
+				config.write(configfile)
+		return render_template('config.html', config=config)
+
+	def web_startlist(self):
+		return render_template('startlist.html', teams=self.team_names)
+
+	def web_team(self, team_nr):
+		if team_nr not in self.teams:
+			return redirect('/team/')
+		return render_template('team.html', team=self.teams[team_nr], team_name=self.team_names[team_nr], team_nr=team_nr)
 
 	@staticmethod
 	def get_data(element, selector, ns):
@@ -447,6 +530,10 @@ def main():
 	# root.geometry("768x1200")
 	app = App(root)
 	root.bind('<Control-Key>', app.on_key_press)
+	webapp = Flask(__name__)
+	webapp_thread = FlaskThread(webapp, app)
+	webapp_thread.start()
+	app.set_webapp(webapp)
 	app.start()
 	root.mainloop()
 
