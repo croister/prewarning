@@ -1,0 +1,6848 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <StartList createTime="2015-09-05T20:26:37+02:00" creator="OLA 5.1.10-1" iofVersion="3.0" xmlns="http://www.orienteering.org/datastandard/3.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Event>
+   <Id>9185</Id>
+   <Name>DM, stafett, Blekinge</Name>
+   <StartTime>
+    <Date>2015-09-06</Date>
+   </StartTime>
+   <EndTime>
+    <Date>2015-09-06</Date>
+   </EndTime>
+   <Organiser>
+    <Id>364</Id>
+    <Name>Stigmännen Karlshamns OK</Name>
+    <ShortName>Stigmännen Karlshamns OK</ShortName>
+    <Country code="SWE"></Country>
+   </Organiser>
+  </Event>
+  <ClassStart>
+   <Class>
+    <Id>1</Id>
+    <Name>DH12</Name>
+   </Class>
+   <Course raceNumber="1">
+    <Length>2880</Length>
+   </Course>
+   <StartName>Start 1</StartName>
+   <TeamStart>
+    <EntryId>2926828</EntryId>
+    <Name>FK Vittus 1</Name>
+    <Organisation>
+     <Id>442</Id>
+     <Name>Friluftsklubben Vittus</Name>
+     <ShortName>FK Vittus</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>213</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:51+02:00">
+     <Person>
+      <Id>68807</Id>
+      <Name>
+       <Family>Törnqvist</Family>
+       <Given>Anton</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>442</Id>
+      <Name>Friluftsklubben Vittus</Name>
+      <ShortName>FK Vittus</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>213</BibNumber>
+      <StartTime>2015-09-06T10:05:00+02:00</StartTime>
+      <ControlCard>7474111</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:51+02:00">
+     <Person>
+      <Id>59703</Id>
+      <Name>
+       <Family>Kronmar</Family>
+       <Given>Lova</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>442</Id>
+      <Name>Friluftsklubben Vittus</Name>
+      <ShortName>FK Vittus</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>213</BibNumber>
+      <ControlCard>451398</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:51+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>2</LegOrder>
+      <BibNumber>213</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:51+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>3</LegOrder>
+      <BibNumber>213</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:51+02:00">
+     <Person>
+      <Id>96778</Id>
+      <Name>
+       <Family>Blomkvist</Family>
+       <Given>Max</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>442</Id>
+      <Name>Friluftsklubben Vittus</Name>
+      <ShortName>FK Vittus</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>213</BibNumber>
+      <ControlCard>1112700</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2926745</EntryId>
+    <Name>OK Dacke 1</Name>
+    <Organisation>
+     <Id>70</Id>
+     <Name>Orienteringsklubben Dacke</Name>
+     <ShortName>OK Dacke</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>214</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:42+02:00">
+     <Person>
+      <Id>55096</Id>
+      <Name>
+       <Family>Larsson</Family>
+       <Given>Hugo</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>70</Id>
+      <Name>Orienteringsklubben Dacke</Name>
+      <ShortName>OK Dacke</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>214</BibNumber>
+      <StartTime>2015-09-06T10:05:00+02:00</StartTime>
+      <ControlCard>9030219</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:42+02:00">
+     <Person>
+      <Id>92168</Id>
+      <Name>
+       <Family>Hammarström</Family>
+       <Given>Damien</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>70</Id>
+      <Name>Orienteringsklubben Dacke</Name>
+      <ShortName>OK Dacke</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>214</BibNumber>
+      <ControlCard>9040212</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:42+02:00">
+     <Person>
+      <Id>60919</Id>
+      <Name>
+       <Family>Larsson</Family>
+       <Given>Emma</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>70</Id>
+      <Name>Orienteringsklubben Dacke</Name>
+      <ShortName>OK Dacke</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>2</LegOrder>
+      <BibNumber>214</BibNumber>
+      <ControlCard>42007</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:42+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>3</LegOrder>
+      <BibNumber>214</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:42+02:00">
+     <Person>
+      <Id>97418</Id>
+      <Name>
+       <Family>Zettervall</Family>
+       <Given>Emma</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>70</Id>
+      <Name>Orienteringsklubben Dacke</Name>
+      <ShortName>OK Dacke</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>214</BibNumber>
+      <ControlCard>1050824</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2926025</EntryId>
+    <Name>OK Orion 1</Name>
+    <Organisation>
+     <Id>288</Id>
+     <Name>Orienteringsklubben Orion</Name>
+     <ShortName>OK Orion</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>215</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:23+02:00">
+     <Person>
+      <Id>28158</Id>
+      <Name>
+       <Family>Johansson</Family>
+       <Given>Leo</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>215</BibNumber>
+      <StartTime>2015-09-06T10:05:00+02:00</StartTime>
+      <ControlCard>1030116</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:23+02:00">
+     <Person>
+      <Id>28346</Id>
+      <Name>
+       <Family>Swartz</Family>
+       <Given>Nils</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>215</BibNumber>
+      <ControlCard>2058124</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:23+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>2</LegOrder>
+      <BibNumber>215</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:23+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>3</LegOrder>
+      <BibNumber>215</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:23+02:00">
+     <Person>
+      <Id>28415</Id>
+      <Name>
+       <Family>Bratt</Family>
+       <Given>Ella</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>215</BibNumber>
+      <ControlCard>555503</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2926026</EntryId>
+    <Name>OK Orion 2</Name>
+    <Organisation>
+     <Id>288</Id>
+     <Name>Orienteringsklubben Orion</Name>
+     <ShortName>OK Orion</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>216</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:24+02:00">
+     <Person>
+      <Id>23525</Id>
+      <Name>
+       <Family>Håkansson</Family>
+       <Given>Filip</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>216</BibNumber>
+      <StartTime>2015-09-06T10:05:00+02:00</StartTime>
+      <ControlCard>820380</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:24+02:00">
+     <Person>
+      <Id>24939</Id>
+      <Name>
+       <Family>Engström</Family>
+       <Given>Vilma</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>216</BibNumber>
+      <ControlCard>2057315</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:24+02:00">
+     <Person>
+      <Id>89952</Id>
+      <Name>
+       <Family>Sundelin</Family>
+       <Given>Nanna</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>2</LegOrder>
+      <BibNumber>216</BibNumber>
+      <ControlCard>1401388</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:24+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>3</LegOrder>
+      <BibNumber>216</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:24+02:00">
+     <Person>
+      <Id>28389</Id>
+      <Name>
+       <Family>Larsson</Family>
+       <Given>Melker</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>216</BibNumber>
+      <ControlCard>1041209</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2926027</EntryId>
+    <Name>OK Orion 3</Name>
+    <Organisation>
+     <Id>288</Id>
+     <Name>Orienteringsklubben Orion</Name>
+     <ShortName>OK Orion</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>217</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:26+02:00">
+     <Person>
+      <Id>28416</Id>
+      <Name>
+       <Family>Bratt</Family>
+       <Given>Axel</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>217</BibNumber>
+      <StartTime>2015-09-06T10:05:00+02:00</StartTime>
+      <ControlCard>993541</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:26+02:00">
+     <Person>
+      <Id>24025</Id>
+      <Name>
+       <Family>Berlin</Family>
+       <Given>Agnes</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>217</BibNumber>
+      <ControlCard>449545</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:26+02:00">
+     <Person>
+      <Id>28180</Id>
+      <Name>
+       <Family>Håkansson</Family>
+       <Given>Oliver</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>2</LegOrder>
+      <BibNumber>217</BibNumber>
+      <ControlCard>18522</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:26+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>3</LegOrder>
+      <BibNumber>217</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:26+02:00">
+     <Person>
+      <Id>28345</Id>
+      <Name>
+       <Family>Swartz</Family>
+       <Given>Lisa</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>217</BibNumber>
+      <ControlCard>2058218</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2925973</EntryId>
+    <Name>OK Skogsfalken 1</Name>
+    <Organisation>
+     <Id>339</Id>
+     <Name>OK Skogsfalken</Name>
+     <ShortName>OK Skogsfalken</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>218</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:21+02:00">
+     <Person>
+      <Id>57216</Id>
+      <Name>
+       <Family>Albinsson</Family>
+       <Given>Emil</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>339</Id>
+      <Name>OK Skogsfalken</Name>
+      <ShortName>OK Skogsfalken</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>218</BibNumber>
+      <StartTime>2015-09-06T10:05:00+02:00</StartTime>
+      <ControlCard>420033</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:21+02:00">
+     <Person>
+      <Id>18696</Id>
+      <Name>
+       <Family>Persson</Family>
+       <Given>Max</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>339</Id>
+      <Name>OK Skogsfalken</Name>
+      <ShortName>OK Skogsfalken</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>218</BibNumber>
+      <ControlCard>530716</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:21+02:00">
+     <Person>
+      <Id>18696</Id>
+      <Name>
+       <Family>Persson</Family>
+       <Given>Max</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>339</Id>
+      <Name>OK Skogsfalken</Name>
+      <ShortName>OK Skogsfalken</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>2</LegOrder>
+      <BibNumber>218</BibNumber>
+      <ControlCard>530716</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:21+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>3</LegOrder>
+      <BibNumber>218</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:21+02:00">
+     <Person>
+      <Id>28001</Id>
+      <Name>
+       <Family>Söderberg</Family>
+       <Given>Ella</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>339</Id>
+      <Name>OK Skogsfalken</Name>
+      <ShortName>OK Skogsfalken</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>218</BibNumber>
+      <ControlCard>631001</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2925974</EntryId>
+    <Name>OK Skogsfalken 2</Name>
+    <Organisation>
+     <Id>339</Id>
+     <Name>OK Skogsfalken</Name>
+     <ShortName>OK Skogsfalken</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>219</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:22+02:00">
+     <Person>
+      <Id>91921</Id>
+      <Name>
+       <Family>Viktorsson</Family>
+       <Given>Emil</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>339</Id>
+      <Name>OK Skogsfalken</Name>
+      <ShortName>OK Skogsfalken</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>219</BibNumber>
+      <StartTime>2015-09-06T10:05:00+02:00</StartTime>
+      <ControlCard>2057332</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:22+02:00">
+     <Person>
+      <Id>91922</Id>
+      <Name>
+       <Family>Viktorsson</Family>
+       <Given>Anna</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>339</Id>
+      <Name>OK Skogsfalken</Name>
+      <ShortName>OK Skogsfalken</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>219</BibNumber>
+      <ControlCard>12286</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:22+02:00">
+     <Person>
+      <Id>105498</Id>
+      <Name>
+       <Family>Josefsson</Family>
+       <Given>Victor</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>339</Id>
+      <Name>OK Skogsfalken</Name>
+      <ShortName>OK Skogsfalken</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>2</LegOrder>
+      <BibNumber>219</BibNumber>
+      <ControlCard>10201</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:22+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>3</LegOrder>
+      <BibNumber>219</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:22+02:00">
+     <Person>
+      <Id>18118</Id>
+      <Name>
+       <Family>Ljungberg</Family>
+       <Given>Elvira</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>339</Id>
+      <Name>OK Skogsfalken</Name>
+      <ShortName>OK Skogsfalken</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>219</BibNumber>
+      <ControlCard>417662</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2927700</EntryId>
+    <Name>OK Vilse 87 1</Name>
+    <Organisation>
+     <Id>551</Id>
+     <Name>Orienteringsklubben Vilse 87</Name>
+     <ShortName>OK Vilse 87</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>220</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:55+02:00">
+     <Person>
+      <Id>17128</Id>
+      <Name>
+       <Family>Åman</Family>
+       <Given>Ina</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>551</Id>
+      <Name>Orienteringsklubben Vilse 87</Name>
+      <ShortName>OK Vilse 87</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>220</BibNumber>
+      <StartTime>2015-09-06T10:05:00+02:00</StartTime>
+      <ControlCard>500971</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:55+02:00">
+     <Person>
+      <Id>23715</Id>
+      <Name>
+       <Family>Jönsson</Family>
+       <Given>Arvid</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>551</Id>
+      <Name>Orienteringsklubben Vilse 87</Name>
+      <ShortName>OK Vilse 87</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>220</BibNumber>
+      <ControlCard>500972</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:55+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>2</LegOrder>
+      <BibNumber>220</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:55+02:00">
+     <Person>
+      <Id>125221</Id>
+      <Name>
+       <Family>Olsson</Family>
+       <Given>Alexander</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>551</Id>
+      <Name>Orienteringsklubben Vilse 87</Name>
+      <ShortName>OK Vilse 87</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>3</LegOrder>
+      <BibNumber>220</BibNumber>
+      <ControlCard>205276</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:55+02:00">
+     <Person>
+      <Id>54701</Id>
+      <Name>
+       <Family>Suwan</Family>
+       <Given>Vilmalee</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>551</Id>
+      <Name>Orienteringsklubben Vilse 87</Name>
+      <ShortName>OK Vilse 87</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>220</BibNumber>
+      <ControlCard>500973</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2927701</EntryId>
+    <Name>OK Vilse 87 2</Name>
+    <Organisation>
+     <Id>551</Id>
+     <Name>Orienteringsklubben Vilse 87</Name>
+     <ShortName>OK Vilse 87</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>221</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:56+02:00">
+     <Person>
+      <Id>23713</Id>
+      <Name>
+       <Family>Jönsson</Family>
+       <Given>Frida</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>551</Id>
+      <Name>Orienteringsklubben Vilse 87</Name>
+      <ShortName>OK Vilse 87</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>221</BibNumber>
+      <StartTime>2015-09-06T10:05:00+02:00</StartTime>
+      <ControlCard>205271</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:56+02:00">
+     <Person>
+      <Id>115082</Id>
+      <Name>
+       <Family>Mulari</Family>
+       <Given>Noah</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>551</Id>
+      <Name>Orienteringsklubben Vilse 87</Name>
+      <ShortName>OK Vilse 87</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>221</BibNumber>
+      <ControlCard>205272</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:56+02:00">
+     <Person>
+      <Id>82324</Id>
+      <Name>
+       <Family>Ericson</Family>
+       <Given>Viktor</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>551</Id>
+      <Name>Orienteringsklubben Vilse 87</Name>
+      <ShortName>OK Vilse 87</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>2</LegOrder>
+      <BibNumber>221</BibNumber>
+      <ControlCard>205274</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:56+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>3</LegOrder>
+      <BibNumber>221</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:56+02:00">
+     <Person>
+      <Id>82323</Id>
+      <Name>
+       <Family>Andrae</Family>
+       <Given>Josefina</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>551</Id>
+      <Name>Orienteringsklubben Vilse 87</Name>
+      <ShortName>OK Vilse 87</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>221</BibNumber>
+      <ControlCard>205273</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2924105</EntryId>
+    <Name>Ronneby OK 1</Name>
+    <Organisation>
+     <Id>310</Id>
+     <Name>Ronneby Orienteringsklubb</Name>
+     <ShortName>Ronneby OK</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>222</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:06:31+02:00">
+     <Person>
+      <Id>27866</Id>
+      <Name>
+       <Family>Lilja</Family>
+       <Given>Ture</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>222</BibNumber>
+      <StartTime>2015-09-06T10:05:00+02:00</StartTime>
+      <ControlCard>1034375</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:06:31+02:00">
+     <Person>
+      <Id>24558</Id>
+      <Name>
+       <Family>Thorén</Family>
+       <Given>Embla</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>222</BibNumber>
+      <ControlCard>7502082</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:06:31+02:00">
+     <Person>
+      <Id>31533</Id>
+      <Name>
+       <Family>Ring</Family>
+       <Given>Emil</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>2</LegOrder>
+      <BibNumber>222</BibNumber>
+      <ControlCard>302348</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:06:31+02:00">
+     <Person>
+      <Id>131829</Id>
+      <Name>
+       <Family>Wahlberg</Family>
+       <Given>Melvin</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>3</LegOrder>
+      <BibNumber>222</BibNumber>
+      <ControlCard>933920</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:06:31+02:00">
+     <Person>
+      <Id>73559</Id>
+      <Name>
+       <Family>Vernström</Family>
+       <Given>Linus</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>222</BibNumber>
+      <ControlCard>9040312</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2924106</EntryId>
+    <Name>Ronneby OK 2</Name>
+    <Organisation>
+     <Id>310</Id>
+     <Name>Ronneby Orienteringsklubb</Name>
+     <ShortName>Ronneby OK</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>223</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:06:32+02:00">
+     <Person>
+      <Id>50436</Id>
+      <Name>
+       <Family>Gliveson</Family>
+       <Given>Carl</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>223</BibNumber>
+      <StartTime>2015-09-06T10:05:00+02:00</StartTime>
+      <ControlCard>539907</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:06:32+02:00">
+     <Person>
+      <Id>28486</Id>
+      <Name>
+       <Family>Eriksson</Family>
+       <Given>Arvid</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>223</BibNumber>
+      <ControlCard>9070309</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:06:32+02:00">
+     <Person>
+      <Id>73560</Id>
+      <Name>
+       <Family>Vernström</Family>
+       <Given>Wille</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>2</LegOrder>
+      <BibNumber>223</BibNumber>
+      <ControlCard>1520329</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:06:32+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>3</LegOrder>
+      <BibNumber>223</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:06:32+02:00">
+     <Person>
+      <Id>28485</Id>
+      <Name>
+       <Family>Eriksson</Family>
+       <Given>Oskar</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>223</BibNumber>
+      <ControlCard>9005102</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2928526</EntryId>
+    <Name>Stigmännen Karlshamns OK 1</Name>
+    <Organisation>
+     <Id>364</Id>
+     <Name>Stigmännen Karlshamns OK</Name>
+     <ShortName>Stigmännen Karlshamns OK</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>224</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:08:02+02:00">
+     <Person>
+      <Id>112581</Id>
+      <Name>
+       <Family>Norlin</Family>
+       <Given>Emma</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>364</Id>
+      <Name>Stigmännen Karlshamns OK</Name>
+      <ShortName>Stigmännen Karlshamns OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>224</BibNumber>
+      <StartTime>2015-09-06T10:05:00+02:00</StartTime>
+      <ControlCard>9520329</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:08:02+02:00">
+     <Person>
+      <Id>125042</Id>
+      <Name>
+       <Family>Karlsson</Family>
+       <Given>Elin</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>364</Id>
+      <Name>Stigmännen Karlshamns OK</Name>
+      <ShortName>Stigmännen Karlshamns OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>224</BibNumber>
+      <ControlCard>7520329</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:08:02+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>2</LegOrder>
+      <BibNumber>224</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:08:02+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>3</LegOrder>
+      <BibNumber>224</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:08:02+02:00">
+     <Person>
+      <Id>120895</Id>
+      <Name>
+       <Family>Waldschmidt</Family>
+       <Given>Alexia</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>364</Id>
+      <Name>Stigmännen Karlshamns OK</Name>
+      <ShortName>Stigmännen Karlshamns OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>224</BibNumber>
+      <ControlCard>354820</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId></EntryId>
+    <Name>vacant</Name>
+    <Organisation>
+     <Name>Vakant</Name>
+     <ShortName>Vakant</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>225</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-03T21:58:34+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>225</BibNumber>
+      <StartTime>2015-09-06T10:05:00+02:00</StartTime>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-03T21:58:34+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>225</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>2</LegOrder>
+      <BibNumber>225</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>3</LegOrder>
+      <BibNumber>225</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-03T21:58:34+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>225</BibNumber>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId></EntryId>
+    <Name>vacant</Name>
+    <Organisation>
+     <Name>Vakant</Name>
+     <ShortName>Vakant</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>226</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>226</BibNumber>
+      <StartTime>2015-09-06T10:05:00+02:00</StartTime>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>226</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>2</LegOrder>
+      <BibNumber>226</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>3</LegOrder>
+      <BibNumber>226</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>226</BibNumber>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId></EntryId>
+    <Name>vacant</Name>
+    <Organisation>
+     <Name>Vakant</Name>
+     <ShortName>Vakant</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>227</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>227</BibNumber>
+      <StartTime>2015-09-06T10:05:00+02:00</StartTime>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>227</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>2</LegOrder>
+      <BibNumber>227</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>3</LegOrder>
+      <BibNumber>227</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>227</BibNumber>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+  </ClassStart>
+  <ClassStart>
+   <Class>
+    <Id>2</Id>
+    <Name>D16</Name>
+   </Class>
+   <Course raceNumber="1">
+    <Length>3600</Length>
+   </Course>
+   <StartName>Start 1</StartName>
+   <TeamStart>
+    <EntryId>2926028</EntryId>
+    <Name>OK Orion 1</Name>
+    <Organisation>
+     <Id>288</Id>
+     <Name>Orienteringsklubben Orion</Name>
+     <ShortName>OK Orion</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>209</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:27+02:00">
+     <Person>
+      <Id>19999</Id>
+      <Name>
+       <Family>Wahlbom</Family>
+       <Given>Ellen</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>209</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>632800</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:27+02:00">
+     <Person>
+      <Id>27693</Id>
+      <Name>
+       <Family>Andersson</Family>
+       <Given>Klara</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>209</BibNumber>
+      <ControlCard>1060302</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:27+02:00">
+     <Person>
+      <Id>27692</Id>
+      <Name>
+       <Family>Andersson</Family>
+       <Given>Kajsa</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>209</BibNumber>
+      <ControlCard>1030600</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2926029</EntryId>
+    <Name>OK Orion 2</Name>
+    <Organisation>
+     <Id>288</Id>
+     <Name>Orienteringsklubben Orion</Name>
+     <ShortName>OK Orion</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>210</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:28+02:00">
+     <Person>
+      <Id>63776</Id>
+      <Name>
+       <Family>Nilsson</Family>
+       <Given>Nellie</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>210</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>450839</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:28+02:00">
+     <Person>
+      <Id>63778</Id>
+      <Name>
+       <Family>Ramberg</Family>
+       <Given>Elin</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>210</BibNumber>
+      <ControlCard>446003</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:28+02:00">
+     <Person>
+      <Id>54079</Id>
+      <Name>
+       <Family>Dagsberg</Family>
+       <Given>Linnea</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>210</BibNumber>
+      <ControlCard>443467</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2924107</EntryId>
+    <Name>Ronneby OK 1</Name>
+    <Organisation>
+     <Id>310</Id>
+     <Name>Ronneby Orienteringsklubb</Name>
+     <ShortName>Ronneby OK</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>211</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:03+02:00">
+     <Person>
+      <Id>14398</Id>
+      <Name>
+       <Family>Johannesson</Family>
+       <Given>Hanna</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>211</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>9812368</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:03+02:00">
+     <Person>
+      <Id>24183</Id>
+      <Name>
+       <Family>Graad</Family>
+       <Given>Matilda</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>211</BibNumber>
+      <ControlCard>41978</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:03+02:00">
+     <Person>
+      <Id>30166</Id>
+      <Name>
+       <Family>Ring</Family>
+       <Given>Hanna</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>211</BibNumber>
+      <ControlCard>427822</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId></EntryId>
+    <Name>vacant</Name>
+    <Organisation>
+     <Name>Vakant</Name>
+     <ShortName>Vakant</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>212</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>212</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>212</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>212</BibNumber>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+  </ClassStart>
+  <ClassStart>
+   <Class>
+    <Id>3</Id>
+    <Name>H16</Name>
+   </Class>
+   <Course raceNumber="1">
+    <Length>3950</Length>
+   </Course>
+   <StartName>Start 1</StartName>
+   <TeamStart>
+    <EntryId>2926829</EntryId>
+    <Name>FK Vittus 1</Name>
+    <Organisation>
+     <Id>442</Id>
+     <Name>Friluftsklubben Vittus</Name>
+     <ShortName>FK Vittus</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>200</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:52+02:00">
+     <Person>
+      <Id>27664</Id>
+      <Name>
+       <Family>Kronmar</Family>
+       <Given>Arvid</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>442</Id>
+      <Name>Friluftsklubben Vittus</Name>
+      <ShortName>FK Vittus</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>200</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>730224</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:52+02:00">
+     <Person>
+      <Id>25058</Id>
+      <Name>
+       <Family>Hansson</Family>
+       <Given>Erik</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>442</Id>
+      <Name>Friluftsklubben Vittus</Name>
+      <ShortName>FK Vittus</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>200</BibNumber>
+      <ControlCard>444777</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:52+02:00">
+     <Person>
+      <Id>114590</Id>
+      <Name>
+       <Family>Omelchenko</Family>
+       <Given>Maxim</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>442</Id>
+      <Name>Friluftsklubben Vittus</Name>
+      <ShortName>FK Vittus</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>200</BibNumber>
+      <ControlCard>7020313</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2926746</EntryId>
+    <Name>OK Dacke 1</Name>
+    <Organisation>
+     <Id>70</Id>
+     <Name>Orienteringsklubben Dacke</Name>
+     <ShortName>OK Dacke</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>201</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:43+02:00">
+     <Person>
+      <Id>14330</Id>
+      <Name>
+       <Family>Johansson</Family>
+       <Given>Oscar</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>70</Id>
+      <Name>Orienteringsklubben Dacke</Name>
+      <ShortName>OK Dacke</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>201</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>990331</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:43+02:00">
+     <Person>
+      <Id>21053</Id>
+      <Name>
+       <Family>Pettersson</Family>
+       <Given>Emil</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>70</Id>
+      <Name>Orienteringsklubben Dacke</Name>
+      <ShortName>OK Dacke</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>201</BibNumber>
+      <ControlCard>990824</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:43+02:00">
+     <Person>
+      <Id>26826</Id>
+      <Name>
+       <Family>Jonsson</Family>
+       <Given>Andreas</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>70</Id>
+      <Name>Orienteringsklubben Dacke</Name>
+      <ShortName>OK Dacke</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>201</BibNumber>
+      <ControlCard>990805</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2926747</EntryId>
+    <Name>OK Dacke 2</Name>
+    <Organisation>
+     <Id>70</Id>
+     <Name>Orienteringsklubben Dacke</Name>
+     <ShortName>OK Dacke</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>202</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:44+02:00">
+     <Person>
+      <Id>33076</Id>
+      <Name>
+       <Family>Johansson</Family>
+       <Given>Lovisa</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>70</Id>
+      <Name>Orienteringsklubben Dacke</Name>
+      <ShortName>OK Dacke</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>202</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>7010228</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:44+02:00">
+     <Person>
+      <Id>33195</Id>
+      <Name>
+       <Family>Wilhelmsson</Family>
+       <Given>Jakob</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>70</Id>
+      <Name>Orienteringsklubben Dacke</Name>
+      <ShortName>OK Dacke</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>202</BibNumber>
+      <ControlCard>7071723</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:44+02:00">
+     <Person>
+      <Id>28868</Id>
+      <Name>
+       <Family>Wilhelmsson</Family>
+       <Given>Johanna</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>70</Id>
+      <Name>Orienteringsklubben Dacke</Name>
+      <ShortName>OK Dacke</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>202</BibNumber>
+      <ControlCard>808182</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2926451</EntryId>
+    <Name>OK Skogsfalken 1</Name>
+    <Organisation>
+     <Id>339</Id>
+     <Name>OK Skogsfalken</Name>
+     <ShortName>OK Skogsfalken</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>203</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:41+02:00">
+     <Person>
+      <Id>32047</Id>
+      <Name>
+       <Family>Emilsson</Family>
+       <Given>Elin</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>339</Id>
+      <Name>OK Skogsfalken</Name>
+      <ShortName>OK Skogsfalken</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>203</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>620202</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:41+02:00">
+     <Person>
+      <Id>57316</Id>
+      <Name>
+       <Family>Danielsson</Family>
+       <Given>Tova</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>339</Id>
+      <Name>OK Skogsfalken</Name>
+      <ShortName>OK Skogsfalken</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>203</BibNumber>
+      <ControlCard>449632</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:41+02:00">
+     <Person>
+      <Id>57214</Id>
+      <Name>
+       <Family>Albinsson</Family>
+       <Given>Herman</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>339</Id>
+      <Name>OK Skogsfalken</Name>
+      <ShortName>OK Skogsfalken</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>203</BibNumber>
+      <ControlCard>420034</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2927702</EntryId>
+    <Name>OK Vilse 87 1</Name>
+    <Organisation>
+     <Id>551</Id>
+     <Name>Orienteringsklubben Vilse 87</Name>
+     <ShortName>OK Vilse 87</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>204</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:57+02:00">
+     <Person>
+      <Id>17126</Id>
+      <Name>
+       <Family>Åman</Family>
+       <Given>Gustav</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>551</Id>
+      <Name>Orienteringsklubben Vilse 87</Name>
+      <ShortName>OK Vilse 87</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>204</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>500974</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:57+02:00">
+     <Person>
+      <Id>23716</Id>
+      <Name>
+       <Family>Jönsson</Family>
+       <Given>Hjalmar</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>551</Id>
+      <Name>Orienteringsklubben Vilse 87</Name>
+      <ShortName>OK Vilse 87</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>204</BibNumber>
+      <ControlCard>500975</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:57+02:00">
+     <Person>
+      <Id>16290</Id>
+      <Name>
+       <Family>Karlsson</Family>
+       <Given>Linn</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>551</Id>
+      <Name>Orienteringsklubben Vilse 87</Name>
+      <ShortName>OK Vilse 87</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>204</BibNumber>
+      <ControlCard>500976</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2924108</EntryId>
+    <Name>Ronneby OK 1</Name>
+    <Organisation>
+     <Id>310</Id>
+     <Name>Ronneby Orienteringsklubb</Name>
+     <ShortName>Ronneby OK</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>205</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:05+02:00">
+     <Person>
+      <Id>50380</Id>
+      <Name>
+       <Family>Gliveson</Family>
+       <Given>Anton</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>205</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>539906</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:05+02:00">
+     <Person>
+      <Id>29224</Id>
+      <Name>
+       <Family>Blomster</Family>
+       <Given>Arvid</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>205</BibNumber>
+      <ControlCard>2050851</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:05+02:00">
+     <Person>
+      <Id>27860</Id>
+      <Name>
+       <Family>Blomster</Family>
+       <Given>Mathias</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>205</BibNumber>
+      <ControlCard>990629</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2924109</EntryId>
+    <Name>Ronneby OK 2</Name>
+    <Organisation>
+     <Id>310</Id>
+     <Name>Ronneby Orienteringsklubb</Name>
+     <ShortName>Ronneby OK</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>206</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:06+02:00">
+     <Person>
+      <Id>14339</Id>
+      <Name>
+       <Family>Giselsson</Family>
+       <Given>Simon</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>206</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>9010821</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:06+02:00">
+     <Person>
+      <Id>52367</Id>
+      <Name>
+       <Family>Håkansson</Family>
+       <Given>Samuel</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>206</BibNumber>
+      <ControlCard>800301</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:06+02:00">
+     <Person>
+      <Id>37087</Id>
+      <Name>
+       <Family>Thorén</Family>
+       <Given>Aron</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>206</BibNumber>
+      <ControlCard>1010529</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId></EntryId>
+    <Name>vacant</Name>
+    <Organisation>
+     <Name>Vakant</Name>
+     <ShortName>Vakant</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>207</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>207</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>207</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>207</BibNumber>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId></EntryId>
+    <Name>vacant</Name>
+    <Organisation>
+     <Name>Vakant</Name>
+     <ShortName>Vakant</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>208</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>208</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>208</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>208</BibNumber>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+  </ClassStart>
+  <ClassStart>
+   <Class>
+    <Id>4</Id>
+    <Name>D20</Name>
+   </Class>
+   <Course raceNumber="1">
+    <Length>5280</Length>
+   </Course>
+   <StartName>Start 1</StartName>
+   <TeamStart>
+    <EntryId>2927178</EntryId>
+    <Name>OK Skogsfalken 1</Name>
+    <Organisation>
+     <Id>339</Id>
+     <Name>OK Skogsfalken</Name>
+     <ShortName>OK Skogsfalken</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>48</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:53+02:00">
+     <Person>
+      <Id>16892</Id>
+      <Name>
+       <Family>Hed</Family>
+       <Given>Julia</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>339</Id>
+      <Name>OK Skogsfalken</Name>
+      <ShortName>OK Skogsfalken</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>48</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>971211</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:53+02:00">
+     <Person>
+      <Id>14349</Id>
+      <Name>
+       <Family>Persson</Family>
+       <Given>Vilma</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>339</Id>
+      <Name>OK Skogsfalken</Name>
+      <ShortName>OK Skogsfalken</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>48</BibNumber>
+      <ControlCard>980813</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:53+02:00">
+     <Person>
+      <Id>21677</Id>
+      <Name>
+       <Family>Hedberg</Family>
+       <Given>Pim</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>339</Id>
+      <Name>OK Skogsfalken</Name>
+      <ShortName>OK Skogsfalken</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>48</BibNumber>
+      <ControlCard>960416</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId></EntryId>
+    <Name>vacant</Name>
+    <Organisation>
+     <Name>Vakant</Name>
+     <ShortName>Vakant</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>49</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>49</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>49</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>49</BibNumber>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+  </ClassStart>
+  <ClassStart>
+   <Class>
+    <Id>5</Id>
+    <Name>H20</Name>
+   </Class>
+   <Course raceNumber="1">
+    <Length>7570</Length>
+   </Course>
+   <StartName>Start 1</StartName>
+   <TeamStart>
+    <EntryId></EntryId>
+    <Name>vacant</Name>
+    <Organisation>
+     <Name>Vakant</Name>
+     <ShortName>Vakant</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>10</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-03T21:45:58+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>10</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-03T21:45:58+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>10</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-03T21:45:58+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>10</BibNumber>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2925790</EntryId>
+    <Name>OK Orion 1</Name>
+    <Organisation>
+     <Id>288</Id>
+     <Name>Orienteringsklubben Orion</Name>
+     <ShortName>OK Orion</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>7</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:16+02:00">
+     <Person>
+      <Id>13071</Id>
+      <Name>
+       <Family>Persson</Family>
+       <Given>Philip</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>7</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>950914</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:16+02:00">
+     <Person>
+      <Id>125809</Id>
+      <Name>
+       <Family>Øbro</Family>
+       <Given>Emil</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>7</BibNumber>
+      <ControlCard>864008</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:16+02:00">
+     <Person>
+      <Id>12838</Id>
+      <Name>
+       <Family>Andersson</Family>
+       <Given>Erik</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>7</BibNumber>
+      <ControlCard>950120</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2930059</EntryId>
+    <Name>OK Skogsfalken 1</Name>
+    <Organisation>
+     <Id>339</Id>
+     <Name>OK Skogsfalken</Name>
+     <ShortName>OK Skogsfalken</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>8</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:08:10+02:00">
+     <Person>
+      <Id>26593</Id>
+      <Name>
+       <Family>Wennermark</Family>
+       <Given>Johan</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>339</Id>
+      <Name>OK Skogsfalken</Name>
+      <ShortName>OK Skogsfalken</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>8</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>970121</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:08:10+02:00">
+     <Person>
+      <Id>18187</Id>
+      <Name>
+       <Family>Hammarskiöld</Family>
+       <Given>Jonas</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>339</Id>
+      <Name>OK Skogsfalken</Name>
+      <ShortName>OK Skogsfalken</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>8</BibNumber>
+      <ControlCard>970315</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:08:10+02:00">
+     <Person>
+      <Id>26397</Id>
+      <Name>
+       <Family>Smedberg</Family>
+       <Given>Edvin</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>339</Id>
+      <Name>OK Skogsfalken</Name>
+      <ShortName>OK Skogsfalken</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>8</BibNumber>
+      <ControlCard>960505</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2924110</EntryId>
+    <Name>Ronneby OK 1</Name>
+    <Organisation>
+     <Id>310</Id>
+     <Name>Ronneby Orienteringsklubb</Name>
+     <ShortName>Ronneby OK</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>9</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:08+02:00">
+     <Person>
+      <Id>24182</Id>
+      <Name>
+       <Family>Graad</Family>
+       <Given>Alexander</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>9</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>9812310</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:08+02:00">
+     <Person>
+      <Id>16496</Id>
+      <Name>
+       <Family>Bökman</Family>
+       <Given>Lukas</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>9</BibNumber>
+      <ControlCard>961225</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:08+02:00">
+     <Person>
+      <Id>14397</Id>
+      <Name>
+       <Family>Johannesson</Family>
+       <Given>Henrik</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>9</BibNumber>
+      <ControlCard>9980705</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+  </ClassStart>
+  <ClassStart>
+   <Class>
+    <Id>6</Id>
+    <Name>D21</Name>
+   </Class>
+   <Course raceNumber="1">
+    <Length>5170</Length>
+   </Course>
+   <StartName>Start 1</StartName>
+   <TeamStart>
+    <EntryId>2926748</EntryId>
+    <Name>OK Dacke 1</Name>
+    <Organisation>
+     <Id>70</Id>
+     <Name>Orienteringsklubben Dacke</Name>
+     <ShortName>OK Dacke</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>45</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:45+02:00">
+     <Person>
+      <Id>97423</Id>
+      <Name>
+       <Family>Gummesson</Family>
+       <Given>Helena</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>70</Id>
+      <Name>Orienteringsklubben Dacke</Name>
+      <ShortName>OK Dacke</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>45</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>1100373</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:45+02:00">
+     <Person>
+      <Id>20870</Id>
+      <Name>
+       <Family>Johansson</Family>
+       <Given>Amanda</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>70</Id>
+      <Name>Orienteringsklubben Dacke</Name>
+      <ShortName>OK Dacke</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>45</BibNumber>
+      <ControlCard>960701</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:45+02:00">
+     <Person>
+      <Id>1404</Id>
+      <Name>
+       <Family>Larsson</Family>
+       <Given>Linda</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>70</Id>
+      <Name>Orienteringsklubben Dacke</Name>
+      <ShortName>OK Dacke</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>45</BibNumber>
+      <ControlCard>16687</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2925791</EntryId>
+    <Name>OK Orion 1</Name>
+    <Organisation>
+     <Id>288</Id>
+     <Name>Orienteringsklubben Orion</Name>
+     <ShortName>OK Orion</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>46</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:17+02:00">
+     <Person>
+      <Id>1340</Id>
+      <Name>
+       <Family>Bratt</Family>
+       <Given>Cecilia</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>46</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>18545</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:17+02:00">
+     <Person>
+      <Id>27898</Id>
+      <Name>
+       <Family>Svensson</Family>
+       <Given>Malin</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>46</BibNumber>
+      <ControlCard>740527</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:17+02:00">
+     <Person>
+      <Id>9950</Id>
+      <Name>
+       <Family>Johansson</Family>
+       <Given>Tilda</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>46</BibNumber>
+      <ControlCard>960409</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId></EntryId>
+    <Name>vacant</Name>
+    <Organisation>
+     <Name>Vakant</Name>
+     <ShortName>Vakant</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>47</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>47</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>47</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>47</BibNumber>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+  </ClassStart>
+  <ClassStart>
+   <Class>
+    <Id>7</Id>
+    <Name>H21</Name>
+   </Class>
+   <Course raceNumber="1">
+    <Length>7590</Length>
+   </Course>
+   <StartName>Start 1</StartName>
+   <TeamStart>
+    <EntryId>2925792</EntryId>
+    <Name>OK Orion 1</Name>
+    <Organisation>
+     <Id>288</Id>
+     <Name>Orienteringsklubben Orion</Name>
+     <ShortName>OK Orion</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>1</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:18+02:00">
+     <Person>
+      <Id>9991</Id>
+      <Name>
+       <Family>Petersson</Family>
+       <Given>Pontus</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>1</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>920215</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:18+02:00">
+     <Person>
+      <Id>41141</Id>
+      <Name>
+       <Family>Bernaciak</Family>
+       <Given>Aleksander</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>1</BibNumber>
+      <ControlCard>504030</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:18+02:00">
+     <Person>
+      <Id>9944</Id>
+      <Name>
+       <Family>Johansson</Family>
+       <Given>Anton</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>1</BibNumber>
+      <ControlCard>940425</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2925793</EntryId>
+    <Name>OK Orion 2</Name>
+    <Organisation>
+     <Id>288</Id>
+     <Name>Orienteringsklubben Orion</Name>
+     <ShortName>OK Orion</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>2</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:20+02:00">
+     <Person>
+      <Id>27807</Id>
+      <Name>
+       <Family>Gunnarsson</Family>
+       <Given>Daniel</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>2</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>840623</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:20+02:00">
+     <Person>
+      <Id>40722</Id>
+      <Name>
+       <Family>Omelchenko</Family>
+       <Given>Yuri</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>2</BibNumber>
+      <ControlCard>710906</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:20+02:00">
+     <Person>
+      <Id>4624</Id>
+      <Name>
+       <Family>Sandgren</Family>
+       <Given>Olof</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>2</BibNumber>
+      <ControlCard>980202</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2930060</EntryId>
+    <Name>OK Skogsfalken 1</Name>
+    <Organisation>
+     <Id>339</Id>
+     <Name>OK Skogsfalken</Name>
+     <ShortName>OK Skogsfalken</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>3</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:08:11+02:00">
+     <Person>
+      <Id>25196</Id>
+      <Name>
+       <Family>Bergman</Family>
+       <Given>Isak</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>339</Id>
+      <Name>OK Skogsfalken</Name>
+      <ShortName>OK Skogsfalken</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>3</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>820900</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:08:11+02:00">
+     <Person>
+      <Id>39504</Id>
+      <Name>
+       <Family>Wiberg</Family>
+       <Given>Anton</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>339</Id>
+      <Name>OK Skogsfalken</Name>
+      <ShortName>OK Skogsfalken</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>3</BibNumber>
+      <ControlCard>910726</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:08:11+02:00">
+     <Person>
+      <Id>5177</Id>
+      <Name>
+       <Family>Gyberg</Family>
+       <Given>Johan</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>339</Id>
+      <Name>OK Skogsfalken</Name>
+      <ShortName>OK Skogsfalken</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>3</BibNumber>
+      <ControlCard>680518</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2929814</EntryId>
+    <Name>OK Vilse 87 1</Name>
+    <Organisation>
+     <Id>551</Id>
+     <Name>Orienteringsklubben Vilse 87</Name>
+     <ShortName>OK Vilse 87</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>4</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:08:03+02:00">
+     <Person>
+      <Id>6389</Id>
+      <Name>
+       <Family>Thörn</Family>
+       <Given>Niklas</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>551</Id>
+      <Name>Orienteringsklubben Vilse 87</Name>
+      <ShortName>OK Vilse 87</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>4</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>9201031</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:08:03+02:00">
+     <Person>
+      <Id>6388</Id>
+      <Name>
+       <Family>Ingvarsson</Family>
+       <Given>Emil</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>551</Id>
+      <Name>Orienteringsklubben Vilse 87</Name>
+      <ShortName>OK Vilse 87</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>4</BibNumber>
+      <ControlCard>9201032</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:08:03+02:00">
+     <Person>
+      <Id>6401</Id>
+      <Name>
+       <Family>Tjernlund</Family>
+       <Given>Niclas</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>551</Id>
+      <Name>Orienteringsklubben Vilse 87</Name>
+      <ShortName>OK Vilse 87</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>4</BibNumber>
+      <ControlCard>9201033</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId></EntryId>
+    <Name>vacant</Name>
+    <Organisation>
+     <Name>Vakant</Name>
+     <ShortName>Vakant</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>5</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>5</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>5</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>5</BibNumber>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId></EntryId>
+    <Name>vacant</Name>
+    <Organisation>
+     <Name>Vakant</Name>
+     <ShortName>Vakant</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>6</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>6</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>6</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>6</BibNumber>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+  </ClassStart>
+  <ClassStart>
+   <Class>
+    <Id>8</Id>
+    <Name>D120</Name>
+   </Class>
+   <Course raceNumber="1">
+    <Length>4580</Length>
+   </Course>
+   <StartName>Start 1</StartName>
+   <TeamStart>
+    <EntryId>2926749</EntryId>
+    <Name>OK Dacke 1</Name>
+    <Organisation>
+     <Id>70</Id>
+     <Name>Orienteringsklubben Dacke</Name>
+     <ShortName>OK Dacke</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>18</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:46+02:00">
+     <Person>
+      <Id>52315</Id>
+      <Name>
+       <Family>Andersson</Family>
+       <Given>Kristina</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>70</Id>
+      <Name>Orienteringsklubben Dacke</Name>
+      <ShortName>OK Dacke</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>18</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>441542</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:46+02:00">
+     <Person>
+      <Id>19980</Id>
+      <Name>
+       <Family>Johansson</Family>
+       <Given>Anne</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>70</Id>
+      <Name>Orienteringsklubben Dacke</Name>
+      <ShortName>OK Dacke</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>18</BibNumber>
+      <ControlCard>9670918</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:46+02:00">
+     <Person>
+      <Id>48978</Id>
+      <Name>
+       <Family>Josefsson</Family>
+       <Given>Annika</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>70</Id>
+      <Name>Orienteringsklubben Dacke</Name>
+      <ShortName>OK Dacke</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>18</BibNumber>
+      <ControlCard>12577</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2926333</EntryId>
+    <Name>OK Orion 1</Name>
+    <Organisation>
+     <Id>288</Id>
+     <Name>Orienteringsklubben Orion</Name>
+     <ShortName>OK Orion</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>19</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:29+02:00">
+     <Person>
+      <Id>4640</Id>
+      <Name>
+       <Family>Hermansson</Family>
+       <Given>Ulrika</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>19</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>7710203</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:29+02:00">
+     <Person>
+      <Id>4712</Id>
+      <Name>
+       <Family>Håkansson</Family>
+       <Given>Jenny</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>19</BibNumber>
+      <ControlCard>721031</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:29+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>19</BibNumber>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2924698</EntryId>
+    <Name>Ronneby OK 1</Name>
+    <Organisation>
+     <Id>310</Id>
+     <Name>Ronneby Orienteringsklubb</Name>
+     <ShortName>Ronneby OK</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>20</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:13+02:00">
+     <Person>
+      <Id>1419</Id>
+      <Name>
+       <Family>Eriksson</Family>
+       <Given>Anna</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>20</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>28682</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:13+02:00">
+     <Person>
+      <Id>21921</Id>
+      <Name>
+       <Family>Johannesson</Family>
+       <Given>Susanne</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>20</BibNumber>
+      <ControlCard>1006592</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:13+02:00">
+     <Person>
+      <Id>13317</Id>
+      <Name>
+       <Family>Lindqvist</Family>
+       <Given>Karin</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>20</BibNumber>
+      <ControlCard>770422</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId></EntryId>
+    <Name>vacant</Name>
+    <Organisation>
+     <Name>Vakant</Name>
+     <ShortName>Vakant</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>21</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>21</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>21</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>21</BibNumber>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId></EntryId>
+    <Name>vacant</Name>
+    <Organisation>
+     <Name>Vakant</Name>
+     <ShortName>Vakant</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>22</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>22</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>22</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>22</BibNumber>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+  </ClassStart>
+  <ClassStart>
+   <Class>
+    <Id>9</Id>
+    <Name>H120</Name>
+   </Class>
+   <Course raceNumber="1">
+    <Length>5740</Length>
+   </Course>
+   <StartName>Start 1</StartName>
+   <TeamStart>
+    <EntryId>2926750</EntryId>
+    <Name>OK Dacke 1</Name>
+    <Organisation>
+     <Id>70</Id>
+     <Name>Orienteringsklubben Dacke</Name>
+     <ShortName>OK Dacke</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>11</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:47+02:00">
+     <Person>
+      <Id>2240</Id>
+      <Name>
+       <Family>Larsson</Family>
+       <Given>Magnus</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>70</Id>
+      <Name>Orienteringsklubben Dacke</Name>
+      <ShortName>OK Dacke</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>11</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>710829</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:47+02:00">
+     <Person>
+      <Id>43338</Id>
+      <Name>
+       <Family>Andersson</Family>
+       <Given>Björn</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>70</Id>
+      <Name>Orienteringsklubben Dacke</Name>
+      <ShortName>OK Dacke</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>11</BibNumber>
+      <ControlCard>1090516</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:47+02:00">
+     <Person>
+      <Id>60727</Id>
+      <Name>
+       <Family>Johansson</Family>
+       <Given>Anders</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>70</Id>
+      <Name>Orienteringsklubben Dacke</Name>
+      <ShortName>OK Dacke</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>11</BibNumber>
+      <ControlCard>243919</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2926336</EntryId>
+    <Name>OK Orion 1</Name>
+    <Organisation>
+     <Id>288</Id>
+     <Name>Orienteringsklubben Orion</Name>
+     <ShortName>OK Orion</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>12</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:32+02:00">
+     <Person>
+      <Id>27788</Id>
+      <Name>
+       <Family>Bratt</Family>
+       <Given>Niklas</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>12</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>41594</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:32+02:00">
+     <Person>
+      <Id>4504</Id>
+      <Name>
+       <Family>Håkansson</Family>
+       <Given>Anders</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>12</BibNumber>
+      <ControlCard>9700516</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:32+02:00">
+     <Person>
+      <Id>4502</Id>
+      <Name>
+       <Family>Berlin</Family>
+       <Given>Henrik</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>12</BibNumber>
+      <ControlCard>690423</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2926337</EntryId>
+    <Name>OK Orion 2</Name>
+    <Organisation>
+     <Id>288</Id>
+     <Name>Orienteringsklubben Orion</Name>
+     <ShortName>OK Orion</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>13</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:33+02:00">
+     <Person>
+      <Id>4622</Id>
+      <Name>
+       <Family>Engström</Family>
+       <Given>Mattias</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>13</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>9771210</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:33+02:00">
+     <Person>
+      <Id>89945</Id>
+      <Name>
+       <Family>Sundelin</Family>
+       <Given>Anders</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>13</BibNumber>
+      <ControlCard>1401351</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:33+02:00">
+     <Person>
+      <Id>4505</Id>
+      <Name>
+       <Family>Larsson</Family>
+       <Given>Lars-Ola</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>13</BibNumber>
+      <ControlCard>670124</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2924605</EntryId>
+    <Name>Ronneby OK 1</Name>
+    <Organisation>
+     <Id>310</Id>
+     <Name>Ronneby Orienteringsklubb</Name>
+     <ShortName>Ronneby OK</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>14</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:09+02:00">
+     <Person>
+      <Id>30865</Id>
+      <Name>
+       <Family>Håkansson</Family>
+       <Given>Christian</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>14</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>741000</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:09+02:00">
+     <Person>
+      <Id>5279</Id>
+      <Name>
+       <Family>Eriksson</Family>
+       <Given>Ingemar</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>14</BibNumber>
+      <ControlCard>740409</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:09+02:00">
+     <Person>
+      <Id>22599</Id>
+      <Name>
+       <Family>Lindström</Family>
+       <Given>Torgny</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>14</BibNumber>
+      <ControlCard>730619</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId></EntryId>
+    <Name>vacant</Name>
+    <Organisation>
+     <Name>Vakant</Name>
+     <ShortName>Vakant</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>15</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>15</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>15</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>15</BibNumber>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId></EntryId>
+    <Name>vacant</Name>
+    <Organisation>
+     <Name>Vakant</Name>
+     <ShortName>Vakant</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>16</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>16</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>16</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>16</BibNumber>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+  </ClassStart>
+  <ClassStart>
+   <Class>
+    <Id>10</Id>
+    <Name>D150</Name>
+   </Class>
+   <Course raceNumber="1">
+    <Length>4040</Length>
+   </Course>
+   <StartName>Start 1</StartName>
+   <TeamStart>
+    <EntryId>2926334</EntryId>
+    <Name>OK Orion 1</Name>
+    <Organisation>
+     <Id>288</Id>
+     <Name>Orienteringsklubben Orion</Name>
+     <ShortName>OK Orion</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>31</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:30+02:00">
+     <Person>
+      <Id>27811</Id>
+      <Name>
+       <Family>Gustafsson</Family>
+       <Given>Gunilla</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>31</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>650406</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:30+02:00">
+     <Person>
+      <Id>28065</Id>
+      <Name>
+       <Family>Svärd</Family>
+       <Given>Carina</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>31</BibNumber>
+      <ControlCard>41589</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:30+02:00">
+     <Person>
+      <Id>4642</Id>
+      <Name>
+       <Family>Swartz</Family>
+       <Given>Lena</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>31</BibNumber>
+      <ControlCard>9620620</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2928401</EntryId>
+    <Name>OK Skogsfalken 1</Name>
+    <Organisation>
+     <Id>339</Id>
+     <Name>OK Skogsfalken</Name>
+     <ShortName>OK Skogsfalken</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>32</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:58+02:00">
+     <Person>
+      <Id>1536</Id>
+      <Name>
+       <Family>Albinsson</Family>
+       <Given>Josefine</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>339</Id>
+      <Name>OK Skogsfalken</Name>
+      <ShortName>OK Skogsfalken</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>32</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>9690301</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:58+02:00">
+     <Person>
+      <Id>5189</Id>
+      <Name>
+       <Family>Olsson</Family>
+       <Given>Birgitta</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>339</Id>
+      <Name>OK Skogsfalken</Name>
+      <ShortName>OK Skogsfalken</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>32</BibNumber>
+      <ControlCard>214205</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:58+02:00">
+     <Person>
+      <Id>1760</Id>
+      <Name>
+       <Family>Söderberg</Family>
+       <Given>Lena</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>339</Id>
+      <Name>OK Skogsfalken</Name>
+      <ShortName>OK Skogsfalken</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>32</BibNumber>
+      <ControlCard>9510605</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId></EntryId>
+    <Name>vacant</Name>
+    <Organisation>
+     <Name>Vakant</Name>
+     <ShortName>Vakant</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>33</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>33</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>33</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>33</BibNumber>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+  </ClassStart>
+  <ClassStart>
+   <Class>
+    <Id>11</Id>
+    <Name>H150</Name>
+   </Class>
+   <Course raceNumber="1">
+    <Length>5140</Length>
+   </Course>
+   <StartName>Start 1</StartName>
+   <TeamStart>
+    <EntryId>2926751</EntryId>
+    <Name>OK Dacke 1</Name>
+    <Organisation>
+     <Id>70</Id>
+     <Name>Orienteringsklubben Dacke</Name>
+     <ShortName>OK Dacke</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>23</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:48+02:00">
+     <Person>
+      <Id>1387</Id>
+      <Name>
+       <Family>Götesson</Family>
+       <Given>Inge</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>70</Id>
+      <Name>Orienteringsklubben Dacke</Name>
+      <ShortName>OK Dacke</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>23</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>16663</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:48+02:00">
+     <Person>
+      <Id>2243</Id>
+      <Name>
+       <Family>Johansson</Family>
+       <Given>Ulf</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>70</Id>
+      <Name>Orienteringsklubben Dacke</Name>
+      <ShortName>OK Dacke</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>23</BibNumber>
+      <ControlCard>18559</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:48+02:00">
+     <Person>
+      <Id>97422</Id>
+      <Name>
+       <Family>Zettervall</Family>
+       <Given>Björn</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>70</Id>
+      <Name>Orienteringsklubben Dacke</Name>
+      <ShortName>OK Dacke</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>23</BibNumber>
+      <ControlCard>1690327</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2926338</EntryId>
+    <Name>OK Orion 1</Name>
+    <Organisation>
+     <Id>288</Id>
+     <Name>Orienteringsklubben Orion</Name>
+     <ShortName>OK Orion</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>24</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:34+02:00">
+     <Person>
+      <Id>16226</Id>
+      <Name>
+       <Family>Carlsson</Family>
+       <Given>Lars</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>24</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>7651004</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:34+02:00">
+     <Person>
+      <Id>4722</Id>
+      <Name>
+       <Family>Andersson</Family>
+       <Given>Peter</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>24</BibNumber>
+      <ControlCard>10311</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:34+02:00">
+     <Person>
+      <Id>11823</Id>
+      <Name>
+       <Family>Wahlbom</Family>
+       <Given>Mikael</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>24</BibNumber>
+      <ControlCard>249297</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2926339</EntryId>
+    <Name>OK Orion 2</Name>
+    <Organisation>
+     <Id>288</Id>
+     <Name>Orienteringsklubben Orion</Name>
+     <ShortName>OK Orion</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>25</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:36+02:00">
+     <Person>
+      <Id>4619</Id>
+      <Name>
+       <Family>Jakobsson</Family>
+       <Given>Johan</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>25</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>9681010</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:36+02:00">
+     <Person>
+      <Id>86405</Id>
+      <Name>
+       <Family>Sohlin</Family>
+       <Given>Lennart</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>25</BibNumber>
+      <ControlCard>452530</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:36+02:00">
+     <Person>
+      <Id>63697</Id>
+      <Name>
+       <Family>Nilsson</Family>
+       <Given>Anders</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>25</BibNumber>
+      <ControlCard>450881</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2928402</EntryId>
+    <Name>OK Skogsfalken 1</Name>
+    <Organisation>
+     <Id>339</Id>
+     <Name>OK Skogsfalken</Name>
+     <ShortName>OK Skogsfalken</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>26</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:59+02:00">
+     <Person>
+      <Id>26599</Id>
+      <Name>
+       <Family>Jungstrand</Family>
+       <Given>Ulf</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>339</Id>
+      <Name>OK Skogsfalken</Name>
+      <ShortName>OK Skogsfalken</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>26</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>505605</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:59+02:00">
+     <Person>
+      <Id>26098</Id>
+      <Name>
+       <Family>Larsson</Family>
+       <Given>Pontus</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>339</Id>
+      <Name>OK Skogsfalken</Name>
+      <ShortName>OK Skogsfalken</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>26</BibNumber>
+      <ControlCard>264152</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:59+02:00">
+     <Person>
+      <Id>398</Id>
+      <Name>
+       <Family>Söderberg</Family>
+       <Given>Ola</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>339</Id>
+      <Name>OK Skogsfalken</Name>
+      <ShortName>OK Skogsfalken</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>26</BibNumber>
+      <ControlCard>9730919</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2928403</EntryId>
+    <Name>OK Skogsfalken 2</Name>
+    <Organisation>
+     <Id>339</Id>
+     <Name>OK Skogsfalken</Name>
+     <ShortName>OK Skogsfalken</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>27</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:08:00+02:00">
+     <Person>
+      <Id>5175</Id>
+      <Name>
+       <Family>Persson</Family>
+       <Given>Lars</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>339</Id>
+      <Name>OK Skogsfalken</Name>
+      <ShortName>OK Skogsfalken</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>27</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>340644</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:08:00+02:00">
+     <Person>
+      <Id>1350</Id>
+      <Name>
+       <Family>Blomqvist</Family>
+       <Given>Anders</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>339</Id>
+      <Name>OK Skogsfalken</Name>
+      <ShortName>OK Skogsfalken</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>27</BibNumber>
+      <ControlCard>12203</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:08:00+02:00">
+     <Person>
+      <Id>555</Id>
+      <Name>
+       <Family>Nilsson</Family>
+       <Given>Jens</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>339</Id>
+      <Name>OK Skogsfalken</Name>
+      <ShortName>OK Skogsfalken</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>27</BibNumber>
+      <ControlCard>12229</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2929815</EntryId>
+    <Name>OK Vilse 87 1</Name>
+    <Organisation>
+     <Id>551</Id>
+     <Name>Orienteringsklubben Vilse 87</Name>
+     <ShortName>OK Vilse 87</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>28</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:08:04+02:00">
+     <Person>
+      <Id>6435</Id>
+      <Name>
+       <Family>Thörn</Family>
+       <Given>Roger</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>551</Id>
+      <Name>Orienteringsklubben Vilse 87</Name>
+      <ShortName>OK Vilse 87</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>28</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>9201034</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:08:04+02:00">
+     <Person>
+      <Id>1418</Id>
+      <Name>
+       <Family>Henmyr</Family>
+       <Given>Thomas</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>551</Id>
+      <Name>Orienteringsklubben Vilse 87</Name>
+      <ShortName>OK Vilse 87</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>28</BibNumber>
+      <ControlCard>9201035</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:08:04+02:00">
+     <Person>
+      <Id>17127</Id>
+      <Name>
+       <Family>Åman</Family>
+       <Given>Ulf</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>551</Id>
+      <Name>Orienteringsklubben Vilse 87</Name>
+      <ShortName>OK Vilse 87</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>28</BibNumber>
+      <ControlCard>9201036</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId></EntryId>
+    <Name>vacant</Name>
+    <Organisation>
+     <Name>Vakant</Name>
+     <ShortName>Vakant</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>29</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>29</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>29</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:39+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>29</BibNumber>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId></EntryId>
+    <Name>vacant</Name>
+    <Organisation>
+     <Name>Vakant</Name>
+     <ShortName>Vakant</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>30</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>30</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:38+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>30</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:39+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>30</BibNumber>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+  </ClassStart>
+  <ClassStart>
+   <Class>
+    <Id>12</Id>
+    <Name>DH Äldre</Name>
+   </Class>
+   <Course raceNumber="1">
+    <Length>4060</Length>
+   </Course>
+   <StartName>Start 1</StartName>
+   <TeamStart>
+    <EntryId>2926340</EntryId>
+    <Name>OK Orion 1</Name>
+    <Organisation>
+     <Id>288</Id>
+     <Name>Orienteringsklubben Orion</Name>
+     <ShortName>OK Orion</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>34</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:37+02:00">
+     <Person>
+      <Id>18611</Id>
+      <Name>
+       <Family>Linnersjö</Family>
+       <Given>Björn</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>34</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>27256</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:37+02:00">
+     <Person>
+      <Id>25025</Id>
+      <Name>
+       <Family>Andersson</Family>
+       <Given>Ingemar</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>34</BibNumber>
+      <ControlCard>262488</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:37+02:00">
+     <Person>
+      <Id>27897</Id>
+      <Name>
+       <Family>Swartz</Family>
+       <Given>Johan</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>34</BibNumber>
+      <ControlCard>7300294</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2929816</EntryId>
+    <Name>OK Vilse 87 1</Name>
+    <Organisation>
+     <Id>551</Id>
+     <Name>Orienteringsklubben Vilse 87</Name>
+     <ShortName>OK Vilse 87</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>35</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:08:05+02:00">
+     <Person>
+      <Id>6434</Id>
+      <Name>
+       <Family>Olsson</Family>
+       <Given>Ingmar</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>551</Id>
+      <Name>Orienteringsklubben Vilse 87</Name>
+      <ShortName>OK Vilse 87</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>35</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>9201037</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:08:05+02:00">
+     <Person>
+      <Id>8434</Id>
+      <Name>
+       <Family>Persson</Family>
+       <Given>Anders</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>551</Id>
+      <Name>Orienteringsklubben Vilse 87</Name>
+      <ShortName>OK Vilse 87</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>35</BibNumber>
+      <ControlCard>9201038</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:08:05+02:00">
+     <Person>
+      <Id>6425</Id>
+      <Name>
+       <Family>Ingvarsson</Family>
+       <Given>Mats</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>551</Id>
+      <Name>Orienteringsklubben Vilse 87</Name>
+      <ShortName>OK Vilse 87</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>35</BibNumber>
+      <ControlCard>9201039</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2929817</EntryId>
+    <Name>OK Vilse 87 2</Name>
+    <Organisation>
+     <Id>551</Id>
+     <Name>Orienteringsklubben Vilse 87</Name>
+     <ShortName>OK Vilse 87</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>36</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:08:06+02:00">
+     <Person>
+      <Id>14198</Id>
+      <Name>
+       <Family>Svensson</Family>
+       <Given>Lars</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>551</Id>
+      <Name>Orienteringsklubben Vilse 87</Name>
+      <ShortName>OK Vilse 87</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>36</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>9201040</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:08:06+02:00">
+     <Person>
+      <Id>1852</Id>
+      <Name>
+       <Family>Johansson</Family>
+       <Given>Bo</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>551</Id>
+      <Name>Orienteringsklubben Vilse 87</Name>
+      <ShortName>OK Vilse 87</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>36</BibNumber>
+      <ControlCard>9201041</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:08:06+02:00">
+     <Person>
+      <Id>41213</Id>
+      <Name>
+       <Family>Tjernlund</Family>
+       <Given>Kerstin</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>551</Id>
+      <Name>Orienteringsklubben Vilse 87</Name>
+      <ShortName>OK Vilse 87</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>36</BibNumber>
+      <ControlCard>9201042</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2929818</EntryId>
+    <Name>OK Vilse 87 3</Name>
+    <Organisation>
+     <Id>551</Id>
+     <Name>Orienteringsklubben Vilse 87</Name>
+     <ShortName>OK Vilse 87</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>37</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:08:07+02:00">
+     <Person>
+      <Id>6369</Id>
+      <Name>
+       <Family>Henmyr</Family>
+       <Given>Katarina</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>551</Id>
+      <Name>Orienteringsklubben Vilse 87</Name>
+      <ShortName>OK Vilse 87</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>37</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>9201043</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:08:07+02:00">
+     <Person>
+      <Id>16138</Id>
+      <Name>
+       <Family>Ingemansson</Family>
+       <Given>Bengt Erik</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>551</Id>
+      <Name>Orienteringsklubben Vilse 87</Name>
+      <ShortName>OK Vilse 87</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>37</BibNumber>
+      <ControlCard>9201044</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:08:07+02:00">
+     <Person>
+      <Id>6419</Id>
+      <Name>
+       <Family>Samuelsson</Family>
+       <Given>Erling</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>551</Id>
+      <Name>Orienteringsklubben Vilse 87</Name>
+      <ShortName>OK Vilse 87</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>37</BibNumber>
+      <ControlCard>9201045</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2924608</EntryId>
+    <Name>Ronneby OK 1</Name>
+    <Organisation>
+     <Id>310</Id>
+     <Name>Ronneby Orienteringsklubb</Name>
+     <ShortName>Ronneby OK</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>38</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:11+02:00">
+     <Person>
+      <Id>27872</Id>
+      <Name>
+       <Family>Thorén</Family>
+       <Given>Lars</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>38</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>850917</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:11+02:00">
+     <Person>
+      <Id>15135</Id>
+      <Name>
+       <Family>Olsson</Family>
+       <Given>Birgitta</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>38</BibNumber>
+      <ControlCard>611004</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:11+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>38</BibNumber>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2924612</EntryId>
+    <Name>Ronneby OK 2</Name>
+    <Organisation>
+     <Id>310</Id>
+     <Name>Ronneby Orienteringsklubb</Name>
+     <ShortName>Ronneby OK</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>39</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:12+02:00">
+     <Person>
+      <Id>5160</Id>
+      <Name>
+       <Family>Nero Forsman</Family>
+       <Given>Ann-Christin</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>39</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>1571127</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:12+02:00">
+     <Person>
+      <Id>5111</Id>
+      <Name>
+       <Family>Nilsson</Family>
+       <Given>Jörgen</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>39</BibNumber>
+      <ControlCard>41566</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:12+02:00">
+     <Person>
+      <Id>8991</Id>
+      <Name>
+       <Family>Forsman</Family>
+       <Given>Håkan</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>39</BibNumber>
+      <ControlCard>560619</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2924700</EntryId>
+    <Name>Ronneby OK 3</Name>
+    <Organisation>
+     <Id>310</Id>
+     <Name>Ronneby Orienteringsklubb</Name>
+     <ShortName>Ronneby OK</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>40</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:14+02:00">
+     <Person>
+      <Id>5096</Id>
+      <Name>
+       <Family>Månsson</Family>
+       <Given>Kjell</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>40</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>2050912</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:14+02:00">
+     <Person>
+      <Id>505</Id>
+      <Name>
+       <Family>Smedenmark</Family>
+       <Given>Lennart</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>40</BibNumber>
+      <ControlCard>521216</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:14+02:00">
+     <Person>
+      <Id>8982</Id>
+      <Name>
+       <Family>Aspvall</Family>
+       <Given>Bengt</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>40</BibNumber>
+      <ControlCard>302334</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2926446</EntryId>
+    <Name>Ronneby OK 4</Name>
+    <Organisation>
+     <Id>310</Id>
+     <Name>Ronneby Orienteringsklubb</Name>
+     <ShortName>Ronneby OK</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>41</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:39+02:00">
+     <Person>
+      <Id>87001</Id>
+      <Name>
+       <Family>Sunnegårdh</Family>
+       <Given>Peter</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>41</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+      <ControlCard>2048707</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:39+02:00">
+     <Person>
+      <Id>31978</Id>
+      <Name>
+       <Family>Svensson</Family>
+       <Given>Gullevi</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>41</BibNumber>
+      <ControlCard>1213145</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:39+02:00">
+     <Person>
+      <Id>32117</Id>
+      <Name>
+       <Family>Karlsson</Family>
+       <Given>Roland</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>41</BibNumber>
+      <ControlCard>261563</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId></EntryId>
+    <Name>vacant</Name>
+    <Organisation>
+     <Name>Vakant</Name>
+     <ShortName>Vakant</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>42</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:39+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>42</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:39+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>42</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:39+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>42</BibNumber>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId></EntryId>
+    <Name>vacant</Name>
+    <Organisation>
+     <Name>Vakant</Name>
+     <ShortName>Vakant</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>43</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:39+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>43</BibNumber>
+      <StartTime>2015-09-06T10:00:00+02:00</StartTime>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:39+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>43</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-01T22:22:39+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>43</BibNumber>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+  </ClassStart>
+  <ClassStart>
+   <Class>
+    <Id>13</Id>
+    <Name>Propaganda</Name>
+   </Class>
+   <Course raceNumber="1">
+    <Length>3650</Length>
+   </Course>
+   <StartName>Start 1</StartName>
+   <TeamStart>
+    <EntryId>2926752</EntryId>
+    <Name>OK Dacke 1</Name>
+    <Organisation>
+     <Id>70</Id>
+     <Name>Orienteringsklubben Dacke</Name>
+     <ShortName>OK Dacke</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>50</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:49+02:00">
+     <Person>
+      <Id>1359</Id>
+      <Name>
+       <Family>Wilhelmsson</Family>
+       <Given>Peter</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>70</Id>
+      <Name>Orienteringsklubben Dacke</Name>
+      <ShortName>OK Dacke</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>50</BibNumber>
+      <StartTime>2015-09-06T10:05:00+02:00</StartTime>
+      <ControlCard>12578</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:49+02:00">
+     <Person>
+      <Id>20099</Id>
+      <Name>
+       <Family>Henrysson</Family>
+       <Given>Gunnel</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>70</Id>
+      <Name>Orienteringsklubben Dacke</Name>
+      <ShortName>OK Dacke</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>50</BibNumber>
+      <ControlCard>231200</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:49+02:00">
+     <Person>
+      <Id>16935</Id>
+      <Name>
+       <Family>Henrysson</Family>
+       <Given>Albin</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>70</Id>
+      <Name>Orienteringsklubben Dacke</Name>
+      <ShortName>OK Dacke</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>50</BibNumber>
+      <ControlCard>981908</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2926341</EntryId>
+    <Name>OK Orion 1</Name>
+    <Organisation>
+     <Id>288</Id>
+     <Name>Orienteringsklubben Orion</Name>
+     <ShortName>OK Orion</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>51</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:38+02:00">
+     <Person>
+      <Id>25377</Id>
+      <Name>
+       <Family>Carlsson</Family>
+       <Given>Love</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>51</BibNumber>
+      <StartTime>2015-09-06T10:05:00+02:00</StartTime>
+      <ControlCard>7202474</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:38+02:00">
+     <Person>
+      <Id>89951</Id>
+      <Name>
+       <Family>Sundelin</Family>
+       <Given>Katarina</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>51</BibNumber>
+      <ControlCard>9650108</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:38+02:00">
+     <Person>
+      <Id>4721</Id>
+      <Name>
+       <Family>Johansson</Family>
+       <Given>Martin</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>288</Id>
+      <Name>Orienteringsklubben Orion</Name>
+      <ShortName>OK Orion</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>51</BibNumber>
+      <ControlCard>18530</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2928404</EntryId>
+    <Name>OK Skogsfalken 1</Name>
+    <Organisation>
+     <Id>339</Id>
+     <Name>OK Skogsfalken</Name>
+     <ShortName>OK Skogsfalken</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>52</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:08:01+02:00">
+     <Person>
+      <Id>57319</Id>
+      <Name>
+       <Family>Danielsson</Family>
+       <Given>Pierre</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>339</Id>
+      <Name>OK Skogsfalken</Name>
+      <ShortName>OK Skogsfalken</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>52</BibNumber>
+      <StartTime>2015-09-06T10:05:00+02:00</StartTime>
+      <ControlCard>449627</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:08:01+02:00">
+     <Person>
+      <Id>57317</Id>
+      <Name>
+       <Family>Eliasson</Family>
+       <Given>Anna</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>339</Id>
+      <Name>OK Skogsfalken</Name>
+      <ShortName>OK Skogsfalken</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>52</BibNumber>
+      <ControlCard>449615</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:08:01+02:00">
+     <Person>
+      <Id>26610</Id>
+      <Name>
+       <Family>Johansson</Family>
+       <Given>Jonas K</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>339</Id>
+      <Name>OK Skogsfalken</Name>
+      <ShortName>OK Skogsfalken</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>52</BibNumber>
+      <ControlCard>438779</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2929819</EntryId>
+    <Name>OK Vilse 87 1</Name>
+    <Organisation>
+     <Id>551</Id>
+     <Name>Orienteringsklubben Vilse 87</Name>
+     <ShortName>OK Vilse 87</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>53</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:08:09+02:00">
+     <Person>
+      <Id>19096</Id>
+      <Name>
+       <Family>Åman</Family>
+       <Given>Malin</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>551</Id>
+      <Name>Orienteringsklubben Vilse 87</Name>
+      <ShortName>OK Vilse 87</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>53</BibNumber>
+      <StartTime>2015-09-06T10:05:00+02:00</StartTime>
+      <ControlCard>500978</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:08:09+02:00">
+     <Person>
+      <Id>94489</Id>
+      <Name>
+       <Family>Ericson</Family>
+       <Given>Anneli</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>551</Id>
+      <Name>Orienteringsklubben Vilse 87</Name>
+      <ShortName>OK Vilse 87</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>53</BibNumber>
+      <ControlCard>500979</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:08:09+02:00">
+     <Person>
+      <Id>1503</Id>
+      <Name>
+       <Family>Jönsson</Family>
+       <Given>Ola</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>551</Id>
+      <Name>Orienteringsklubben Vilse 87</Name>
+      <ShortName>OK Vilse 87</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>53</BibNumber>
+      <ControlCard>500980</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2915502</EntryId>
+    <Name>Ronneby OK 1</Name>
+    <Organisation>
+     <Id>310</Id>
+     <Name>Ronneby Orienteringsklubb</Name>
+     <ShortName>Ronneby OK</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>54</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:06:29+02:00">
+     <Person>
+      <Id>110263</Id>
+      <Name>
+       <Family>Lin</Family>
+       <Given>Yuwei</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>54</BibNumber>
+      <StartTime>2015-09-06T10:05:00+02:00</StartTime>
+      <ControlCard>344536</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:06:29+02:00">
+     <Person>
+      <Id>110262</Id>
+      <Name>
+       <Family>Yan</Family>
+       <Given>Tianxia</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>54</BibNumber>
+      <ControlCard>231262</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:06:29+02:00">
+     <Person>
+      <Id>24243</Id>
+      <Name>
+       <Family>Månsson</Family>
+       <Given>Ingemar</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>54</BibNumber>
+      <ControlCard>591016</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId>2924606</EntryId>
+    <Name>Ronneby OK 2</Name>
+    <Organisation>
+     <Id>310</Id>
+     <Name>Ronneby Orienteringsklubb</Name>
+     <ShortName>Ronneby OK</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>55</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:10+02:00">
+     <Person>
+      <Id>20124</Id>
+      <Name>
+       <Family>Oskarsson</Family>
+       <Given>Fredrik</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>55</BibNumber>
+      <StartTime>2015-09-06T10:05:00+02:00</StartTime>
+      <ControlCard>681210</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:10+02:00">
+     <Person>
+      <Id>23212</Id>
+      <Name>
+       <Family>Svensson</Family>
+       <Given>Christer</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>55</BibNumber>
+      <ControlCard>438663</ControlCard>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-05T19:07:10+02:00">
+     <Person>
+      <Id>5156</Id>
+      <Name>
+       <Family>Nilsson</Family>
+       <Given>Jon</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Id>310</Id>
+      <Name>Ronneby Orienteringsklubb</Name>
+      <ShortName>Ronneby OK</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>55</BibNumber>
+      <ControlCard>41569</ControlCard>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId></EntryId>
+    <Name>vacant</Name>
+    <Organisation>
+     <Name>Vakant</Name>
+     <ShortName>Vakant</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>56</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-03T21:47:46+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>56</BibNumber>
+      <StartTime>2015-09-06T10:05:00+02:00</StartTime>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-03T21:47:46+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>56</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-03T21:47:46+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>56</BibNumber>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId></EntryId>
+    <Name>vacant</Name>
+    <Organisation>
+     <Name>Vakant</Name>
+     <ShortName>Vakant</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>57</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-03T21:47:46+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>57</BibNumber>
+      <StartTime>2015-09-06T10:05:00+02:00</StartTime>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-03T21:47:46+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>57</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-03T21:47:46+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>57</BibNumber>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId></EntryId>
+    <Name>vacant</Name>
+    <Organisation>
+     <Name>Vakant</Name>
+     <ShortName>Vakant</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>58</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-03T21:47:46+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>58</BibNumber>
+      <StartTime>2015-09-06T10:05:00+02:00</StartTime>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-03T21:47:46+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>58</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-03T21:47:46+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>58</BibNumber>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+   <TeamStart>
+    <EntryId></EntryId>
+    <Name>vacant</Name>
+    <Organisation>
+     <Name>Vakant</Name>
+     <ShortName>Vakant</ShortName>
+     <Country code="SWE"></Country>
+    </Organisation>
+    <BibNumber>59</BibNumber>
+    <TeamMemberStart modifyTime="2015-09-03T21:47:49+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>1</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>59</BibNumber>
+      <StartTime>2015-09-06T10:05:00+02:00</StartTime>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-03T21:47:49+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>2</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>59</BibNumber>
+     </Start>
+    </TeamMemberStart>
+    <TeamMemberStart modifyTime="2015-09-03T21:47:49+02:00">
+     <Person>
+      <Name>
+       <Family> </Family>
+       <Given>Vakant</Given>
+      </Name>
+     </Person>
+     <Organisation>
+      <Name>Vakant</Name>
+      <ShortName>Vakant</ShortName>
+      <Country code="SWE"></Country>
+     </Organisation>
+     <Start>
+      <Leg>3</Leg>
+      <LegOrder>1</LegOrder>
+      <BibNumber>59</BibNumber>
+     </Start>
+    </TeamMemberStart>
+   </TeamStart>
+  </ClassStart>
+ </StartList>
