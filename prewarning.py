@@ -70,6 +70,7 @@ class App(Frame):
 
 		self.start_list_file = None
 		self.start_list_file_time = None
+		self.add_prewarnings_to_bottom = False
 		# self.start_list_observer = Observer()
 		# self.start_list_observer.schedule(self, '.')
 		# self.start_list_observer.start()
@@ -185,6 +186,7 @@ class App(Frame):
 
 		common = config['Common']
 		new_start_list_file = common.get('StartListFile', fallback='startlist.zip')
+		self.add_prewarnings_to_bottom = common.getboolean('AddPrewarningsToBottom', fallback=False)
 
 		punch_source = config['PunchSource']
 		self.punches_url = punch_source.get('PunchSourceUrl', fallback='http://roc.olresultat.se/getpunches.asp')
@@ -236,8 +238,7 @@ class App(Frame):
 		self.prewarn['font'] = ('Arial', self.font_size, 'bold')
 		self.clock['font'] = ('times', self.font_size, 'bold')
 		self.treeview.tag_configure('T', font=('Arial', self.font_size, 'bold'))
-		if self.last_item is not None:
-			self.treeview.see(self.last_item)
+		self.scroll_to_last()
 
 	def add_prewarning(self, time, team):
 		# last_item = None
@@ -257,8 +258,15 @@ class App(Frame):
 		# 		self.last_item = self.treeview.insert('', 'end', text=time, values=team, tags='T')
 		# else:
 		# 	self.last_item = self.treeview.insert('', 'end', text=time, values=team, tags='T')
-		self.last_item = self.treeview.insert('', 'end', text=time, values=team, tags='T')
-		self.treeview.see(self.last_item)
+		if self.add_prewarnings_to_bottom:
+			self.last_item = self.treeview.insert('', 'end', text=time, values=team, tags='T')
+		else:
+			self.last_item = self.treeview.insert('', 0, text=time, values=team, tags='T')
+		self.scroll_to_last()
+
+	def scroll_to_last(self):
+		if self.last_item is not None:
+			self.treeview.see(self.last_item)
 
 	def clear(self):
 		self.treeview.delete(*self.treeview.get_children())
