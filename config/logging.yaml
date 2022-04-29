@@ -1,0 +1,43 @@
+version: 1
+formatters:
+  simple:
+    format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+  thread:
+    format: '%(asctime)s - %(threadName)s(%(thread)s) - %(name)s - %(levelname)s - %(message)s'
+  detail:
+    format: '%(asctime)s - %(threadName)s(%(thread)s) - %(levelname)s - File: %(filename)s - %(funcName)s() - Line: %(lineno)d -  %(message)s'
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: thread
+    stream: ext://sys.stdout
+  file:
+    class: logging.handlers.TimedRotatingFileHandler
+    level: DEBUG
+    formatter: thread
+    filename: 'logs/prewarning.log'
+    when: 'MIDNIGHT'
+    interval: 1
+loggers:
+  PreWarning:
+    level: NOTSET
+  Config:
+    level: NOTSET
+  Sound:
+    level: NOTSET
+  OlaMySql:
+    level: NOTSET
+  PunchSourceOlaMySql:
+    level: NOTSET
+  PunchSourceOlresultatSe:
+    level: NOTSET
+  StartListSourceFile:
+    level: NOTSET
+  StartListSourceOlaMySql:
+    level: NOTSET
+  Validators:
+    level: NOTSET
+root:
+  level: WARNING
+  handlers: [file]

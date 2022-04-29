@@ -1,0 +1,1 @@
+pyinstaller prewarning.py --add-data "punchsources;punchsources" --add-data "startlistsources;startlistsources" --add-data "sounds;sounds" --add-data "utils;utils" --add-data "mpg123;mpg123" --add-data "validators;validators" --add-data "config;config" --add-data "logs;logs" --add-data "favicon.ico;." --noconsole --icon=favicon.ico
