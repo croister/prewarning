@@ -16,7 +16,7 @@ handlers:
     class: logging.handlers.TimedRotatingFileHandler
     level: DEBUG
     formatter: thread
-    filename: 'logs/prewarning.log'
+    filename: '{APPLICATION_DIR}/logs/prewarning.log'
     when: 'MIDNIGHT'
     interval: 1
 loggers:

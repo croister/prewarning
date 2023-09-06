@@ -5,7 +5,7 @@ PreWarning main file.
 """
 
 __author__ = 'Christian Lindblom croister@croister.se'
-__version__ = '2.0.0'
+__version__ = '2.1.0'
 
 import logging
 import logging.config
@@ -14,7 +14,7 @@ import socket
 from datetime import timedelta, datetime
 from pathlib import Path
 from queue import Queue
-from threading import Thread
+from threading import Thread, Lock
 from time import strftime, time
 from typing import List, Dict
 
@@ -34,6 +34,7 @@ from utils.config_consumer import ConfigConsumer
 from utils.config_definitions import ConfigOptionDefinition, ConfigSectionDefinition, ConfigVerifierDefinition, \
     ConfigSectionOptionDefinition
 from utils.config_dialog import ConfigDialog
+from utils.constants import CONFIGURATION_DIR, APPLICATION_DIR
 from utils.help_dialog import HelpDialog
 from utils.hotkey_bindings import HotKeyBindingDefinition, HotKeyDefinition, key_event_to_str
 from utils.sound import Sound, SoundFolder, verify_sound
@@ -46,34 +47,46 @@ COL_NR_LEG = 2
 # The first row
 ROW_ZERO = 0
 
-# The directory where this file is located
-APPLICATION_DIR = Path(__file__).resolve().parent.absolute()
-
-# The name of the directory where the configuration files are located
-CONFIGURATION_DIR_NAME = 'config'
-
-# The directory where the configuration files are located
-CONFIGURATION_DIR = APPLICATION_DIR / CONFIGURATION_DIR_NAME
-
 # Name of the logging configuration file
 LOGGING_CONFIGURATION_FILE_NAME = 'logging.yaml'
 
 # Logging configuration file location
 LOGGING_CONFIGURATION_FILE = CONFIGURATION_DIR / LOGGING_CONFIGURATION_FILE_NAME
 
+LOGGING_CONFIGURATION_FILE_FILTER_VALUES = {
+    "APPLICATION_DIR": APPLICATION_DIR,
+}
+
+
+def _filter_logging_configuration(config_dict: dict):
+    for key, value in config_dict.items():
+        if isinstance(value, dict):
+            _filter_logging_configuration(value)
+        elif isinstance(value, str):
+            value = value.format(**LOGGING_CONFIGURATION_FILE_FILTER_VALUES)
+            if key == 'filename':
+                value = str(Path(value).resolve())
+            config_dict[key] = value
+
 
 def _update_logging_configuration():
     # noinspection PyBroadException
-    cwd = Path.cwd()
-    os.chdir(APPLICATION_DIR)
+    src_path = APPLICATION_DIR / LOGGING_CONFIGURATION_FILE
     try:
-        with open(LOGGING_CONFIGURATION_FILE, 'r') as f:
+        with open(src_path, 'r') as f:
             config = yaml.safe_load(f.read())
+            _filter_logging_configuration(config)
             logging.config.dictConfig(config)
+    except PermissionError as e:
+        logging.error('PermissionError in accessing the logging configuration file: "%s" %s', src_path, e)
+    except OSError as e:
+        logging.error('OSError in accessing the logging configuration file: "%s" %s', src_path, e)
     except Exception as e:
-        logging.error('Error in logging configuration file: %s', e)
-    finally:
-        os.chdir(cwd)
+        logging.error('Exception in accessing the logging configuration file: "%s" %s', src_path, e)
+    except BaseException as e:
+        logging.error('BaseException in accessing the logging configuration file: "%s" %s', src_path, e)
+    except:
+        logging.error('Unknown exception in accessing the logging configuration file: "%s"', src_path)
 
 
 _update_logging_configuration()
@@ -212,6 +225,8 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
     def config_section_definition(cls) -> ConfigSectionDefinition:
         return cls.COMMON_CONFIG_SECTION_DEFINITION
 
+    display_lock = Lock()
+
     def __init__(self):
         # ensure the parent's __init__ is called
         wx.Frame.__init__(self, None, wx.ID_ANY, "PreWarning " + __version__)
@@ -346,7 +361,7 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
             HotKeyBindingDefinition(
                 name='Exit',
                 hotkey=HotKeyDefinition(key_code=ord('X')).with_ctrl(),
-                handler=self._close,
+                handler=self.Close,
                 description="Exits the application",
                 alternate_hotkeys=[
                     HotKeyDefinition(key_code=ord('Q')).with_ctrl(),
@@ -360,7 +375,7 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
 
         # Used for manual tests.
         self.test_bib_number = 0
-        self.test_leg_number = 1
+        self.test_leg_number = 0
 
         # Create the UI
         self._create_gui()
@@ -372,6 +387,9 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
 
         self.Bind(wx.EVT_SIZE, self._on_resize)
         self.header_panel.Bind(wx.EVT_SIZE, self._on_resize_head)
+
+        # Catch Clicking on the Corner X to close
+        self.Bind(wx.EVT_CLOSE, self._close)
 
         # Read the configuration
         self.config = Config(CONFIGURATION_FILE)
@@ -416,9 +434,17 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
             self._toggle_full_screen()
 
     def __del__(self):
+        self.stop()
+
+    def stop(self):
         if self.observer and self.observer.is_alive():
             self.observer.stop()
             self.observer.join()
+        Config().stop()
+        if self.punch_source is not None:
+            self.punch_source.stop()
+        if self.start_list_source is not None:
+            self.start_list_source.stop()
 
     @staticmethod
     def _get_portrait_screen() -> wx.Display or None:
@@ -576,23 +602,25 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
         item.handler()
 
     def _add_pre_warning(self, punch_time: str, team: str, leg: str):
-        if self._has_filler_row():
-            self.prewarning_grid.DeleteRows(ROW_ZERO)
+        self.logger.debug('_add_pre_warning: display_lock=%s', self.display_lock.locked())
+        with self.display_lock:
+            if self._has_filler_row():
+                self.prewarning_grid.DeleteRows(ROW_ZERO)
 
-        new_row = ROW_ZERO
+            new_row = ROW_ZERO
 
-        if self.add_pre_warnings_to_bottom:
-            new_row = self.prewarning_grid.GetNumberRows()
+            if self.add_pre_warnings_to_bottom:
+                new_row = self.prewarning_grid.GetNumberRows()
 
-        self.prewarning_grid.InsertRows(pos=new_row)
+            self.prewarning_grid.InsertRows(pos=new_row)
 
-        self.prewarning_grid.SetCellValue(new_row, COL_NR_TIME, punch_time)
-        self.prewarning_grid.SetCellValue(new_row, COL_NR_TEAM, team)
-        self.prewarning_grid.SetCellValue(new_row, COL_NR_LEG, leg)
+            self.prewarning_grid.SetCellValue(new_row, COL_NR_TIME, punch_time)
+            self.prewarning_grid.SetCellValue(new_row, COL_NR_TEAM, team)
+            self.prewarning_grid.SetCellValue(new_row, COL_NR_LEG, leg)
 
-        self._update_column_sizes()
+            self._update_column_sizes()
 
-        wx.CallAfter(self._remove_non_visible_rows)
+        self._remove_non_visible_rows()
 
     def _add_filler_row(self):
         self.prewarning_grid.InsertRows()
@@ -613,22 +641,29 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
 
     def _remove_non_visible_rows(self):
         if not self._has_filler_row():
-            last_row = self.prewarning_grid.GetNumberRows() - 1
-            while last_row >= 0 and not self.prewarning_grid.IsVisible(self.prewarning_grid.GetNumberRows() - 1,
-                                                                       COL_NR_TIME,
-                                                                       wholeCellVisible=True):
-                if self.add_pre_warnings_to_bottom:
-                    self.logger.debug('DELETE 0')
-                    self.prewarning_grid.DeleteRows(ROW_ZERO)
-                else:
-                    self.logger.debug('DELETE LAST %d', last_row)
-                    self.prewarning_grid.DeleteRows(last_row)
+            self.logger.debug('_remove_non_visible_rows: display_lock=%s', self.display_lock.locked())
+            with self.display_lock:
+                self.logger.debug('_remove_non_visible_rows: LOCKED display_lock=%s', self.display_lock.locked())
                 last_row = self.prewarning_grid.GetNumberRows() - 1
+                while last_row >= 0 and not self.prewarning_grid.IsVisible(self.prewarning_grid.GetNumberRows() - 1,
+                                                                           COL_NR_TIME,
+                                                                           wholeCellVisible=True):
+                    if self.add_pre_warnings_to_bottom:
+                        self.logger.debug('DELETE 0')
+                        self.prewarning_grid.DeleteRows(ROW_ZERO)
+                    else:
+                        self.logger.debug('DELETE LAST %d', last_row)
+                        self.prewarning_grid.DeleteRows(last_row)
+                    last_row = self.prewarning_grid.GetNumberRows() - 1
+                self.logger.debug('_remove_non_visible_rows: DONE display_lock=%s', self.display_lock.locked())
+            self.logger.debug('_remove_non_visible_rows: END display_lock=%s', self.display_lock.locked())
 
     def _clear(self):
-        self.prewarning_grid.DeleteRows(ROW_ZERO, self.prewarning_grid.GetNumberRows())
-        self._add_filler_row()
-        self._calculate_sizes()
+        self.logger.debug('_clear: display_lock=%s', self.display_lock.locked())
+        with self.display_lock:
+            self.prewarning_grid.DeleteRows(ROW_ZERO, self.prewarning_grid.GetNumberRows())
+            self._add_filler_row()
+            self._calculate_sizes()
 
     def _refresh(self):
         orig_size = self.GetSize()
@@ -636,7 +671,9 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
         self.SetSize(new_size)
         self.SetSize(orig_size)
 
-        self._calculate_sizes()
+        self.logger.debug('_refresh: display_lock=%s', self.display_lock.locked())
+        with self.display_lock:
+            self._calculate_sizes()
 
     def _calculate_sizes(self):
         usable_size = wx.Window.GetClientSize(self)
@@ -677,8 +714,9 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
         wx.CallAfter(self._remove_non_visible_rows)
 
     def _update_column_sizes(self):
-        self.prewarning_grid.AutoSizeColumns()
+        self.prewarning_grid.Freeze()
         self.prewarning_grid.AutoSizeRows()
+        self.prewarning_grid.AutoSizeColumns()
 
         self._print_sizes()
         (grid_width, grid_height) = self.grid_panel.GetSize()
@@ -694,6 +732,7 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
         col_size_time = (grid_width - new_col_size_leg - new_col_size_team)
         col_size_time = max(10, col_size_time)
         self.prewarning_grid.SetColSize(COL_NR_TIME, col_size_time)
+        self.prewarning_grid.Thaw()
 
     def _print_sizes(self):
         self.logger.debug('PRINT SIZES')
@@ -706,13 +745,17 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
 
     def _on_resize(self, event: wx.SizeEvent):
         self.logger.debug('EventSize: %dx%d', event.GetSize().GetWidth(), event.GetSize().GetHeight())
-        self._calculate_sizes()
+        self.logger.debug('_on_resize: display_lock=%s', self.display_lock.locked())
+        with self.display_lock:
+            self._calculate_sizes()
 
         event.Skip()
 
     def _on_resize_head(self, event: wx.SizeEvent):
         self.logger.debug('HEAD EventSize: %dx%d', event.GetSize().GetWidth(), event.GetSize().GetHeight())
-        self._calculate_sizes()
+        self.logger.debug('_on_resize_head: display_lock=%s', self.display_lock.locked())
+        with self.display_lock:
+            self._calculate_sizes()
 
         event.Skip()
 
@@ -767,26 +810,34 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
             pass
         s.close()
 
-    def _close(self):
+    def _close(self, event=None):
         self.logger.debug('Close')
+        self.stop()
+        self.Unbind(wx.EVT_CLOSE, handler=self._close)
         self.Close(True)
 
     def _increase_font_size(self):
         self.logger.debug('Increase Font Size')
         self.font_factor_offset -= 1
-        self._calculate_sizes()
+        self.logger.debug('_increase_font_size: display_lock=%s', self.display_lock.locked())
+        with self.display_lock:
+            self._calculate_sizes()
         wx.CallAfter(self._refresh)
 
     def _decrease_font_size(self):
         self.logger.debug('Decrease Font Size')
         self.font_factor_offset += 1
-        self._calculate_sizes()
+        self.logger.debug('_decrease_font_size: display_lock=%s', self.display_lock.locked())
+        with self.display_lock:
+            self._calculate_sizes()
         wx.CallAfter(self._refresh)
 
     def _restore_font_size(self):
         self.logger.debug('Restore Font Size')
         self.font_factor_offset = 0
-        self._calculate_sizes()
+        self.logger.debug('_restore_font_size: display_lock=%s', self.display_lock.locked())
+        with self.display_lock:
+            self._calculate_sizes()
         wx.CallAfter(self._refresh)
 
     def _on_key_press(self, key_event: wx.KeyEvent):
@@ -925,28 +976,8 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
             self.last_sound_time = datetime.now()
 
 
-class MyApp(wx.App):
-
-    def InitLocale(self):
-        self.ResetLocale()
-        if 'wxMSW' in wx.PlatformInfo:
-            import locale
-            # Hack to work around my en_SE (given by Windows when language is
-            # english and location is Sweden) locale that is not found in Python.
-            try:
-                # lang, enc = locale.getdefaultlocale()
-                lang = 'C'
-                self._initial_locale = wx.Locale(lang, lang[:2], lang)
-                locale.setlocale(locale.LC_ALL, lang)
-            except (ValueError, locale.Error) as ex:
-                target = wx.LogStderr()
-                orig = wx.Log.SetActiveTarget(target)
-                wx.LogError("Unable to set default locale: '{}'".format(ex))
-                wx.Log.SetActiveTarget(orig)
-
-
 if __name__ == '__main__':
-    app = MyApp()
+    app = wx.App()
     frm = PreWarning()
     frm.Show()
     frm.start()

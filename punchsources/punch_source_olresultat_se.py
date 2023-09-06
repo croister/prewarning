@@ -10,6 +10,7 @@ from urllib.request import Request, urlopen
 
 from imurl import URL
 
+from utils.state_saver import StateSaverMixin
 from utils.config import ConfigSectionDefinition, ConfigOptionDefinition, Config
 from utils.config_definitions import ConfigSectionEnableType, ConfigVerifierDefinition, ConfigSectionOptionDefinition, \
     VerificationResult
@@ -138,7 +139,7 @@ def _verify_control_codes(url_str: str,
         return VerificationResult(message=str(e), status=False)
 
 
-class PunchSourceOlresultatSe(_PunchSourceBase):
+class PunchSourceOlresultatSe(StateSaverMixin, _PunchSourceBase):
     """
     A Punch Source that reads the Punches from olresultat.se.
     """
@@ -336,7 +337,11 @@ class PunchSourceOlresultatSe(_PunchSourceBase):
         return repr(self)
 
     def __init__(self):
-        super().__init__()
+        _PunchSourceBase.__init__(self)
+        StateSaverMixin.__init__(self,
+                                 'ps_olresultatse.dat',
+                                 self.name,
+                                 [self.CONFIG_OPTION_PUNCH_SOURCE_OL_RESULTAT_SE_LAST_RECEIVED_PUNCH_ID])
 
         if LOGGER_NAME != self.__class__.__name__:
             raise ValueError('LOGGER_NAME not correct: {} vs {}'.format(LOGGER_NAME, self.__class__.__name__))
@@ -353,18 +358,25 @@ class PunchSourceOlresultatSe(_PunchSourceBase):
 
         self.response_encoding = 'utf-8'
         self._running = False
-        self._last_written_punch_ids = list()
 
         self.logger.debug(self)
 
         self.update()
 
+        if self._data_read(self.CONFIG_OPTION_PUNCH_SOURCE_OL_RESULTAT_SE_LAST_RECEIVED_PUNCH_ID):
+            self.last_received_punch_id = self._get_value(
+                self.CONFIG_OPTION_PUNCH_SOURCE_OL_RESULTAT_SE_LAST_RECEIVED_PUNCH_ID)
+            Config().update_live_section_option(self.name,
+                                                self.CONFIG_OPTION_PUNCH_SOURCE_OL_RESULTAT_SE_LAST_RECEIVED_PUNCH_ID,
+                                                self.last_received_punch_id)
+            self.logger.info('Read %s value from state file: %s',
+                             self.CONFIG_OPTION_PUNCH_SOURCE_OL_RESULTAT_SE_LAST_RECEIVED_PUNCH_ID.name,
+                             self.last_received_punch_id)
+
         self.punch_fetcher = Thread(target=self._fetch_punches, daemon=True, name='PunchFetcherOlresultatSeThread')
 
     def __del__(self):
         self.stop()
-        if self.punch_fetcher.is_alive():
-            self.punch_fetcher.join()
 
     def start(self):
         self._running = True
@@ -372,6 +384,8 @@ class PunchSourceOlresultatSe(_PunchSourceBase):
 
     def stop(self):
         self._running = False
+        if self.punch_fetcher.is_alive():
+            self.punch_fetcher.join()
 
     def is_running(self) -> bool:
         return self._running
@@ -382,10 +396,6 @@ class PunchSourceOlresultatSe(_PunchSourceBase):
     def update(self):
         self._parse_config()
 
-    def _not_in_last_written(self, new_last_received_punch_id: int) -> bool:
-        self.logger.debug('_not_in_last_written: %s %d', self._last_written_punch_ids, new_last_received_punch_id)
-        return new_last_received_punch_id not in self._last_written_punch_ids
-
     def _parse_config(self):
         config_section = Config().get_section(self.name)
 
@@ -395,17 +405,7 @@ class PunchSourceOlresultatSe(_PunchSourceBase):
         new_last_received_punch_id = self.CONFIG_OPTION_PUNCH_SOURCE_OL_RESULTAT_SE_LAST_RECEIVED_PUNCH_ID.get_value(
             config_section)
         self.logger.debug('_parse_config: old %s new %s', self.last_received_punch_id, new_last_received_punch_id)
-
-        # Used to prevent unintentional decreases of last received punch id due to
-        # late updates from the config file watcher.
-        if self._not_in_last_written(new_last_received_punch_id):
-            self.last_received_punch_id = new_last_received_punch_id
-            self.logger.debug('_parse_config: updated last_received_punch_id')
-
-        # If the new last received punch id matches the last we already have we are receiving the last update and
-        # can clear the last written punch ids. This allows for us to receive intentional manual changes of the config.
-        if self.last_received_punch_id == new_last_received_punch_id:
-            self._last_written_punch_ids.clear()
+        self.last_received_punch_id = new_last_received_punch_id
 
         self.from_date = self.CONFIG_OPTION_PUNCH_SOURCE_OL_RESULTAT_SE_FROM_DATE.get_value(config_section)
         self.from_time = self.CONFIG_OPTION_PUNCH_SOURCE_OL_RESULTAT_SE_FROM_TIME.get_value(config_section)
@@ -416,19 +416,19 @@ class PunchSourceOlresultatSe(_PunchSourceBase):
         if new_control_codes is not None:
             self.control_codes.extend(new_control_codes.split())
 
-    def _write_config(self):
-        config_section = Config().get_section(self.name)
-        self.logger.debug('_write_config: %s', self.last_received_punch_id)
-        self.CONFIG_OPTION_PUNCH_SOURCE_OL_RESULTAT_SE_LAST_RECEIVED_PUNCH_ID.set_value(config_section,
-                                                                                        self.last_received_punch_id)
+    def _save_state(self):
+        self.logger.debug('_save_state: %s', self.last_received_punch_id)
 
-        Config().write()
+        self._save_value(self.CONFIG_OPTION_PUNCH_SOURCE_OL_RESULTAT_SE_LAST_RECEIVED_PUNCH_ID,
+                         self.last_received_punch_id)
+
+        Config().update_live_section_option(self.name,
+                                            self.CONFIG_OPTION_PUNCH_SOURCE_OL_RESULTAT_SE_LAST_RECEIVED_PUNCH_ID,
+                                            self.last_received_punch_id)
 
     def _fetch_punches(self):
         self.logger.debug('Started')
         while self._running:
-            self._last_written_punch_ids.clear()
-
             url = URL(self.url)
 
             url = url.set_query('unitId', self.competition_id)
@@ -456,9 +456,8 @@ class PunchSourceOlresultatSe(_PunchSourceBase):
                         if punch_dict['controlCode'] in self.control_codes:
                             self._notify_punch_listeners(punch_dict)
                         self.last_received_punch_id = int(punch_dict['id'])
-                        self._last_written_punch_ids.append(self.last_received_punch_id)
                         self.logger.debug(self.last_received_punch_id)
-                        self._write_config()
+                    self._save_state()
             except HTTPError as e:
                 self.logger.error('The server could not fulfill the request. Error code: %s', e.code)
             except URLError as e:
@@ -466,3 +465,5 @@ class PunchSourceOlresultatSe(_PunchSourceBase):
 
             sleep(self.fetch_interval_seconds)
         self.logger.debug('Stopped')
+        Config().write()
+        self._cleanup()

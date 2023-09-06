@@ -1,7 +1,7 @@
 decorator==5.1.1
 imurl==0.2.1
-natsort==8.1.0
-pymysql==1.0.2
-ruamel.yaml==0.17.21
-watchdog==2.1.7
-wxpython==4.1.1
+natsort==8.4.0
+pymysql==1.1.0
+ruamel.yaml==0.17.32
+watchdog==3.0.0
+wxpython==4.2.1

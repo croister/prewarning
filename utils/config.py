@@ -3,7 +3,7 @@
 from configparser import ConfigParser, SectionProxy
 import logging
 from pathlib import Path
-from typing import List, Dict
+from typing import List, Dict, Any
 
 from natsort import natsorted
 from watchdog.events import LoggingEventHandler, FileSystemEvent
@@ -132,21 +132,37 @@ class Config(LoggingEventHandler, Singleton):
         self.logger.debug('Config: %s', self)
 
     def __del__(self):
+        self.stop()
+
+    def stop(self):
         if self.observer and self.observer.is_alive():
             self.observer.stop()
             self.observer.join()
 
     def on_modified(self, event: FileSystemEvent):
         super().on_modified(event)
+        what = 'directory' if event.is_directory else 'file'
+        self.logger.debug("Modified %s: %s", what, event.src_path)
 
         src_path = event.src_path
-        if Path(src_path).resolve() == self.config_file_location:
-            self.logger.debug('Configuration file modification detected, reloading.')
-            self.read_config()
-            validation_errors = self.validate()
-            if len(validation_errors):
-                raise ValueError('The configuration contains the following errors: {}.'
-                                 .format(str(validation_errors)))
+        try:
+            if Path(src_path).resolve() == self.config_file_location:
+                self.logger.debug('Configuration file modification detected, reloading.')
+                self.read_config()
+                validation_errors = self.validate()
+                if len(validation_errors):
+                    raise ValueError('The configuration contains the following errors: {}.'
+                                     .format(str(validation_errors)))
+        except PermissionError as e:
+            logging.error('PermissionError in accessing the file: "%s" %s', src_path, e)
+        except OSError as e:
+            logging.error('OSError in accessing the file: "%s" %s', src_path, e)
+        except Exception as e:
+            logging.error('Exception in accessing the file: "%s" %s', src_path, e)
+        except BaseException as e:
+            logging.error('BaseException in accessing the file: "%s" %s', src_path, e)
+        except:
+            logging.error('Unknown exception in accessing the file: "%s"', src_path)
 
     def start(self):
         self.read_config()
@@ -156,6 +172,16 @@ class Config(LoggingEventHandler, Singleton):
             self.logger.error('The config section "%s" is not available.', name)
             raise ValueError('The config section "{}" is not available.'.format(name))
         return self.config[name]
+
+    def update_live_section_option(self, name: str, option_definition: ConfigOptionDefinition, value: Any):
+        if name not in self.config:
+            self.logger.error('The config section "%s" is not available in active config.', name)
+            raise ValueError('The config section "{}" is not available in active config.'.format(name))
+        if name not in self.prev_config_sections:
+            self.logger.error('The config section "%s" is not available in prev config.', name)
+            raise ValueError('The config section "{}" is not available in prev config.'.format(name))
+        option_definition.set_value(self.config[name], value)
+        option_definition.set_value(self.prev_config_sections[name], value)
 
     def config_option_definition_added(self, config_section_name: str, config_option_definition_name: str):
         config_section = self.config[config_section_name]

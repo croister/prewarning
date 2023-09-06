@@ -7,6 +7,7 @@ from typing import List, Dict, Any
 
 from pymysql import OperationalError
 
+from utils.state_saver import StateSaverMixin
 from utils.config import ConfigSectionDefinition, ConfigOptionDefinition, Config
 from utils.config_definitions import ConfigSectionEnableType, ConfigVerifierDefinition, ConfigSectionOptionDefinition, \
     ConfigSelectorDefinition, SelectionData, SelectionType, SelectionResult, VerificationResult
@@ -124,7 +125,7 @@ def _verify_fetch(host: str, user: str, password: str, database: str,
         return VerificationResult(message=str(e), status=False)
 
 
-class PunchSourceOlaMySql(_PunchSourceBase):
+class PunchSourceOlaMySql(StateSaverMixin, _PunchSourceBase):
     """
     A Punch Source that reads the Punches from the OLA MySQL Database.
     """
@@ -370,7 +371,12 @@ class PunchSourceOlaMySql(_PunchSourceBase):
         return repr(self)
 
     def __init__(self):
-        super().__init__()
+        _PunchSourceBase.__init__(self)
+        StateSaverMixin.__init__(self,
+                                 'ps_ola_mysql.dat',
+                                 self.name,
+                                 [self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_MODIFIED_TIME,
+                                  self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_RECEIVED_PUNCH_ID])
 
         if LOGGER_NAME != self.__class__.__name__:
             raise ValueError('LOGGER_NAME not correct: {} vs {}'.format(LOGGER_NAME, self.__class__.__name__))
@@ -385,18 +391,34 @@ class PunchSourceOlaMySql(_PunchSourceBase):
         self.control_ids = None
 
         self._running = False
-        self._last_written_punch_ids = list()
 
         self.logger.debug(self)
 
         self.update()
 
+        if self._data_read(self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_MODIFIED_TIME):
+            self.last_modify_time = self._get_value(
+                self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_MODIFIED_TIME)
+            Config().update_live_section_option(self.name,
+                                                self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_MODIFIED_TIME,
+                                                self.last_modify_time)
+            self.logger.info('Read %s value from state file: %s',
+                             self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_MODIFIED_TIME.name,
+                             self.last_modify_time)
+        if self._data_read(self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_RECEIVED_PUNCH_ID):
+            self.last_received_punch_id = self._get_value(
+                self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_RECEIVED_PUNCH_ID)
+            Config().update_live_section_option(self.name,
+                                                self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_RECEIVED_PUNCH_ID,
+                                                self.last_received_punch_id)
+            self.logger.info('Read %s value from state file: %s',
+                             self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_RECEIVED_PUNCH_ID.name,
+                             self.last_received_punch_id)
+
         self.punch_fetcher = Thread(target=self._fetch_punches, daemon=True, name='PunchFetcherOlaMySqlThread')
 
     def __del__(self):
         self.stop()
-        if self.punch_fetcher.is_alive():
-            self.punch_fetcher.join()
 
     def start(self):
         self._running = True
@@ -404,6 +426,8 @@ class PunchSourceOlaMySql(_PunchSourceBase):
 
     def stop(self):
         self._running = False
+        if self.punch_fetcher.is_alive():
+            self.punch_fetcher.join()
 
     def is_running(self) -> bool:
         return self._running
@@ -414,10 +438,6 @@ class PunchSourceOlaMySql(_PunchSourceBase):
     def update(self):
         self._parse_config()
 
-    def _not_in_last_written(self, new_last_received_punch_id: int) -> bool:
-        self.logger.debug('_not_in_last_written: %s %s', self._last_written_punch_ids, new_last_received_punch_id)
-        return new_last_received_punch_id not in self._last_written_punch_ids
-
     def _parse_config(self):
         self.logger.debug('_parse_config')
         config_section = Config().get_section(self.name)
@@ -425,18 +445,9 @@ class PunchSourceOlaMySql(_PunchSourceBase):
         new_last_received_punch_id = self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_RECEIVED_PUNCH_ID.get_value(
             config_section)
         self.logger.debug('_parse_config: old %s new %s', self.last_received_punch_id, new_last_received_punch_id)
-
-        # Used to prevent unintentional decreases of last received punch id due to
-        # late updates from the config file watcher.
-        if self._not_in_last_written(new_last_received_punch_id):
-            self.last_modify_time = self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_MODIFIED_TIME.get_value(
-                config_section)
-            self.last_received_punch_id = new_last_received_punch_id
-
-        # If the new last received punch id matches the last we already have we are receiving the last update and
-        # can clear the last written punch ids. This allows for us to receive intentional manual changes of the config.
-        if self.last_received_punch_id == new_last_received_punch_id:
-            self._last_written_punch_ids.clear()
+        self.last_received_punch_id = new_last_received_punch_id
+        self.last_modify_time = self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_MODIFIED_TIME.get_value(
+            config_section)
 
         self.fetch_interval_seconds = self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_FETCH_INTERVAL_SECONDS\
             .get_value(config_section)
@@ -444,20 +455,24 @@ class PunchSourceOlaMySql(_PunchSourceBase):
         if self.control_ids is not None:
             self.control_ids = self.control_ids.split()
 
-    def _write_config(self):
-        self.logger.debug('_write_config')
-        config_section = Config().get_section(self.name)
+    def _save_state(self):
+        self.logger.debug('_save_state: %s %s', self.last_modify_time, self.last_received_punch_id)
 
-        self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_MODIFIED_TIME.set_value(config_section, self.last_modify_time)
-        self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_RECEIVED_PUNCH_ID.set_value(config_section,
-                                                                                   self.last_received_punch_id)
+        self._save_value(self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_MODIFIED_TIME,
+                         self.last_modify_time)
+        self._save_value(self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_RECEIVED_PUNCH_ID,
+                         self.last_received_punch_id)
 
-        Config().write()
+        Config().update_live_section_option(self.name,
+                                            self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_MODIFIED_TIME,
+                                            self.last_modify_time)
+        Config().update_live_section_option(self.name,
+                                            self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_RECEIVED_PUNCH_ID,
+                                            self.last_received_punch_id)
 
     def _fetch_punches(self):
         self.logger.debug('Started')
         while self._running:
-            self._last_written_punch_ids.clear()
             try:
                 split_times = self.ola_mysql.get_event_race_split_times(self.control_ids, self.last_modify_time)
                 for split_time in split_times:
@@ -467,13 +482,14 @@ class PunchSourceOlaMySql(_PunchSourceBase):
                         continue
                     self._notify_punch_listeners(split_time)
                     self.last_received_punch_id = split_time['id']
-                    self._last_written_punch_ids.append(self.last_received_punch_id)
                     self.logger.debug('last_received_punch_id: %s', self.last_received_punch_id)
                     self.last_modify_time = split_time['modifyDate']
                     self.logger.debug('last_modify_time: %s', self.last_modify_time)
-                    self._write_config()
+                    self._save_state()
             except OperationalError as oe:
                 self.logger.error(oe)
 
             sleep(self.fetch_interval_seconds)
         self.logger.debug('Stopped')
+        Config().write()
+        self._cleanup()

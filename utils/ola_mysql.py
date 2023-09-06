@@ -267,7 +267,45 @@ def get_event_race_split_time_controls(connection: Connection,
 
     event_split_time_controls = []
     with connection.cursor(DictCursor) as cursor:
-        if ola_db_version >= 564:  # OLA 6.3.0.0
+        if ola_db_version >= 565:  # OLA 6.3.9
+            sql = 'SELECT DISTINCT' \
+                  '       `RaceClassSplitTimeControls`.`name` AS `raceClassSplitTimeControlName`,' \
+                  '       `Controls`.`name` AS `splitTimeControlName`,' \
+                  '       `Controls`.`name` AS `controlName`,' \
+                  '       `Controls`.`ID` AS `ID`,' \
+                  '       GROUP_CONCAT(DISTINCT `PunchingUnits`.`punchingCode`' \
+                  '          ORDER BY `PunchingUnits`.`punchingCode`' \
+                  '          SEPARATOR ", ") AS `punchingCodes`,' \
+                  '       `Controls`.`location` AS `controlLocation`,' \
+                  '       `Controls`.`controlAreaName` AS `controlAreaName`,' \
+                  '       COUNT(DISTINCT `RaceClasses`.`raceClassId`) AS `classCount`,' \
+                  '       {class_names_query} AS `classNames`,' \
+                  '       `RaceClassSplitTimeControls`.`noSplitTimes` AS `noSplitTimes`' \
+                  ' FROM `Controls`' \
+                  '  LEFT JOIN `CoursesWayPointControls`' \
+                  '         ON `Controls`.`controlId` = `CoursesWayPointControls`.`controlId`' \
+                  '  LEFT JOIN `RaceClassCourses`' \
+                  '         ON `CoursesWayPointControls`.`courseId` = `RaceClassCourses`.`courseId`' \
+                  '  LEFT JOIN `RaceClasses`' \
+                  '         ON `RaceClassCourses`.`raceClassId` = `RaceClasses`.`raceClassId`' \
+                  '  LEFT JOIN `EventClasses`' \
+                  '         ON `RaceClasses`.`eventClassId` = `EventClasses`.`eventClassId`' \
+                  '  LEFT JOIN `ControlsPunchingUnits`' \
+                  '         ON `Controls`.`controlId` = `ControlsPunchingUnits`.`control`' \
+                  '  LEFT JOIN `PunchingUnits`' \
+                  '         ON `ControlsPunchingUnits`.`punchingUnit` = `PunchingUnits`.`punchingUnitId`' \
+                  '  LEFT OUTER JOIN `RaceClassSplitTimeControls`' \
+                  '         ON `Controls`.`controlId` = `RaceClassSplitTimeControls`.`splitTimeControlId`' \
+                  ' WHERE `Controls`.`typeCode` = "WTC"' \
+                  '   AND `Controls`.`eventRaceId` = %s' \
+                  ' GROUP BY' \
+                  '       `Controls`.`ID`' \
+                  ' ORDER BY' \
+                  '       `Controls`.`ID` ASC,' \
+                  '       `EventClasses`.`name` ASC,' \
+                  '       `RaceClasses`.`raceClassName` ASC' \
+                  ';'.format(class_names_query=class_names_query)
+        elif ola_db_version >= 564:  # OLA 6.3.0.0
             sql = 'SELECT DISTINCT' \
                   '       `RaceClassSplitTimeControls`.`name` AS `raceClassSplitTimeControlName`,' \
                   '       `Controls`.`name` AS `splitTimeControlName`,' \

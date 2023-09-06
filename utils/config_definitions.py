@@ -251,7 +251,7 @@ class ConfigOptionDefinition:
                 value = None
             if value is not None:
                 try:
-                    value = Path(value).resolve()
+                    value = Path(value)
                 except Exception as e:
                     self.logger.debug('get_value: %s', e)
                     value = None
@@ -311,8 +311,8 @@ class ConfigOptionDefinition:
                 self.logger.error(
                     'The %s (%s) for the configuration option %s is not in the valid values list (%s).',
                     value_name, value, self.name, str(valid_values))
-                validation_errors.append('The {} is not in the valid values list ({}).'
-                                         .format(value_name, str(valid_values)))
+                validation_errors.append('The {} ({}) is not in the valid values list ({}).'
+                                         .format(value_name, self.name, str(valid_values)))
         elif self.validator is not None:
             result = self.validator(value)
             if not result:
