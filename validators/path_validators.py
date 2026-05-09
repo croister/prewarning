@@ -10,7 +10,7 @@ from validators.validator_decorator import validator
 BASE_DIR = Path(__file__).resolve().parent.parent.absolute()
 
 
-def _to_path(value: str or Path) -> Path:
+def _to_path(value: str | Path) -> Path:
     """
     Validate if the given value is a valid path.
 
@@ -37,7 +37,7 @@ def _to_path(value: str or Path) -> Path:
 
 
 @validator(message='Not a valid Path.')
-def is_path(value: str or Path) -> bool:
+def is_path(value: str | Path) -> bool:
     """
     Validate if the given value is a valid path.
 
@@ -53,7 +53,7 @@ def is_path(value: str or Path) -> bool:
 
 
 @validator(message='The path does not exist.')
-def path_exists(value: str or Path) -> bool:
+def path_exists(value: str | Path) -> bool:
     """
     Validate if the given value is an existing path.
 
@@ -72,7 +72,7 @@ def path_exists(value: str or Path) -> bool:
 
 
 @validator(message='The file does not exist.')
-def file_exists(value: str or Path) -> bool:
+def file_exists(value: str | Path) -> bool:
     """
     Validate if the given value is an existing file path.
 
@@ -94,7 +94,7 @@ def file_exists(value: str or Path) -> bool:
 
 
 @validator(message='The directory does not exist.')
-def directory_exists(value: str or Path) -> bool:
+def directory_exists(value: str | Path) -> bool:
     """
     Validate if the given value is an existing directory path.
 

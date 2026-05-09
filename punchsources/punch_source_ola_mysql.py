@@ -94,7 +94,7 @@ def _verify_control_ids(host: str, user: str, password: str, database: str,
 
 def _verify_fetch(host: str, user: str, password: str, database: str,
                   event_id: int, event_race_id: int, control_ids: str,
-                  last_modify_time: str or None, last_received_punch_id: str = None) -> VerificationResult:
+                  last_modify_time: str | None, last_received_punch_id: str = None) -> VerificationResult:
     try:
         if control_ids is None or len(control_ids) == 0:
             control_id_ints = []

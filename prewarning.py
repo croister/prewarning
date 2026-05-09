@@ -9,7 +9,6 @@ __version__ = '2.1.0'
 
 import logging
 import logging.config
-import os
 import socket
 from datetime import timedelta, datetime
 from pathlib import Path
@@ -18,8 +17,8 @@ from threading import Thread, Lock
 from time import strftime, time
 from typing import List, Dict
 
-from ruamel import yaml
-from watchdog.events import LoggingEventHandler, FileSystemEvent
+from ruamel.yaml import YAML
+from watchdog.events import LoggingEventHandler, DirModifiedEvent, FileModifiedEvent
 from watchdog.observers import Observer
 import wx
 import wx.grid
@@ -73,8 +72,9 @@ def _update_logging_configuration():
     # noinspection PyBroadException
     src_path = APPLICATION_DIR / LOGGING_CONFIGURATION_FILE
     try:
+        yaml = YAML(typ='safe', pure=True)
         with open(src_path, 'r') as f:
-            config = yaml.safe_load(f.read())
+            config = yaml.load(f.read())
             _filter_logging_configuration(config)
             logging.config.dictConfig(config)
     except PermissionError as e:
@@ -447,7 +447,7 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
             self.start_list_source.stop()
 
     @staticmethod
-    def _get_portrait_screen() -> wx.Display or None:
+    def _get_portrait_screen() -> wx.Display | None:
         for display in (wx.Display(i) for i in range(wx.Display.GetCount())):
             geometry = display.GetGeometry()
             if geometry.GetHeight() > geometry.GetWidth():
@@ -474,11 +474,11 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
 
         self.logger.debug('Frame size: %dx%d', width, height)
 
-        self.SetMinSize((width, height))
-        self.SetSize((width, height))
+        self.SetMinSize(wx.Size(width, height))
+        self.SetSize(wx.Size(width, height))
         self.Center()
 
-    def on_modified(self, event: FileSystemEvent):
+    def on_modified(self, event: DirModifiedEvent | FileModifiedEvent):
         super().on_modified(event)
 
         src_path = event.src_path
@@ -577,7 +577,7 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
                                     text=hotkey_binding.name,
                                     helpString=hotkey_binding.description)
             if hotkey_binding.bitmap_name is not None:
-                menu_item.SetBitmap(wx.ArtProvider.GetBitmap(hotkey_binding.bitmap_name,
+                menu_item.SetBitmap(wx.ArtProvider.GetBitmapBundle(hotkey_binding.bitmap_name,
                                                              client=wx.ART_MENU,
                                                              size=image_size))
             menu_item = menu.Append(menu_item)
@@ -950,11 +950,11 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
             passed_time = self._to_str(punch['passedTime']).rpartition(' ')[2]
             bib_number = self._to_str(punch['bibNumber'])
             relay_leg = self._to_str(punch['relayLeg'])
-            self._add_pre_warning(passed_time, bib_number, relay_leg)
+            wx.CallAfter(self._add_pre_warning, passed_time, bib_number, relay_leg)
             self.announcement_queue.put({'language': language, 'sound': bib_number})
 
     @staticmethod
-    def _to_str(val: int or str or None) -> str:
+    def _to_str(val: int | str | None) -> str:
         if val is None:
             return '-'
         return str(val)

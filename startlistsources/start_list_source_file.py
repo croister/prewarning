@@ -25,7 +25,7 @@ LOGGER_NAME = 'StartListSourceFile'
 DEFAULT_START_LIST_FILE_FOLDER = Path(__file__).resolve().parent.parent.absolute()
 
 
-def _select_start_list_file(parent: wx.Window, prev_file: str or Path = None) -> str or False:
+def _select_start_list_file(parent: wx.Window, prev_file: str | Path = None) -> SelectionResult | bool:
 
     if prev_file is None:
         default_dir = DEFAULT_START_LIST_FILE_FOLDER.as_posix()
@@ -423,7 +423,7 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
 
         Sound.play(self.start_list_update_sound_file)
 
-    def lookup_from_card_number(self, card_number: str) -> Dict[str, str] or None:
+    def lookup_from_card_number(self, card_number: str) -> Dict[str, str] | None:
         """Returns Bib-Number and Relay Leg for the provided Card Number.
 
         :param str card_number: The Card Number to look up.

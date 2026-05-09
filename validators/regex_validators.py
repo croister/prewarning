@@ -8,7 +8,7 @@ from validators import LOGGER_NAME
 from validators.validator_decorator import validator
 
 
-def _regex(value: str, regex_pattern: str or Pattern, flags: int = 0) -> bool:
+def _regex(value: str, regex_pattern: str | Pattern, flags: int = 0) -> bool:
     """
     Validate the given value using the given regex pattern.
 

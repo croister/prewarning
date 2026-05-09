@@ -14,7 +14,7 @@ from utils.hotkey_bindings import HotKeyBindingDefinition
 class HelpDialog(wx.Frame):
 
     def __init__(self, parent, app_version: str, hotkey_bindings: List[HotKeyBindingDefinition] = None):
-        wx.Frame.__init__(self, parent, wx.ID_ANY, title="Help", size=(600, 800))
+        wx.Frame.__init__(self, parent, wx.ID_ANY, title="Help", size=wx.Size(600, 800))
 
         if hotkey_bindings is None:
             hotkey_bindings = []

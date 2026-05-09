@@ -3,7 +3,7 @@
 import logging
 from configparser import SectionProxy
 from pathlib import Path
-from typing import Any, List
+from typing import Any, List, cast
 
 import wx
 import wx.lib.scrolledpanel
@@ -36,7 +36,7 @@ def _has_default_value(option_definition: ConfigOptionDefinition, config_section
     return value == default_value
 
 
-def _set_value(control: wx.TextEntry or wx.CheckBox, value: Any):
+def _set_value(control: wx.TextEntry | wx.CheckBox, value: Any):
     if type(control) == wx.TextCtrl:
         control.ChangeValue(value)
     elif type(control) == wx.ComboBox:
@@ -47,7 +47,7 @@ def _set_value(control: wx.TextEntry or wx.CheckBox, value: Any):
         control.SetValue(value)
 
 
-def _get_value(control: wx.TextEntry or wx.CheckBox) -> str or None:
+def _get_value(control: wx.TextEntry | wx.CheckBox) -> str | None:
     if type(control) == wx.ListBox:
         selection = control.GetSelection()
         if selection != wx.NOT_FOUND:
@@ -102,7 +102,7 @@ class ConfigOptionValidator(wx.Validator):
         validation_errors = self.config_option_definition.validate(value)
 
         if len(validation_errors) > 0:
-            control.SetBackgroundColour("pink")
+            control.SetBackgroundColour(wx.Colour("pink"))
             control.SetToolTip('\n'.join(validation_errors))
             control.SetFocus()
             control.Refresh()
@@ -168,9 +168,9 @@ class ConfigSectionPanel(wx.Panel):
                                                                              self.config_section_definition.requires])))
 
         image_size = wx.Size(16, 16)
-        image_reset_to_default = wx.ArtProvider.GetBitmap(wx.ART_UNDO, client=wx.ART_TOOLBAR, size=image_size)
-        image_test = wx.ArtProvider.GetBitmap(wx.ART_TICK_MARK)
-        image_select = wx.ArtProvider.GetBitmap(wx.ART_FILE_OPEN, client=wx.ART_MENU, size=image_size)
+        image_reset_to_default = wx.ArtProvider.GetBitmapBundle(wx.ART_UNDO, client=wx.ART_TOOLBAR, size=image_size)
+        image_test = wx.ArtProvider.GetBitmapBundle(wx.ART_TICK_MARK)
+        image_select = wx.ArtProvider.GetBitmapBundle(wx.ART_FILE_OPEN, client=wx.ART_MENU, size=image_size)
 
         main_sizer.Add(self.section_label, 0, wx.ALL, 5)
 
@@ -386,126 +386,127 @@ class ConfigSectionPanel(wx.Panel):
         self.GetParent().GetParent().TransferDataFromWindow()
 
         button = event.GetEventObject()
-        (name, function) = button.GetName().split('_')[0:2]
-        option_definition = self.config_section_definition.option_definitions[name]
+        if isinstance(button, wx.Button):
+            (name, function) = button.GetName().split('_')[0:2]
+            option_definition = self.config_section_definition.option_definitions[name]
 
-        if function == 'default':
-            default_value = _default_value(option_definition)
+            if function == 'default':
+                default_value = _default_value(option_definition)
 
-            option_input = wx.FindWindowByName(name, parent=self)
-            if option_input is None:
-                self.logger.error('Unable to find the %s input.', name)
-                raise ValueError('Unable to find the {} input.'.format(name))
+                option_input = wx.FindWindowByName(name, parent=self)
+                if option_input is None:
+                    self.logger.error('Unable to find the %s input.', name)
+                    raise ValueError('Unable to find the {} input.'.format(name))
 
-            _set_value(option_input, default_value)
-            option_input.SetFocus()
+                _set_value(option_input, default_value)
+                option_input.SetFocus()
 
-            self.update()
+                self.update()
 
-        elif function == 'verify':
-            result = option_definition.verifier.verify()
+            elif function == 'verify':
+                result = option_definition.verifier.verify()
 
-            self.update()
+                self.update()
 
-            if not result:
-                button.SetBackgroundColour('pink')
-                button.SetToolTip(result.message)
-                button.SetFocus()
-                button.Refresh()
-            else:
-                message = 'Success'
-                if isinstance(result, VerificationResult):
-                    if result.message is not None:
-                        message = f'Success: {result.message}'
-                button.SetBackgroundColour(wx.GREEN)
-                button.SetToolTip(message)
-                button.Refresh()
-
-        elif function == 'select':
-            valid_values = option_definition.get_valid_values()
-            if option_definition.selector is not None:
-                result = option_definition.selector.select(parent=self.GetParent())
-            elif ConfigSectionPanel._use_selector_for(valid_values):
-                result = SelectionResult(caption='Valid Values',
-                                         message='Select a Value:')
-                for value in valid_values:
-                    result.add_value(SelectionData(value, value))
-            else:
-                self.logger.error('Unknown select method.')
-                raise ValueError('Unknown select method.')
-
-            if result is not None:
-                if type(result) == SelectionError:
-                    button.SetBackgroundColour('pink')
+                if not result:
+                    button.SetBackgroundColour(wx.Colour('pink'))
                     button.SetToolTip(result.message)
                     button.SetFocus()
                     button.Refresh()
+                else:
+                    message = 'Success'
+                    if isinstance(result, VerificationResult):
+                        if result.message is not None:
+                            message = f'Success: {result.message}'
+                    button.SetBackgroundColour(wx.GREEN)
+                    button.SetToolTip(message)
+                    button.Refresh()
 
-                elif type(result) == SelectionResult:
-                    option_input = wx.FindWindowByName(name, parent=self)
-                    if option_input is None:
-                        self.logger.error('Unable to find the %s input.', name)
-                        raise ValueError('Unable to find the {} input.'.format(name))
+            elif function == 'select':
+                valid_values = option_definition.get_valid_values()
+                if option_definition.selector is not None:
+                    result = option_definition.selector.select(parent=self.GetParent())
+                elif ConfigSectionPanel._use_selector_for(valid_values):
+                    result = SelectionResult(caption='Valid Values',
+                                             message='Select a Value:')
+                    for value in valid_values:
+                        result.add_value(SelectionData(value, value))
+                else:
+                    self.logger.error('Unknown select method.')
+                    raise ValueError('Unknown select method.')
 
-                    selected = None
-
-                    if len(result.values) > 1:
-                        old_value = str(option_definition.get_value(self.config.get_section(
-                            self.config_section_definition.name)))
-                        new_values = [str(s.value) for s in result.values]
-
-                        value_dict = {str(r.display_name): r for r in result.values}
-                        value_list = list(value_dict.keys())
-
-                        if result.selection_type == SelectionType.SINGLE:
-                            old_selected = 0
-                            if old_value is not None and old_value in new_values:
-                                old_selected = new_values.index(old_value)
-
-                            with wx.SingleChoiceDialog(self.GetParent(),
-                                                       'Select a value',
-                                                       'Values',
-                                                       value_list) as dialog:
-                                dialog.SetSelection(old_selected)
-
-                                if dialog.ShowModal() == wx.ID_OK:
-                                    self.logger.debug('You selected: "%s"', dialog.GetStringSelection())
-                                    selected = [value_dict[dialog.GetStringSelection()]]
-
-                        elif result.selection_type == SelectionType.MULTIPLE:
-                            old_selected = []
-                            if old_value is not None:
-                                old_values = old_value.split()
-                                for old_val in old_values:
-                                    if old_val in new_values:
-                                        old_selected.append(new_values.index(old_val))
-
-                            with wx.MultiChoiceDialog(self.GetParent(),
-                                                      'Select value(s)',
-                                                      'Values',
-                                                      value_list) as dialog:
-                                dialog.SetSelections(old_selected)
-
-                                if dialog.ShowModal() == wx.ID_OK:
-                                    selections = dialog.GetSelections()
-                                    selected = [value_dict[value_list[x]] for x in selections]
-                                    self.logger.debug('You selected: "%s"', selected)
-
-                    elif len(result.values) == 1:
-                        selected = result.values
-
-                    if selected is not None:
-                        value = ' '.join([str(s.value) for s in selected])
-
-                        _set_value(option_input, value)
-
-                        self.update()
-
-                        button.SetBackgroundColour(wx.GREEN)
-                        button.SetToolTip('Success')
+                if result is not None:
+                    if type(result) == SelectionError:
+                        button.SetBackgroundColour(wx.Colour('pink'))
+                        button.SetToolTip(result.message)
+                        button.SetFocus()
                         button.Refresh()
-                    else:
-                        self.update()
+
+                    elif type(result) == SelectionResult:
+                        option_input = wx.FindWindowByName(name, parent=self)
+                        if option_input is None:
+                            self.logger.error('Unable to find the %s input.', name)
+                            raise ValueError('Unable to find the {} input.'.format(name))
+
+                        selected = None
+
+                        if len(result.values) > 1:
+                            old_value = str(option_definition.get_value(self.config.get_section(
+                                self.config_section_definition.name)))
+                            new_values = [str(s.value) for s in result.values]
+
+                            value_dict = {str(r.display_name): r for r in result.values}
+                            value_list = list(value_dict.keys())
+
+                            if result.selection_type == SelectionType.SINGLE:
+                                old_selected = 0
+                                if old_value is not None and old_value in new_values:
+                                    old_selected = new_values.index(old_value)
+
+                                with wx.SingleChoiceDialog(self.GetParent(),
+                                                           'Select a value',
+                                                           'Values',
+                                                           value_list) as dialog:
+                                    dialog.SetSelection(old_selected)
+
+                                    if dialog.ShowModal() == wx.ID_OK:
+                                        self.logger.debug('You selected: "%s"', dialog.GetStringSelection())
+                                        selected = [value_dict[dialog.GetStringSelection()]]
+
+                            elif result.selection_type == SelectionType.MULTIPLE:
+                                old_selected = []
+                                if old_value is not None:
+                                    old_values = old_value.split()
+                                    for old_val in old_values:
+                                        if old_val in new_values:
+                                            old_selected.append(new_values.index(old_val))
+
+                                with wx.MultiChoiceDialog(self.GetParent(),
+                                                          'Select value(s)',
+                                                          'Values',
+                                                          value_list) as dialog:
+                                    dialog.SetSelections(old_selected)
+
+                                    if dialog.ShowModal() == wx.ID_OK:
+                                        selections = dialog.GetSelections()
+                                        selected = [value_dict[value_list[x]] for x in selections]
+                                        self.logger.debug('You selected: "%s"', selected)
+
+                        elif len(result.values) == 1:
+                            selected = result.values
+
+                        if selected is not None:
+                            value = ' '.join([str(s.value) for s in selected])
+
+                            _set_value(option_input, value)
+
+                            self.update()
+
+                            button.SetBackgroundColour(wx.GREEN)
+                            button.SetToolTip('Success')
+                            button.Refresh()
+                        else:
+                            self.update()
 
     def Validate(self) -> bool:
         for child in self.GetChildren():

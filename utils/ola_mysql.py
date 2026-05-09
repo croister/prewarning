@@ -149,7 +149,7 @@ def _generate_in_format_str(no_of_values: int):
     return ', '.join(['%s'] * no_of_values)
 
 
-def get_events(connection: Connection, event_forms: EventForm or EventFormType = None) -> List[Dict[str, Any]]:
+def get_events(connection: Connection, event_forms: EventForm | EventFormType = None) -> List[Dict[str, Any]]:
     logging.getLogger(LOGGER_NAME).debug('get_events')
 
     if event_forms is None:
@@ -201,7 +201,7 @@ def get_event(connection: Connection, event_id: int) -> Dict[str, Any]:
     return event
 
 
-def is_valid_event(connection: Connection, event_id: int, event_forms: EventForm or EventFormType = None) -> bool:
+def is_valid_event(connection: Connection, event_id: int, event_forms: EventForm | EventFormType = None) -> bool:
     logging.getLogger(LOGGER_NAME).debug('is_valid_event')
 
     if event_forms is None:
@@ -419,7 +419,7 @@ def _verify_connection_parameters(host: str, user: str, password: str):
     return True
 
 
-def _select_database(host: str, user: str, password: str) -> SelectionResult or False:
+def _select_database(host: str, user: str, password: str) -> SelectionResult | bool:
     try:
         connection = connect(host, user, password)
         with connection:
@@ -445,7 +445,7 @@ def _verify_database(host: str, user: str, password: str, database: str):
 
 
 def _select_event(host: str, user: str, password: str, database: str,
-                  event_forms: EventForm or EventFormType = None) -> SelectionResult or False:
+                  event_forms: EventForm | EventFormType = None) -> SelectionResult | bool:
     try:
         connection = connect(host, user, password, database)
         with connection:
@@ -470,7 +470,7 @@ def _select_event(host: str, user: str, password: str, database: str,
 
 
 def _verify_event(host: str, user: str, password: str, database: str, event_id: int,
-                  event_forms: EventForm or EventFormType = None):
+                  event_forms: EventForm | EventFormType = None):
     if event_forms is None:
         event_forms = EventFormType.ALL
 
@@ -483,7 +483,7 @@ def _verify_event(host: str, user: str, password: str, database: str, event_id: 
         return False
 
 
-def _select_event_race(host: str, user: str, password: str, database: str, event_id: int) -> SelectionResult or False:
+def _select_event_race(host: str, user: str, password: str, database: str, event_id: int) -> SelectionResult | bool:
     try:
         connection = connect(host, user, password, database)
         with connection:
@@ -520,7 +520,7 @@ def get_event_race_split_times(connection: Connection,
                                event_id: int,
                                event_race_id: int,
                                control_ids: List[int],
-                               last_modify_time: str or None = None) -> List[Dict[str, Any]]:
+                               last_modify_time: str | None = None) -> List[Dict[str, Any]]:
     logging.getLogger(LOGGER_NAME).debug('get_event_race_split_times')
 
     if last_modify_time is None:
@@ -593,7 +593,9 @@ def get_event_race_split_times(connection: Connection,
                   ' ORDER BY' \
                   '  `SplitTimes`.`modifyDate` ASC' \
                   ';'.format(control_ids_format_str)
-        args = [event_id, event_race_id]
+        args = list()
+        args.append(event_id)
+        args.append(event_race_id)
         args.extend(control_ids)
         args.append(last_modify_time)
         cursor.execute(sql, args)
@@ -960,7 +962,7 @@ class OlaMySql(ConfigConsumer, Singleton, metaclass=_OlaMySqlMeta):
             connection.close()
         return self.ola_db_version
 
-    def get_events(self, event_forms: EventForm or EventFormType = None) -> List[Dict[str, Any]]:
+    def get_events(self, event_forms: EventForm | EventFormType = None) -> List[Dict[str, Any]]:
         self.logger.debug('get_events')
 
         connection = self._connect()
@@ -1037,7 +1039,7 @@ class OlaMySql(ConfigConsumer, Singleton, metaclass=_OlaMySqlMeta):
 
     def get_event_race_results(self,
                                event_class_ids: List[str],
-                               runner_statuses: List[str] or None = None) -> List[Dict[str, Any]]:
+                               runner_statuses: List[str] | None = None) -> List[Dict[str, Any]]:
         self.logger.debug('get_event_results')
         if self.event is None:
             raise ValueError('A Event needs to be selected first')
@@ -1110,7 +1112,7 @@ class OlaMySql(ConfigConsumer, Singleton, metaclass=_OlaMySqlMeta):
 
     def get_event_race_split_times(self,
                                    control_ids: List[int],
-                                   last_modify_time: str or None = None) -> List[Dict[str, Any]]:
+                                   last_modify_time: str | None = None) -> List[Dict[str, Any]]:
         self.logger.debug('get_event_race_split_times')
         if self.event is None:
             raise ValueError('A Event needs to be selected first')
@@ -1130,7 +1132,7 @@ class OlaMySql(ConfigConsumer, Singleton, metaclass=_OlaMySqlMeta):
                                                            last_modify_time=last_modify_time)
         return event_split_times
 
-    def get_event_race_pre_warning_data(self, card_number: str) -> Dict[str, Any] or None:
+    def get_event_race_pre_warning_data(self, card_number: str) -> Dict[str, Any] | None:
         self.logger.debug('get_event_pre_warning_data')
         if self.event is None:
             raise ValueError('A Event needs to be selected first')
@@ -1141,7 +1143,9 @@ class OlaMySql(ConfigConsumer, Singleton, metaclass=_OlaMySqlMeta):
             with connection.cursor(DictCursor) as cursor:
                 sql = 'SELECT' \
                       '  `Results`.`bibNumber`,' \
-                      '  `RaceClasses`.`relayLeg`' \
+                      '  `RaceClasses`.`relayLeg`,' \
+                      '  (SELECT MAX(`RaceClasses`.`relayLeg`) FROM `RaceClasses` WHERE `RaceClasses`.`eventClassId`' \
+                      '    = `RaceClasses`.`eventClassId`) = `RaceClasses`.`relayLeg` AS isLastLeg' \
                       ' FROM `Results`' \
                       '  LEFT JOIN `RaceClasses`' \
                       '         ON `Results`.`raceClassId` = `RaceClasses`.`raceClassId`' \

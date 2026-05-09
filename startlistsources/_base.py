@@ -46,7 +46,7 @@ class _StartListSourceBase(ConfigConsumer):
         """
 
     @abstractmethod
-    def lookup_from_card_number(self, card_number: str) -> Dict[str, str] or None:
+    def lookup_from_card_number(self, card_number: str) -> Dict[str, str] | None:
         """Returns Bib-Number and Relay Leg for the provided Card Number.
 
         :param str card_number: The Card Number to look up.

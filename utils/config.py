@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import List, Dict, Any
 
 from natsort import natsorted
-from watchdog.events import LoggingEventHandler, FileSystemEvent
+from watchdog.events import LoggingEventHandler, DirModifiedEvent, FileModifiedEvent
 from watchdog.observers import Observer
 
 from utils.config_consumer import ConfigConsumer
@@ -99,10 +99,10 @@ class Config(LoggingEventHandler, Singleton):
     def __str__(self) -> str:
         return repr(self)
 
-    def __init__(self, config_file_location: str or Path or None = None):
+    def __init__(self, config_file_location: str | Path | None = None):
         self.logger = logging.getLogger(self.__class__.__name__)
 
-        super().__init__(self.logger)
+        super().__init__(logger=self.logger)
 
         self.observer = None
 
@@ -139,7 +139,7 @@ class Config(LoggingEventHandler, Singleton):
             self.observer.stop()
             self.observer.join()
 
-    def on_modified(self, event: FileSystemEvent):
+    def on_modified(self, event: DirModifiedEvent | FileModifiedEvent):
         super().on_modified(event)
         what = 'directory' if event.is_directory else 'file'
         self.logger.debug("Modified %s: %s", what, event.src_path)

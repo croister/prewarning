@@ -2,10 +2,9 @@
 
 import inspect
 import logging
-from typing import Callable, Iterable, Tuple, Any
+from typing import Callable, Iterable, Tuple, Any, List
 
 from utils.config_definitions import ConfigSectionOptionDefinition
-from validators.validation_error import ValidationError
 
 
 class VerificationError(Exception):
@@ -49,7 +48,7 @@ class ConfigVerifierDefinition:
 
     def __init__(self,
                  function: Callable,
-                 parameters: [ConfigSectionOptionDefinition],
+                 parameters: List[ConfigSectionOptionDefinition] | List[Any],
                  message: str = None):
         super().__init__()
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -63,7 +62,7 @@ class ConfigVerifierDefinition:
 
         self.logger.debug(self)
 
-    def verify(self) -> bool or VerificationError:
+    def verify(self) -> bool | VerificationError:
         from utils.config import Config
         args = [p.option_definition.get_value(Config().get_section(p.section_name))
                 if type(p) == ConfigSectionOptionDefinition
@@ -73,5 +72,5 @@ class ConfigVerifierDefinition:
         result = self.function(*args)
         if not result:
             arg_names = inspect.getfullargspec(self.function)[0]
-            return ValidationError(self.function, self.message, dict(zip(arg_names, args)))
+            return VerificationError(self.function, self.message, dict(zip(arg_names, args)))
         return True

@@ -8,7 +8,8 @@ from threading import Lock
 from natsort import natsorted
 from subprocess import run
 from typing import List
-from watchdog.events import LoggingEventHandler, FileSystemEvent
+
+from watchdog.events import LoggingEventHandler, DirMovedEvent, FileMovedEvent, DirCreatedEvent, FileCreatedEvent, DirDeletedEvent, FileDeletedEvent, DirModifiedEvent, FileModifiedEvent
 from watchdog.observers import Observer
 
 from utils.config import ConfigConsumer, ConfigSectionDefinition, ConfigOptionDefinition, Config
@@ -55,22 +56,22 @@ class SoundFolder(LoggingEventHandler, Singleton):
             self.observer.stop()
             self.observer.join()
 
-    def on_moved(self, event):
+    def on_moved(self, event: DirMovedEvent | FileMovedEvent):
         super().on_moved(event)
 
         self._reset()
 
-    def on_created(self, event):
+    def on_created(self, event: DirCreatedEvent | FileCreatedEvent):
         super().on_created(event)
 
         self._reset()
 
-    def on_deleted(self, event):
+    def on_deleted(self, event: DirDeletedEvent | FileDeletedEvent):
         super().on_deleted(event)
 
         self._reset()
 
-    def on_modified(self, event: FileSystemEvent):
+    def on_modified(self, event: DirModifiedEvent | FileModifiedEvent):
         super().on_modified(event)
 
         self._reset()

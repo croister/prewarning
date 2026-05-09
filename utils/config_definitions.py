@@ -133,7 +133,7 @@ class ConfigOptionDefinition:
                     'A configuration option ({}) with the type bool can not have valid values defined.'.format(
                         self.name))
 
-    def get_valid_values(self) -> List[Any] or None:
+    def get_valid_values(self) -> List[Any] | None:
         """Returns the list of valid values for this option
 
         :return: The list of valid values for this option
@@ -230,7 +230,7 @@ class ConfigOptionDefinition:
         elif self.value_type is int:
             try:
                 value = config_section.getint(self.name, fallback=self.default_value)
-            except ValueError as e:
+            except ValueError:
                 value = None
         elif self.value_type is float:
             try:
@@ -277,7 +277,7 @@ class ConfigOptionDefinition:
         config_section[self.name] = str(value)
 
     def _validate_value_type(self, value_name: str, value: Any) -> List[str]:
-        """Validates the type of a value
+        """Validates the type of value
 
         :param str value_name: The name of the value
         :param str value: The value to be validated
@@ -536,6 +536,8 @@ class ConfigSectionDefinition:
             return self._is_enabled_by(config_sections)
         elif self.enable_type is ConfigSectionEnableType.IF_REQUIRED:
             return self._is_enabled_if_required_by(config_sections)
+        else:
+            return False
 
     def _is_enabled_by(self, config_sections: Dict[str, SectionProxy]) -> bool:
         """Determines if this config section is enabled by a configuration in another config section
@@ -658,7 +660,7 @@ class ConfigVerifierDefinition:
 
     def __init__(self,
                  function: Callable,
-                 parameters: [ConfigSectionOptionDefinition],
+                 parameters: List[ConfigSectionOptionDefinition],
                  message: str = None):
         super().__init__()
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -672,7 +674,7 @@ class ConfigVerifierDefinition:
 
         self.logger.debug(self)
 
-    def verify(self) -> bool or VerificationError:
+    def verify(self) -> bool | VerificationError:
         from utils.config import Config
         args = [p.option_definition.get_value(Config().get_section(p.section_name)) for p in self.parameters]
 
@@ -787,7 +789,7 @@ class ConfigSelectorDefinition:
 
     def __init__(self,
                  function: Callable,
-                 parameters: [ConfigSectionOptionDefinition],
+                 parameters: List[ConfigSectionOptionDefinition] | List[Any],
                  message: str = None):
         super().__init__()
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -801,13 +803,12 @@ class ConfigSelectorDefinition:
 
         self.logger.debug(self)
 
-    def select(self, parent: wx.Window = None) -> SelectionResult or SelectionError:
+    def select(self, parent: wx.Window = None) -> SelectionResult | SelectionError:
         from utils.config import Config
         arg_names = inspect.getfullargspec(self.function)[0]
         args = [p.option_definition.get_value(Config().get_section(p.section_name))
                 if type(p) == ConfigSectionOptionDefinition
-                else p
-                for p in self.parameters]
+                else p for p in self.parameters]
 
         if 'parent' in arg_names:
             result = self.function(parent, *args)

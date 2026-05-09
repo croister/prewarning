@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 from configparser import ConfigParser, SectionProxy
 import logging
 from pathlib import Path
@@ -9,7 +9,7 @@ from utils.config_definitions import ConfigOptionDefinition
 from utils.constants import DATA_DIR
 
 
-class StateSaverMixin:
+class StateSaverMixin(ABC):
     """
     Provides functionality to preserve state that survives abrupt restarts by writing and reading it from a file.
     """
