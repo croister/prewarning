@@ -2,6 +2,7 @@
 
 import logging
 from pathlib import Path
+from threading import Lock, RLock
 from typing import List, Dict
 from xml.etree import ElementTree
 from zipfile import ZipFile
@@ -270,6 +271,10 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
         self.start_list_file = None
         self.start_list_update_sound_file = None
 
+        self._data_lock = Lock()
+
+        self._observer_lock = Lock()
+
         self.team_names = dict()
         self.teams = dict()
         self.runners = dict()
@@ -341,87 +346,90 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
 
         self.start_list_update_sound_file = self.CONFIG_OPTION_START_LIST_UPDATE_SOUND_FILE.get_value(config_section)
 
-        self.observer.schedule(event_handler=self, path=self.start_list_file.parent.as_posix())
-        if self._running and not self.observer.is_alive():
-            self.observer.start()
+        with self._observer_lock:
+            self.observer.schedule(event_handler=self, path=self.start_list_file.parent.as_posix())
+            if self._running and not self.observer.is_alive():
+                self.observer.start()
 
     def _read_start_list(self):
-        if self.start_list_file.as_posix().lower().endswith('.zip'):
-            with ZipFile(self.start_list_file, 'r') as archive:
-                data = archive.read('SOFTSTRT.XML')
-        else:
-            with open(self.start_list_file.as_posix(), 'r', encoding='windows-1252') as f:
-                data = f.read()
+        with self._data_lock:
+            if self.start_list_file.as_posix().lower().endswith('.zip'):
+                with ZipFile(self.start_list_file, 'r') as archive:
+                    data = archive.read('SOFTSTRT.XML')
+            else:
+                with open(self.start_list_file.as_posix(), 'r', encoding='windows-1252') as f:
+                    data = f.read()
 
-        start_list = ElementTree.fromstring(data)
+            start_list = ElementTree.fromstring(data)
 
-        if start_list.tag != '{http://www.orienteering.org/datastandard/3.0}StartList':
-            self.logger.error('The Start List File (%s) is not a valid IOFv3 Start List.',
-                              self.start_list_file.as_posix())
-            raise ValueError('The Start List File ({}) is not a valid IOFv3 Start List.'.format(
-                self.start_list_file.as_posix()))
+            if start_list.tag != '{http://www.orienteering.org/datastandard/3.0}StartList':
+                self.logger.error('The Start List File (%s) is not a valid IOFv3 Start List.',
+                                  self.start_list_file.as_posix())
+                raise ValueError('The Start List File ({}) is not a valid IOFv3 Start List.'.format(
+                    self.start_list_file.as_posix()))
 
-        ns = {'ns': 'http://www.orienteering.org/datastandard/3.0'}
+            ns = {'ns': 'http://www.orienteering.org/datastandard/3.0'}
 
-        event_id = _get_data(start_list, 'ns:Event/ns:Id', ns)
-        event_name = _get_data(start_list, 'ns:Event/ns:Name', ns)
-        event_date = _get_data(start_list, 'ns:Event/ns:StartTime/ns:Date', ns)
-        organiser_id = _get_data(start_list, 'ns:Event/ns:Organiser/ns:Id', ns)
-        organiser_name = _get_data(start_list, 'ns:Event/ns:Organiser/ns:Name', ns)
+            event_id = _get_data(start_list, 'ns:Event/ns:Id', ns)
+            event_name = _get_data(start_list, 'ns:Event/ns:Name', ns)
+            event_date = _get_data(start_list, 'ns:Event/ns:StartTime/ns:Date', ns)
+            organiser_id = _get_data(start_list, 'ns:Event/ns:Organiser/ns:Id', ns)
+            organiser_name = _get_data(start_list, 'ns:Event/ns:Organiser/ns:Name', ns)
 
-        if event_date is not None:
-            self.competition_date = event_date
+            if event_date is not None:
+                self.competition_date = event_date
 
-        self.logger.debug('Event: %s (%s) %s', str(event_name), str(event_id), str(event_date))
-        self.logger.debug('Organiser: %s (%s)', str(organiser_name), str(organiser_id))
+            self.logger.debug('Event: %s (%s) %s', str(event_name), str(event_id), str(event_date))
+            self.logger.debug('Organiser: %s (%s)', str(organiser_name), str(organiser_id))
 
-        self.team_names.clear()
-        self.teams.clear()
-        self.runners.clear()
+            self.team_names.clear()
+            self.teams.clear()
+            self.runners.clear()
 
-        xml_teams = start_list.findall('ns:ClassStart/ns:TeamStart', ns)
-        for xml_team in xml_teams:
-            team_name = _get_data(xml_team, 'ns:Name', ns)
-            team_bib_number = _get_data(xml_team, 'ns:BibNumber', ns)
-            self.team_names[team_bib_number] = team_name
+            xml_teams = start_list.findall('ns:ClassStart/ns:TeamStart', ns)
+            for xml_team in xml_teams:
+                team_name = _get_data(xml_team, 'ns:Name', ns)
+                team_bib_number = _get_data(xml_team, 'ns:BibNumber', ns)
+                self.team_names[team_bib_number] = team_name
 
-            team = dict()
-            team_members = xml_team.findall('ns:TeamMemberStart', ns)
-            for team_member in team_members:
-                team_member_id = _get_data(team_member, 'ns:Person/ns:Id', ns)
-                team_member_name_family = _get_data(team_member, 'ns:Person/ns:Name/ns:Family', ns)
-                team_member_name_given = _get_data(team_member, 'ns:Person/ns:Name/ns:Given', ns)
-                team_member_leg = _get_data(team_member, 'ns:Start/ns:Leg', ns)
-                team_member_leg_order = _get_data(team_member, 'ns:Start/ns:LegOrder', ns)
-                team_member_bib_number = _get_data(team_member, 'ns:Start/ns:BibNumber', ns)
-                team_member_control_card = _get_data(team_member, 'ns:Start/ns:ControlCard', ns)
-                if team_member_control_card is not None:
-                    self.runners[team_member_control_card] = {'id': team_member_id,
-                                                              'family': team_member_name_family,
-                                                              'given': team_member_name_given,
-                                                              'leg': team_member_leg,
-                                                              'leg_order': team_member_leg_order,
-                                                              'team_bib_number': team_bib_number,
-                                                              'bib_number': team_member_bib_number,
-                                                              'control_card': team_member_control_card}
-                    if team_member_leg not in team:
-                        team[team_member_leg] = dict()
-                    leg = team[team_member_leg]
-                    leg[team_member_leg_order] = self.runners[team_member_control_card]
+                team = dict()
+                team_members = xml_team.findall('ns:TeamMemberStart', ns)
+                for team_member in team_members:
+                    team_member_id = _get_data(team_member, 'ns:Person/ns:Id', ns)
+                    team_member_name_family = _get_data(team_member, 'ns:Person/ns:Name/ns:Family', ns)
+                    team_member_name_given = _get_data(team_member, 'ns:Person/ns:Name/ns:Given', ns)
+                    team_member_leg = _get_data(team_member, 'ns:Start/ns:Leg', ns)
+                    team_member_leg_order = _get_data(team_member, 'ns:Start/ns:LegOrder', ns)
+                    team_member_bib_number = _get_data(team_member, 'ns:Start/ns:BibNumber', ns)
+                    team_member_control_card = _get_data(team_member, 'ns:Start/ns:ControlCard', ns)
+                    if team_member_control_card is not None:
+                        self.runners[team_member_control_card] = {'id': team_member_id,
+                                                                  'family': team_member_name_family,
+                                                                  'given': team_member_name_given,
+                                                                  'leg': team_member_leg,
+                                                                  'leg_order': team_member_leg_order,
+                                                                  'team_bib_number': team_bib_number,
+                                                                  'bib_number': team_member_bib_number,
+                                                                  'control_card': team_member_control_card}
+                        if team_member_leg not in team:
+                            team[team_member_leg] = dict()
+                        leg = team[team_member_leg]
+                        leg[team_member_leg_order] = self.runners[team_member_control_card]
 
-            team = natsorted(team.items())
-            self.teams[team_bib_number] = team
-        # for leg in team.items():
-        # 	for subleg in leg:
-        #
+                team = natsorted(team.items())
 
-        self.team_names = natsorted(self.team_names.items())
-        self.teams = natsorted(self.teams.items())
-        # self.start_list_file_time = stat(self.add_path(self.start_list_file)).st_mtime
-        self.logger.debug('Teams: %s', str(self.team_names))
-        self.logger.debug('Runners: %s', str(self.runners))
+                self.teams[team_bib_number] = team
+            # for leg in team.items():
+            # 	for subleg in leg:
+            #
 
-        Sound.play(self.start_list_update_sound_file)
+            self.team_names = natsorted(self.team_names.items())
+            self.teams = natsorted(self.teams.items())
+            # self.start_list_file_time = stat(self.add_path(self.start_list_file)).st_mtime
+            self.logger.debug('Teams: %s', str(self.team_names))
+            self.logger.debug('Runners: %s', str(self.runners))
+
+            Sound.play(self.start_list_update_sound_file)
 
     def lookup_from_card_number(self, card_number: str) -> Dict[str, str] | None:
         """Returns Bib-Number and Relay Leg for the provided Card Number.
@@ -430,11 +438,12 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
         :return: A dict with the Bib-Number (bibNumber) and Relay Leg (relayLeg).
         :rtype: Dict[str, Str] or None
         """
-        runner = self.runners.get(card_number)
-        if runner is not None:
-            team_bib_number = runner['team_bib_number']
-            leg = runner['leg']
-            return {'bibNumber': team_bib_number, 'relayLeg': leg}
-        else:
-            self.logger.warning('Not found: %s', card_number)
-            return None
+        with self._data_lock:
+            runner = self.runners.get(card_number)
+            if runner is not None:
+                team_bib_number = runner['team_bib_number']
+                leg = runner['leg']
+                return {'bibNumber': team_bib_number, 'relayLeg': leg}
+            else:
+                self.logger.warning('Not found: %s', card_number)
+                return None

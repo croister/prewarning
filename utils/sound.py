@@ -39,10 +39,9 @@ class SoundFolder(LoggingEventHandler, Singleton):
         self._sounds_dir_location = None
 
         self._languages = None
-        self._languages_mutex = Lock()
-
         self._all_sounds = None
-        self._all_sounds_mutex = Lock()
+
+        self._lock = Lock()
 
         self.observer = Observer()
         self.observer.name = 'SoundsDirObserverThread'
@@ -79,14 +78,9 @@ class SoundFolder(LoggingEventHandler, Singleton):
     def _reset(self):
         self.logger.debug('Reset')
 
-        self._languages_mutex.acquire()
-        self._all_sounds_mutex.acquire()
-        try:
+        with self._lock:
             self._languages = None
             self._all_sounds = None
-        finally:
-            self._languages_mutex.release()
-            self._all_sounds_mutex.release()
 
     def get_sounds_dir(self) -> Path:
         if self._sounds_dir_location is None:
@@ -94,8 +88,7 @@ class SoundFolder(LoggingEventHandler, Singleton):
         return self._sounds_dir_location
 
     def get_languages(self) -> List[str]:
-        self._languages_mutex.acquire()
-        try:
+        with self._lock:
             if self._languages is None:
                 sounds_dir_location = self.get_sounds_dir()
                 self._languages = []
@@ -103,10 +96,8 @@ class SoundFolder(LoggingEventHandler, Singleton):
                     if child.is_dir():
                         self._languages.append(child.name)
                 self._languages = natsorted(self._languages)
-        finally:
-            self._languages_mutex.release()
 
-        return self._languages
+            return self._languages
 
     @staticmethod
     def _path_sort_key(path: Path) -> str:
@@ -133,14 +124,11 @@ class SoundFolder(LoggingEventHandler, Singleton):
 
             return all_sounds
 
-        self._all_sounds_mutex.acquire()
-        try:
+        with self._lock:
             if self._all_sounds is None:
                 sounds_dir_location = self.get_sounds_dir()
                 self._all_sounds = _get_all_sounds_rec(sounds_dir_location)
-        finally:
-            self._all_sounds_mutex.release()
-        return self._all_sounds
+            return self._all_sounds
 
 
 LOGGER_NAME = 'Sound'
@@ -257,6 +245,8 @@ class Sound(ConfigConsumer, Singleton, metaclass=_SoundMeta):
 
         self.logger = logging.getLogger(self.__class__.__name__)
 
+        self._sound_lock = Lock()
+
         self.sound_enabled = None
         self.default_language = None
         # self.default_foreign_language = None
@@ -273,24 +263,26 @@ class Sound(ConfigConsumer, Singleton, metaclass=_SoundMeta):
         self._parse_config()
 
     def _parse_config(self):
-        config_section = Config().get_section(self.name)
+        with self._sound_lock:
+            config_section = Config().get_section(self.name)
 
-        self.sound_enabled = self.CONFIG_OPTION_SOUND_ENABLED.get_value(config_section)
+            self.sound_enabled = self.CONFIG_OPTION_SOUND_ENABLED.get_value(config_section)
 
-        self.default_language = self.CONFIG_OPTION_DEFAULT_LANGUAGE.get_value(config_section)
+            self.default_language = self.CONFIG_OPTION_DEFAULT_LANGUAGE.get_value(config_section)
 
-        # self.default_foreign_language = self.CONFIG_OPTION_FOREIGN_DEFAULT_LANGUAGE.get_value(config_section)
+            # self.default_foreign_language = self.CONFIG_OPTION_FOREIGN_DEFAULT_LANGUAGE.get_value(config_section)
 
     def play_sound(self, sound: str, override: bool = False):
         self.logger.debug('Play requested: %s', sound)
-        if self.sound_enabled or override:
-            sound_file = self.sound_folder.get_sounds_dir() / sound
-            if not os.path.exists(sound_file):
-                self.logger.error('The requested sound does not exist: %s', sound_file)
-                sound_file = self.sound_folder.get_sounds_dir() / 'ding.mp3'
-            self._run_cmd([self.player_command, '-q', sound_file.as_posix()])
-        else:
-            self.logger.debug('Sound playback disabled, not playing.')
+        with self._sound_lock:
+            if self.sound_enabled or override:
+                sound_file = self.sound_folder.get_sounds_dir() / sound
+                if not os.path.exists(sound_file):
+                    self.logger.error('The requested sound does not exist: %s', sound_file)
+                    sound_file = self.sound_folder.get_sounds_dir() / 'ding.mp3'
+                self._run_cmd([self.player_command, '-q', sound_file.as_posix()])
+            else:
+                self.logger.debug('Sound playback disabled, not playing.')
 
     def play_sound_lang(self, sound: str, lang: str, override: bool = False):
         self.logger.debug('Play lang requested: %s Lang: %s', sound, lang)

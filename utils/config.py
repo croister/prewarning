@@ -3,6 +3,7 @@
 from configparser import ConfigParser, SectionProxy
 import logging
 from pathlib import Path
+from threading import RLock
 from typing import List, Dict, Any
 
 from natsort import natsorted
@@ -102,6 +103,8 @@ class Config(LoggingEventHandler, Singleton):
     def __init__(self, config_file_location: str | Path | None = None):
         self.logger = logging.getLogger(self.__class__.__name__)
 
+        self._config_lock = RLock()
+
         super().__init__(logger=self.logger)
 
         self.observer = None
@@ -168,20 +171,22 @@ class Config(LoggingEventHandler, Singleton):
         self.read_config()
 
     def get_section(self, name: str) -> SectionProxy:
-        if name not in self.config:
-            self.logger.error('The config section "%s" is not available.', name)
-            raise ValueError('The config section "{}" is not available.'.format(name))
-        return self.config[name]
+        with self._config_lock:
+            if name not in self.config:
+                self.logger.error('The config section "%s" is not available.', name)
+                raise ValueError('The config section "{}" is not available.'.format(name))
+            return self.config[name]
 
     def update_live_section_option(self, name: str, option_definition: ConfigOptionDefinition, value: Any):
-        if name not in self.config:
-            self.logger.error('The config section "%s" is not available in active config.', name)
-            raise ValueError('The config section "{}" is not available in active config.'.format(name))
-        if name not in self.prev_config_sections:
-            self.logger.error('The config section "%s" is not available in prev config.', name)
-            raise ValueError('The config section "{}" is not available in prev config.'.format(name))
-        option_definition.set_value(self.config[name], value)
-        option_definition.set_value(self.prev_config_sections[name], value)
+        with self._config_lock:
+            if name not in self.config:
+                self.logger.error('The config section "%s" is not available in active config.', name)
+                raise ValueError('The config section "{}" is not available in active config.'.format(name))
+            if name not in self.prev_config_sections:
+                self.logger.error('The config section "%s" is not available in prev config.', name)
+                raise ValueError('The config section "{}" is not available in prev config.'.format(name))
+            option_definition.set_value(self.config[name], value)
+            option_definition.set_value(self.prev_config_sections[name], value)
 
     def config_option_definition_added(self, config_section_name: str, config_option_definition_name: str):
         config_section = self.config[config_section_name]
@@ -198,25 +203,26 @@ class Config(LoggingEventHandler, Singleton):
     def read_config(self):
         self.logger.debug('read_config')
 
-        self.observer.unschedule_all()
+        with self._config_lock:
+            self.observer.unschedule_all()
 
-        self.config.read(self.config_file_location)
+            self.config.read(self.config_file_location)
 
-        updated_sections = []
+            updated_sections = []
 
-        for config_section_definition in self.CONFIG_SECTION_DEFINITIONS.values():
-            config_section = self._read_config_section(config_section_definition)
-            section_name = config_section_definition.name
+            for config_section_definition in self.CONFIG_SECTION_DEFINITIONS.values():
+                config_section = self._read_config_section(config_section_definition)
+                section_name = config_section_definition.name
 
-            if section_name not in self.prev_config_sections \
-                    or self.prev_config_sections[section_name] != config_section:
-                self.config_sections[section_name] = config_section
-                self.prev_config_sections[section_name] = dict(config_section)
-                updated_sections.append(section_name)
+                if section_name not in self.prev_config_sections \
+                        or self.prev_config_sections[section_name] != config_section:
+                    self.config_sections[section_name] = config_section
+                    self.prev_config_sections[section_name] = dict(config_section)
+                    updated_sections.append(section_name)
 
-        self._notify_updates(updated_sections)
+            self._notify_updates(updated_sections)
 
-        self.observer.schedule(event_handler=self, path=self.config_file_location.parent.as_posix())
+            self.observer.schedule(event_handler=self, path=self.config_file_location.parent.as_posix())
 
     def _read_config_section(self, config_section_definition: ConfigSectionDefinition) -> SectionProxy:
         config_section_name = config_section_definition.name
@@ -327,5 +333,6 @@ class Config(LoggingEventHandler, Singleton):
 
     def write(self):
         """Write the configuration to file"""
-        with open(self.config_file_location, 'w') as configfile:
-            self.config.write(configfile)
+        with self._config_lock:
+            with open(self.config_file_location, 'w') as configfile:
+                self.config.write(configfile)

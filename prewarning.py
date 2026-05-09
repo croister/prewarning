@@ -225,8 +225,6 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
     def config_section_definition(cls) -> ConfigSectionDefinition:
         return cls.COMMON_CONFIG_SECTION_DEFINITION
 
-    display_lock = Lock()
-
     def __init__(self):
         # ensure the parent's __init__ is called
         wx.Frame.__init__(self, None, wx.ID_ANY, "PreWarning " + __version__)
@@ -236,6 +234,12 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
         self.observer = None
 
         self.logger = logging.getLogger(self.__class__.__name__)
+
+        # Lock for thread-safe GUI updates
+        self.display_lock = Lock()
+
+        # Lock for thread-safe last_sound_time access
+        self._last_sound_time_lock = Lock()
 
         # Config variables
         self.interactive_mode = None
@@ -963,17 +967,18 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
         while True:
             self.logger.debug('process_announcements')
             sound = self.announcement_queue.get()
-            self.logger.debug('last_sound_time: %s', self.last_sound_time)
-            if self.last_sound_time is None\
-                    or (datetime.now()-self.last_sound_time).total_seconds()\
-                    >= self.intro_sound_trigger_timeout_seconds.total_seconds():
-                self.logger.debug('intro_sound_file: %s', self.intro_sound_file)
-                self.sound.play_sound(self.intro_sound_file)
+            with self._last_sound_time_lock:
+                self.logger.debug('last_sound_time: %s', self.last_sound_time)
+                if self.last_sound_time is None\
+                        or (datetime.now()-self.last_sound_time).total_seconds()\
+                        >= self.intro_sound_trigger_timeout_seconds.total_seconds():
+                    self.logger.debug('intro_sound_file: %s', self.intro_sound_file)
+                    self.sound.play_sound(self.intro_sound_file)
 
-            self.logger.debug('sound: %s', sound)
-            self.sound.play_lang('{}.mp3'.format(sound['sound']), sound['language'])
+                self.logger.debug('sound: %s', sound)
+                self.sound.play_lang('{}.mp3'.format(sound['sound']), sound['language'])
 
-            self.last_sound_time = datetime.now()
+                self.last_sound_time = datetime.now()
 
 
 if __name__ == '__main__':
