@@ -189,16 +189,18 @@ class Config(LoggingEventHandler, Singleton):
             option_definition.set_value(self.prev_config_sections[name], value)
 
     def config_option_definition_added(self, config_section_name: str, config_option_definition_name: str):
-        config_section = self.config[config_section_name]
-        section_definition = self.CONFIG_SECTION_DEFINITIONS[config_section_name]
-        option_definition = section_definition[config_option_definition_name]
-        value = config_section.get(option_definition.name, fallback=option_definition.default_value)
-        self._validate_config_option(config_section_name, option_definition, value)
+        with self._config_lock:
+            config_section = self.config[config_section_name]
+            section_definition = self.CONFIG_SECTION_DEFINITIONS[config_section_name]
+            option_definition = section_definition[config_option_definition_name]
+            value = config_section.get(option_definition.name, fallback=option_definition.default_value)
+            self._validate_config_option(config_section_name, option_definition, value)
 
     def config_section_definition_changed(self, config_section_name: str):
-        config_section = self.config[config_section_name]
-        config_section_definition = self.CONFIG_SECTION_DEFINITIONS[config_section_name]
-        self._validate_config_section(config_section, config_section_definition)
+        with self._config_lock:
+            config_section = self.config[config_section_name]
+            config_section_definition = self.CONFIG_SECTION_DEFINITIONS[config_section_name]
+            self._validate_config_section(config_section, config_section_definition)
 
     def read_config(self):
         self.logger.debug('read_config')
@@ -220,9 +222,9 @@ class Config(LoggingEventHandler, Singleton):
                     self.prev_config_sections[section_name] = dict(config_section)
                     updated_sections.append(section_name)
 
-            self._notify_updates(updated_sections)
-
             self.observer.schedule(event_handler=self, path=self.config_file_location.parent.as_posix())
+
+        self._notify_updates(updated_sections)
 
     def _read_config_section(self, config_section_definition: ConfigSectionDefinition) -> SectionProxy:
         config_section_name = config_section_definition.name

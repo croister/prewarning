@@ -271,7 +271,7 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
         self.start_list_file = None
         self.start_list_update_sound_file = None
 
-        self._data_lock = Lock()
+        self._data_lock = RLock()
 
         self._observer_lock = Lock()
 
@@ -318,7 +318,9 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
         src_path = event.src_path
         if src_path.endswith('~'):
             src_path = src_path[0:-1]
-        if Path(src_path).resolve() == self.start_list_file:
+        with self._data_lock:
+            start_list_file = self.start_list_file
+        if Path(src_path).resolve() == start_list_file:
             self._read_start_list()
 
     def config_updated(self, section_names: List[str]):
@@ -330,8 +332,6 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
 
     def _parse_config(self):
         config_section = Config().get_section(self.name)
-
-        self.observer.unschedule_all()
 
         start_list_file = self.CONFIG_OPTION_START_LIST_FILE.get_value(config_section)
 
@@ -347,6 +347,7 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
         self.start_list_update_sound_file = self.CONFIG_OPTION_START_LIST_UPDATE_SOUND_FILE.get_value(config_section)
 
         with self._observer_lock:
+            self.observer.unschedule_all()
             self.observer.schedule(event_handler=self, path=self.start_list_file.parent.as_posix())
             if self._running and not self.observer.is_alive():
                 self.observer.start()
