@@ -389,16 +389,18 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
             xml_teams = start_list.findall('ns:ClassStart/ns:TeamStart', ns)
             for xml_team in xml_teams:
                 team_name = _get_data(xml_team, 'ns:Name', ns)
-                team_bib_number = _get_data(xml_team, 'ns:BibNumber', ns)
+                team_bib_number = int(_get_data(xml_team, 'ns:BibNumber', ns))
                 self.team_names[team_bib_number] = team_name
 
                 team = dict()
+                last_leg = 0
                 team_members = xml_team.findall('ns:TeamMemberStart', ns)
                 for team_member in team_members:
                     team_member_id = _get_data(team_member, 'ns:Person/ns:Id', ns)
                     team_member_name_family = _get_data(team_member, 'ns:Person/ns:Name/ns:Family', ns)
                     team_member_name_given = _get_data(team_member, 'ns:Person/ns:Name/ns:Given', ns)
-                    team_member_leg = _get_data(team_member, 'ns:Start/ns:Leg', ns)
+                    team_member_leg = int(_get_data(team_member, 'ns:Start/ns:Leg', ns))
+                    last_leg = max(last_leg, team_member_leg)
                     team_member_leg_order = _get_data(team_member, 'ns:Start/ns:LegOrder', ns)
                     team_member_bib_number = _get_data(team_member, 'ns:Start/ns:BibNumber', ns)
                     team_member_control_card = _get_data(team_member, 'ns:Start/ns:ControlCard', ns)
@@ -410,11 +412,18 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
                                                                   'leg_order': team_member_leg_order,
                                                                   'team_bib_number': team_bib_number,
                                                                   'bib_number': team_member_bib_number,
-                                                                  'control_card': team_member_control_card}
+                                                                  'control_card': team_member_control_card,
+                                                                  'is_last_leg': False}
                         if team_member_leg not in team:
                             team[team_member_leg] = dict()
                         leg = team[team_member_leg]
                         leg[team_member_leg_order] = self.runners[team_member_control_card]
+
+                if team and last_leg in team:
+                    leg = team[last_leg]
+                    if leg:
+                        for team_member in leg.values():
+                            team_member['is_last_leg'] = True
 
                 team = natsorted(team.items())
 
@@ -443,7 +452,8 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
             if runner is not None:
                 team_bib_number = runner['team_bib_number']
                 leg = runner['leg']
-                return {'bibNumber': team_bib_number, 'relayLeg': leg}
+                is_last_leg = runner['is_last_leg']
+                return {'bibNumber': team_bib_number, 'relayLeg': leg, 'isLastLeg': is_last_leg}
             else:
                 self.logger.warning('Not found: %s', card_number)
                 return None
