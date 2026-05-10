@@ -474,8 +474,12 @@ class ConfigSectionPanel(wx.Panel):
                 _set_value(option_input, default_value)
                 if name in self._tracking_controls:
                     self._tracking_dirty[name] = True
-                    if self.state_provider is not None:
-                        self.state_provider.reset_tracking()
+                    for opt_def in self.config_section_definition.option_definitions.values():
+                        if opt_def.runtime_state_only:
+                            ctrl = self._tracking_controls.get(opt_def.name)
+                            if ctrl is not None:
+                                _set_value(ctrl, _default_value(opt_def))
+                                self._tracking_dirty[opt_def.name] = True
                 option_input.SetFocus()
 
                 self.update()
