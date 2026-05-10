@@ -336,13 +336,16 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
         start_list_file = self.CONFIG_OPTION_START_LIST_FILE.get_value(config_section)
 
         if start_list_file.is_file():
-            self.start_list_file = start_list_file
+            resolved = start_list_file
         else:
-            self.start_list_file = DEFAULT_START_LIST_FILE_FOLDER / start_list_file
+            resolved = DEFAULT_START_LIST_FILE_FOLDER / start_list_file
 
-        if not self.start_list_file.is_file():
+        if not resolved.is_file():
             self.logger.error('The Start List file "%s" could not be found.', str(start_list_file))
             raise ValueError('The Start List file "{}" could not be found.'.format(str(start_list_file)))
+
+        with self._data_lock:
+            self.start_list_file = resolved
 
         self.start_list_update_sound_file = self.CONFIG_OPTION_START_LIST_UPDATE_SOUND_FILE.get_value(config_section)
 
