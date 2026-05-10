@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
-from threading import Thread
-from time import sleep
+from threading import Event, Thread
 from typing import List, Dict, Any
 
 from pymysql import OperationalError
@@ -392,7 +391,7 @@ class PunchSourceOlaMySql(StateSaverMixin, _PunchSourceBase):
         self.fetch_interval_seconds = None
         self.control_ids = None
 
-        self._running = False
+        self._stop_event = Event()
 
         self.logger.debug(self)
 
@@ -419,16 +418,16 @@ class PunchSourceOlaMySql(StateSaverMixin, _PunchSourceBase):
         self.stop()
 
     def start(self):
-        self._running = True
+        self._stop_event.clear()
         self.punch_fetcher.start()
 
     def stop(self):
-        self._running = False
+        self._stop_event.set()
         if self.punch_fetcher.is_alive():
             self.punch_fetcher.join()
 
     def is_running(self) -> bool:
-        return self._running
+        return not self._stop_event.is_set()
 
     def config_updated(self, section_names: List[str]):
         self.update()
@@ -485,7 +484,7 @@ class PunchSourceOlaMySql(StateSaverMixin, _PunchSourceBase):
 
     def _fetch_punches(self):
         self.logger.debug('Started')
-        while self._running:
+        while not self._stop_event.is_set():
             try:
                 split_times = self.ola_mysql.get_event_race_split_times(self.control_ids, self.last_modify_time)
                 for split_time in split_times:
@@ -502,6 +501,6 @@ class PunchSourceOlaMySql(StateSaverMixin, _PunchSourceBase):
             except OperationalError as oe:
                 self.logger.error(oe)
 
-            sleep(self.fetch_interval_seconds)
+            self._stop_event.wait(timeout=self.fetch_interval_seconds)
         self.logger.debug('Stopped')
         Config().write()

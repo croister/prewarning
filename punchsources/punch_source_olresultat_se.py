@@ -2,8 +2,7 @@
 
 import logging
 from datetime import date
-from threading import Thread
-from time import sleep
+from threading import Event, Thread
 from typing import List
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
@@ -358,7 +357,7 @@ class PunchSourceOlresultatSe(StateSaverMixin, _PunchSourceBase):
         self.control_codes = list()
 
         self.response_encoding = 'utf-8'
-        self._running = False
+        self._stop_event = Event()
 
         self.logger.debug(self)
 
@@ -379,16 +378,16 @@ class PunchSourceOlresultatSe(StateSaverMixin, _PunchSourceBase):
         self.stop()
 
     def start(self):
-        self._running = True
+        self._stop_event.clear()
         self.punch_fetcher.start()
 
     def stop(self):
-        self._running = False
+        self._stop_event.set()
         if self.punch_fetcher.is_alive():
             self.punch_fetcher.join()
 
     def is_running(self) -> bool:
-        return self._running
+        return not self._stop_event.is_set()
 
     def config_updated(self, section_names: List[str]):
         self.update()
@@ -442,7 +441,7 @@ class PunchSourceOlresultatSe(StateSaverMixin, _PunchSourceBase):
 
     def _fetch_punches(self):
         self.logger.debug('Started')
-        while self._running:
+        while not self._stop_event.is_set():
             url = URL(self.url)
 
             url = url.set_query('unitId', self.competition_id)
@@ -477,6 +476,6 @@ class PunchSourceOlresultatSe(StateSaverMixin, _PunchSourceBase):
             except URLError as e:
                 self.logger.error('We failed to reach a server. Reason: %s', e.reason)
 
-            sleep(self.fetch_interval_seconds)
+            self._stop_event.wait(timeout=self.fetch_interval_seconds)
         self.logger.debug('Stopped')
         Config().write()
