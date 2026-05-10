@@ -10,6 +10,7 @@ __version__ = '2.1.0'
 import logging
 import logging.config
 import socket
+import sys
 from datetime import timedelta, datetime
 from pathlib import Path
 from queue import Queue
@@ -773,7 +774,7 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
 
         res = settings_dialog.ShowModal()
         if res == wx.ID_CANCEL and perform_validation:
-            exit(1)
+            sys.exit(1)
         settings_dialog.Destroy()
 
     def _toggle_full_screen(self):
