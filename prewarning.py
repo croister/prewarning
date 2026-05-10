@@ -36,7 +36,7 @@ from utils.config_dialog import ConfigDialog
 from utils.constants import CONFIGURATION_DIR, APPLICATION_DIR
 from utils.help_dialog import HelpDialog
 from utils.hotkey_bindings import HotKeyBindingDefinition, HotKeyDefinition, key_event_to_str
-from utils.sound import Sound, SoundFolder, verify_sound
+from utils.sound import Sound, SoundFolder, verify_sound, get_all_sounds
 
 # Column index names
 COL_NR_TIME = 0
@@ -154,7 +154,7 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
         value_type=Path,
         description='The path to the sound file to use as the intro sound before announcements.',
         default_value=Path('ding.mp3'),
-        valid_values_gen=SoundFolder().get_all_sounds,
+        valid_values_gen=get_all_sounds,
         enabled_by=CONFIG_OPTION_ENABLE_INTRO_SOUND,
     )
 
@@ -167,7 +167,7 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
         value_type=Path,
         description='The path to the sound file to use as the test sound.',
         default_value=Path('en/Testing.mp3'),
-        valid_values_gen=SoundFolder().get_all_sounds,
+        valid_values_gen=get_all_sounds,
     )
 
     CONFIG_OPTION_ADD_PRE_WARNINGS_TO_BOTTOM = ConfigOptionDefinition(

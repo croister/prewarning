@@ -307,3 +307,8 @@ def verify_sound(sound: str):
     except Exception as e:
         logging.getLogger(LOGGER_NAME).debug('verify_sound: %s', e)
         return False
+
+
+def get_all_sounds():
+    """Lazy wrapper that creates SoundFolder on first call, not at import time."""
+    return SoundFolder().get_all_sounds()

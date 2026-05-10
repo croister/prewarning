@@ -16,7 +16,7 @@ from utils.config import ConfigSectionDefinition, ConfigOptionDefinition, Config
 from utils.config_definitions import ConfigSectionEnableType, ConfigVerifierDefinition, ConfigSectionOptionDefinition, \
     ConfigSelectorDefinition, SelectionResult, SelectionData, VerificationResult
 from utils.config_selection import select_file
-from utils.sound import Sound, SoundFolder, verify_sound
+from utils.sound import Sound, SoundFolder, verify_sound, get_all_sounds
 from validators.path_validators import file_exists
 from ._base import _StartListSourceBase
 
@@ -190,7 +190,7 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
         value_type=Path,
         description='The path to the sound file to use when the start list is updated.',
         default_value=Path('half_ding.mp3'),
-        valid_values_gen=SoundFolder().get_all_sounds,
+        valid_values_gen=get_all_sounds,
     )
 
     START_LIST_SOURCE_FILE_CONFIG_SECTION_DEFINITION = ConfigSectionDefinition(
