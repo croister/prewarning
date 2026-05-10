@@ -362,7 +362,7 @@ class PunchSourceOlaMySql(StateSaverMixin, _PunchSourceBase):
         return cls.PUNCH_SOURCE_OLA_MYSQL_CONFIG_SECTION_DEFINITION
 
     def __repr__(self) -> str:
-        return f'PunchSourceOlaMySQL(running={self._running},' \
+        return f'PunchSourceOlaMySQL(running={self.is_running()},' \
                f' last_passed_time={self.last_modify_time},' \
                f' last_received_punch_id={self.last_received_punch_id},' \
                f' fetch_interval_seconds={self.fetch_interval_seconds},' \
@@ -392,6 +392,8 @@ class PunchSourceOlaMySql(StateSaverMixin, _PunchSourceBase):
         self.control_ids = None
 
         self._stop_event = Event()
+        self._stop_event.set()
+        self.punch_fetcher = None
 
         self.logger.debug(self)
 
@@ -412,18 +414,17 @@ class PunchSourceOlaMySql(StateSaverMixin, _PunchSourceBase):
 
         self._notify_tracking_listeners()
 
-        self.punch_fetcher = Thread(target=self._fetch_punches, daemon=True, name='PunchFetcherOlaMySqlThread')
-
     def __del__(self):
         self.stop()
 
     def start(self):
         self._stop_event.clear()
+        self.punch_fetcher = Thread(target=self._fetch_punches, daemon=True, name='PunchFetcherOlaMySqlThread')
         self.punch_fetcher.start()
 
     def stop(self):
         self._stop_event.set()
-        if self.punch_fetcher.is_alive():
+        if self.punch_fetcher is not None and self.punch_fetcher.is_alive():
             self.punch_fetcher.join()
 
     def is_running(self) -> bool:

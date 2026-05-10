@@ -16,7 +16,7 @@ from utils.config import ConfigSectionDefinition, ConfigOptionDefinition, Config
 from utils.config_definitions import ConfigSectionEnableType, ConfigVerifierDefinition, ConfigSectionOptionDefinition, \
     ConfigSelectorDefinition, SelectionResult, SelectionData, VerificationResult
 from utils.config_selection import select_file
-from utils.sound import Sound, SoundFolder, verify_sound, get_all_sounds
+from utils.sound import Sound, verify_sound, get_all_sounds
 from validators.path_validators import file_exists
 from ._base import _StartListSourceBase
 
