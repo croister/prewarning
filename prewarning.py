@@ -235,9 +235,6 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
 
         self.logger = logging.getLogger(self.__class__.__name__)
 
-        # Lock for thread-safe GUI updates
-        self.display_lock = Lock()
-
         # Lock for thread-safe last_sound_time access
         self._last_sound_time_lock = Lock()
 
@@ -606,23 +603,21 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
         item.handler()
 
     def _add_pre_warning(self, punch_time: str, team: str, leg: str):
-        self.logger.debug('_add_pre_warning: display_lock=%s', self.display_lock.locked())
-        with self.display_lock:
-            if self._has_filler_row():
-                self.prewarning_grid.DeleteRows(ROW_ZERO)
+        if self._has_filler_row():
+            self.prewarning_grid.DeleteRows(ROW_ZERO)
 
-            new_row = ROW_ZERO
+        new_row = ROW_ZERO
 
-            if self.add_pre_warnings_to_bottom:
-                new_row = self.prewarning_grid.GetNumberRows()
+        if self.add_pre_warnings_to_bottom:
+            new_row = self.prewarning_grid.GetNumberRows()
 
-            self.prewarning_grid.InsertRows(pos=new_row)
+        self.prewarning_grid.InsertRows(pos=new_row)
 
-            self.prewarning_grid.SetCellValue(new_row, COL_NR_TIME, punch_time)
-            self.prewarning_grid.SetCellValue(new_row, COL_NR_TEAM, team)
-            self.prewarning_grid.SetCellValue(new_row, COL_NR_LEG, leg)
+        self.prewarning_grid.SetCellValue(new_row, COL_NR_TIME, punch_time)
+        self.prewarning_grid.SetCellValue(new_row, COL_NR_TEAM, team)
+        self.prewarning_grid.SetCellValue(new_row, COL_NR_LEG, leg)
 
-            self._update_column_sizes()
+        self._update_column_sizes()
 
         self._remove_non_visible_rows()
 
@@ -645,29 +640,22 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
 
     def _remove_non_visible_rows(self):
         if not self._has_filler_row():
-            self.logger.debug('_remove_non_visible_rows: display_lock=%s', self.display_lock.locked())
-            with self.display_lock:
-                self.logger.debug('_remove_non_visible_rows: LOCKED display_lock=%s', self.display_lock.locked())
+            last_row = self.prewarning_grid.GetNumberRows() - 1
+            while last_row >= 0 and not self.prewarning_grid.IsVisible(self.prewarning_grid.GetNumberRows() - 1,
+                                                                       COL_NR_TIME,
+                                                                       wholeCellVisible=True):
+                if self.add_pre_warnings_to_bottom:
+                    self.logger.debug('DELETE 0')
+                    self.prewarning_grid.DeleteRows(ROW_ZERO)
+                else:
+                    self.logger.debug('DELETE LAST %d', last_row)
+                    self.prewarning_grid.DeleteRows(last_row)
                 last_row = self.prewarning_grid.GetNumberRows() - 1
-                while last_row >= 0 and not self.prewarning_grid.IsVisible(self.prewarning_grid.GetNumberRows() - 1,
-                                                                           COL_NR_TIME,
-                                                                           wholeCellVisible=True):
-                    if self.add_pre_warnings_to_bottom:
-                        self.logger.debug('DELETE 0')
-                        self.prewarning_grid.DeleteRows(ROW_ZERO)
-                    else:
-                        self.logger.debug('DELETE LAST %d', last_row)
-                        self.prewarning_grid.DeleteRows(last_row)
-                    last_row = self.prewarning_grid.GetNumberRows() - 1
-                self.logger.debug('_remove_non_visible_rows: DONE display_lock=%s', self.display_lock.locked())
-            self.logger.debug('_remove_non_visible_rows: END display_lock=%s', self.display_lock.locked())
 
     def _clear(self):
-        self.logger.debug('_clear: display_lock=%s', self.display_lock.locked())
-        with self.display_lock:
-            self.prewarning_grid.DeleteRows(ROW_ZERO, self.prewarning_grid.GetNumberRows())
-            self._add_filler_row()
-            self._calculate_sizes()
+        self.prewarning_grid.DeleteRows(ROW_ZERO, self.prewarning_grid.GetNumberRows())
+        self._add_filler_row()
+        self._calculate_sizes()
 
     def _refresh(self):
         orig_size = self.GetSize()
@@ -675,9 +663,7 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
         self.SetSize(new_size)
         self.SetSize(orig_size)
 
-        self.logger.debug('_refresh: display_lock=%s', self.display_lock.locked())
-        with self.display_lock:
-            self._calculate_sizes()
+        self._calculate_sizes()
 
     def _calculate_sizes(self):
         usable_size = wx.Window.GetClientSize(self)
@@ -749,17 +735,13 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
 
     def _on_resize(self, event: wx.SizeEvent):
         self.logger.debug('EventSize: %dx%d', event.GetSize().GetWidth(), event.GetSize().GetHeight())
-        self.logger.debug('_on_resize: display_lock=%s', self.display_lock.locked())
-        with self.display_lock:
-            self._calculate_sizes()
+        self._calculate_sizes()
 
         event.Skip()
 
     def _on_resize_head(self, event: wx.SizeEvent):
         self.logger.debug('HEAD EventSize: %dx%d', event.GetSize().GetWidth(), event.GetSize().GetHeight())
-        self.logger.debug('_on_resize_head: display_lock=%s', self.display_lock.locked())
-        with self.display_lock:
-            self._calculate_sizes()
+        self._calculate_sizes()
 
         event.Skip()
 
@@ -827,25 +809,19 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
     def _increase_font_size(self):
         self.logger.debug('Increase Font Size')
         self.font_factor_offset -= 1
-        self.logger.debug('_increase_font_size: display_lock=%s', self.display_lock.locked())
-        with self.display_lock:
-            self._calculate_sizes()
+        self._calculate_sizes()
         wx.CallAfter(self._refresh)
 
     def _decrease_font_size(self):
         self.logger.debug('Decrease Font Size')
         self.font_factor_offset += 1
-        self.logger.debug('_decrease_font_size: display_lock=%s', self.display_lock.locked())
-        with self.display_lock:
-            self._calculate_sizes()
+        self._calculate_sizes()
         wx.CallAfter(self._refresh)
 
     def _restore_font_size(self):
         self.logger.debug('Restore Font Size')
         self.font_factor_offset = 0
-        self.logger.debug('_restore_font_size: display_lock=%s', self.display_lock.locked())
-        with self.display_lock:
-            self._calculate_sizes()
+        self._calculate_sizes()
         wx.CallAfter(self._refresh)
 
     def _on_key_press(self, key_event: wx.KeyEvent):
