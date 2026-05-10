@@ -913,9 +913,10 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
         self.announce_ip_on_Startup = self.CONFIG_OPTION_ANNOUNCE_IP_ON_STARTUP.get_value(config_section)
 
         seconds = self.CONFIG_OPTION_INTRO_SOUND_TRIGGER_TIMEOUT_SECONDS.get_value(config_section)
-        self.intro_sound_trigger_timeout_seconds = timedelta(seconds=seconds)
-
-        self.intro_sound_file = self.CONFIG_OPTION_INTRO_SOUND_FILE.get_value(config_section)
+        sound_file = self.CONFIG_OPTION_INTRO_SOUND_FILE.get_value(config_section)
+        with self._last_sound_time_lock:
+            self.intro_sound_trigger_timeout_seconds = timedelta(seconds=seconds)
+            self.intro_sound_file = sound_file
 
         self.test_sound_file = self.CONFIG_OPTION_TEST_SOUND_FILE.get_value(config_section)
 
