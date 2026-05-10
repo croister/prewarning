@@ -124,14 +124,14 @@ def _read_start_list(start_list_file: str):
                 leg = team[team_member_leg]
                 leg[team_member_leg_order] = runners[team_member_control_card]
 
-        team = natsorted(team.items())
+        team = dict(natsorted(team.items()))
         teams[team_bib_number] = team
     # for leg in team.items():
     # 	for subleg in leg:
     #
 
-    team_names = natsorted(team_names.items())
-    teams = natsorted(teams.items())
+    team_names = dict(natsorted(team_names.items()))
+    teams = dict(natsorted(teams.items()))
 
     logging.getLogger(LOGGER_NAME).debug('_read_start_list - Teams: %s', str(team_names))
     logging.getLogger(LOGGER_NAME).debug('_read_start_list - Runners: %s', str(runners))
@@ -429,9 +429,12 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
                         for team_member in leg.values():
                             team_member['is_last_leg'] = True
 
-                team = natsorted(team.items())
+                team = dict(natsorted(team.items()))
 
                 self.teams[team_bib_number] = team
+
+            self.team_names = dict(natsorted(self.team_names.items()))
+            self.teams = dict(natsorted(self.teams.items()))
             # for leg in team.items():
             # 	for subleg in leg:
             #

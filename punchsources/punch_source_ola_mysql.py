@@ -443,7 +443,7 @@ class PunchSourceOlaMySql(StateSaverMixin, _PunchSourceBase):
             .get_value(config_section)
         self.control_ids = self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_CONTROL_IDS.get_value(config_section)
         if self.control_ids is not None:
-            self.control_ids = self.control_ids.split()
+            self.control_ids = [int(c) for c in self.control_ids.split()]
 
     def _get_tracking_state(self) -> Dict[str, str]:
         return {
