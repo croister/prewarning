@@ -621,6 +621,11 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
 
         self._remove_non_visible_rows()
 
+    def _add_pre_warning_with_refresh(self, passed_time: str, bib_number: str, relay_leg: str):
+        self._add_pre_warning(passed_time, bib_number, relay_leg)
+        self.prewarning_grid.Refresh()
+        self.prewarning_grid.Update()
+
     def _add_filler_row(self):
         self.prewarning_grid.InsertRows()
         self.prewarning_grid.SetCellValue(ROW_ZERO, COL_NR_TIME, '00:00:00')
@@ -940,8 +945,8 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
             passed_time = self._to_str(punch['passedTime']).rpartition(' ')[2]
             bib_number = self._to_str(punch['bibNumber'])
             relay_leg = self._to_str(punch['relayLeg'])
-            wx.CallAfter(self._add_pre_warning, passed_time, bib_number, relay_leg)
             self.announcement_queue.put({'language': language, 'sound': bib_number})
+            wx.CallAfter(self._add_pre_warning_with_refresh, passed_time, bib_number, relay_leg)
 
     @staticmethod
     def _to_str(val: int | str | None) -> str:
