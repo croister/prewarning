@@ -859,6 +859,9 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
         key_event.Skip()
 
     def config_updated(self, section_names: List[str]):
+        wx.CallAfter(self._apply_config_update)
+
+    def _apply_config_update(self):
         self._parse_config()
         self.update_sources()
 
