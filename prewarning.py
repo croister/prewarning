@@ -5,7 +5,8 @@ PreWarning main file.
 """
 
 __author__ = 'Christian Lindblom croister@croister.se'
-__version__ = '2.1.0'
+from importlib.metadata import version
+__version__ = version('prewarning')
 
 import logging
 import logging.config
@@ -35,6 +36,7 @@ from utils.config_definitions import ConfigOptionDefinition, ConfigSectionDefini
     ConfigSectionOptionDefinition
 from utils.config_dialog import ConfigDialog
 from utils.constants import CONFIGURATION_DIR, APPLICATION_DIR
+from utils.about_dialog import AboutDialog
 from utils.help_dialog import HelpDialog
 from utils.hotkey_bindings import HotKeyBindingDefinition, HotKeyDefinition, key_event_to_str
 from utils.sound import Sound, SoundFolder, verify_sound, get_all_sounds
@@ -273,6 +275,13 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
                     HotKeyDefinition(key_code=ord('H')).with_ctrl(),
                 ],
                 bitmap_name=wx.ART_HELP,
+            ),
+            HotKeyBindingDefinition(
+                name='About',
+                hotkey=HotKeyDefinition(key_code=ord('A')).with_ctrl(),
+                handler=self._about_dialog,
+                description="Opens the About Dialog",
+                bitmap_name=wx.ART_INFORMATION,
             ),
             HotKeyBindingDefinition(
                 name='Full Screen',
@@ -751,6 +760,11 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
 
         event.Skip()
 
+    def _about_dialog(self):
+        self.logger.debug('About Dialog')
+        about_dialog = AboutDialog(self, app_version=__version__)
+        about_dialog.Show()
+
     def _help_dialog(self):
         self.logger.debug('Help Dialog')
         help_dialog = HelpDialog(self, app_version=__version__, hotkey_bindings=self.hotkey_bindings)
@@ -973,9 +987,13 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
                 self.last_sound_time = datetime.now()
 
 
-if __name__ == '__main__':
+def main():
     app = wx.App()
     frm = PreWarning()
     frm.Show()
     frm.start()
     app.MainLoop()
+
+
+if __name__ == '__main__':
+    main()
