@@ -224,7 +224,7 @@ class Config(LoggingEventHandler, Singleton):
 
             self.observer.schedule(event_handler=self, path=self.config_file_location.parent.as_posix())
 
-        self._notify_updates(updated_sections)
+            self._notify_updates(updated_sections)
 
     def _read_config_section(self, config_section_definition: ConfigSectionDefinition) -> SectionProxy:
         config_section_name = config_section_definition.name
