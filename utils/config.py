@@ -234,6 +234,8 @@ class Config(LoggingEventHandler, Singleton):
             self._create_initial_config_section(config_section_definition)
 
         for option_definition in config_section_definition.option_definitions.values():
+            if option_definition.runtime_state_only:
+                continue
             if option_definition.name not in self.config[config_section_name]:
                 self.logger.warning('The configuration file is missing the "%s" option in the "%s" section,'
                                     ' creating with default value.',
@@ -294,7 +296,7 @@ class Config(LoggingEventHandler, Singleton):
     def _validate_config_section(self,
                                  config_section: SectionProxy,
                                  config_section_definition: ConfigSectionDefinition) -> Dict[ConfigOptionDefinition,
-                                                                                             List[str]]:
+                                                                                              List[str]]:
         """Validate a configuration section
 
         :param SectionProxy config_section: The config section to validate
@@ -305,6 +307,8 @@ class Config(LoggingEventHandler, Singleton):
         validation_errors = dict()
         if self._is_config_section_enabled(config_section_definition):
             for option_definition in config_section_definition.option_definitions.values():
+                if option_definition.runtime_state_only:
+                    continue
                 if self._is_config_option_enabled(config_section_definition, option_definition):
                     value = option_definition.get_value(config_section)
                     option_validation_errors = option_definition.validate(value)
@@ -336,5 +340,23 @@ class Config(LoggingEventHandler, Singleton):
     def write(self):
         """Write the configuration to file"""
         with self._config_lock:
+            runtime_snapshots = {}
+            for section_def in self.CONFIG_SECTION_DEFINITIONS.values():
+                section_name = section_def.name
+                if not self.config.has_section(section_name):
+                    continue
+                removed = []
+                for option_def in section_def.option_definitions.values():
+                    if option_def.runtime_state_only and option_def.name in self.config[section_name]:
+                        removed.append(option_def.name)
+                        del self.config[section_name][option_def.name]
+                if removed:
+                    runtime_snapshots[section_name] = removed
+
             with open(self.config_file_location, 'w') as configfile:
                 self.config.write(configfile)
+
+            for section_name, option_names in runtime_snapshots.items():
+                for option_name in option_names:
+                    default = self.CONFIG_SECTION_DEFINITIONS[section_name].option_definitions[option_name].default_value
+                    self.config[section_name][option_name] = str(default) if default is not None else ''

@@ -2,9 +2,12 @@
 
 from abc import abstractmethod, ABC
 import logging
-from typing import Dict
+from typing import Dict, Callable, List
+
+import wx
 
 from utils.config import ConfigConsumer
+from utils.config_definitions import ConfigOptionDefinition
 
 
 class PunchListener(ABC):
@@ -49,6 +52,7 @@ class _PunchSourceBase(ConfigConsumer):
         self.logger = logging.getLogger(self.__class__.__name__)
 
         self.punch_listeners = set()
+        self._tracking_listeners: List[Callable] = []
 
     @abstractmethod
     def start(self):
@@ -79,3 +83,37 @@ class _PunchSourceBase(ConfigConsumer):
         """
         for listener in self.punch_listeners:
             listener.punch_received(punch)
+
+    def register_tracking_listener(self, callback: Callable):
+        """Register a callback to receive tracking state updates.
+
+        The callback is invoked via wx.CallAfter on each tracking state change.
+        It receives a dict mapping option definition names to their current values.
+        """
+        if callback not in self._tracking_listeners:
+            self._tracking_listeners.append(callback)
+
+    def unregister_tracking_listener(self, callback: Callable):
+        if callback in self._tracking_listeners:
+            self._tracking_listeners.remove(callback)
+
+    def _notify_tracking_listeners(self):
+        if not self._tracking_listeners:
+            return
+        state = self._get_tracking_state()
+        for callback in self._tracking_listeners:
+            wx.CallAfter(callback, state)
+
+    def _get_tracking_state(self) -> Dict[str, str]:
+        """Override in subclasses to return current tracking values by name."""
+        return {}
+
+    def get_runtime_value(self, option_definition: ConfigOptionDefinition):
+        """Return the current runtime value for the given option definition, or None."""
+        return None
+
+    def set_runtime_value(self, option_definition: ConfigOptionDefinition, value: str):
+        """Set a runtime tracking value. Override in subclasses."""
+
+    def reset_tracking(self):
+        """Reset tracking state to defaults. Override in subclasses."""

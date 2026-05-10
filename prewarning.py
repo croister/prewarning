@@ -770,7 +770,11 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
 
     def _config_dialog(self, perform_validation: bool = False):
         start = time()
-        settings_dialog = ConfigDialog(self.config, self, title='Settings')
+        state_providers = {}
+        if self.punch_source is not None:
+            state_providers[self.punch_source.name] = self.punch_source
+        settings_dialog = ConfigDialog(self.config, self, title='Settings',
+                                       state_providers=state_providers)
         created = time()
         self.logger.debug('Config Dialog created: %d seconds', created - start)
         settings_dialog.Center()

@@ -36,7 +36,8 @@ class ConfigOptionDefinition:
                  valid_values_gen: Callable = None,
                  enabled_by: 'ConfigOptionDefinition' = None,
                  enables: List['ConfigSectionDefinition' or 'ConfigOptionDefinition'] = None,
-                 validator: Callable = None):
+                 validator: Callable = None,
+                 runtime_state_only: bool = False):
         super().__init__()
         self.logger = logging.getLogger(self.__class__.__name__)
 
@@ -56,6 +57,7 @@ class ConfigOptionDefinition:
         self.validator = validator
         self.verifier = None
         self.selector = None
+        self.runtime_state_only = runtime_state_only
 
         if enabled_by is not None:
             if enabled_by.value_type != bool:

@@ -177,6 +177,7 @@ class PunchSourceOlresultatSe(StateSaverMixin, _PunchSourceBase):
         description='The Id of the last received Punch, used to only fetch Punches with a higher Id.',
         default_value=0,
         validator=is_not_negative_int,
+        runtime_state_only=True,
     )
 
     CONFIG_OPTION_PUNCH_SOURCE_OL_RESULTAT_SE_FROM_DATE = ConfigOptionDefinition(
@@ -366,12 +367,11 @@ class PunchSourceOlresultatSe(StateSaverMixin, _PunchSourceBase):
         if self._data_read(self.CONFIG_OPTION_PUNCH_SOURCE_OL_RESULTAT_SE_LAST_RECEIVED_PUNCH_ID):
             self.last_received_punch_id = self._get_value(
                 self.CONFIG_OPTION_PUNCH_SOURCE_OL_RESULTAT_SE_LAST_RECEIVED_PUNCH_ID)
-            Config().update_live_section_option(self.name,
-                                                self.CONFIG_OPTION_PUNCH_SOURCE_OL_RESULTAT_SE_LAST_RECEIVED_PUNCH_ID,
-                                                self.last_received_punch_id)
             self.logger.info('Read %s value from state file: %s',
                              self.CONFIG_OPTION_PUNCH_SOURCE_OL_RESULTAT_SE_LAST_RECEIVED_PUNCH_ID.name,
                              self.last_received_punch_id)
+
+        self._notify_tracking_listeners()
 
         self.punch_fetcher = Thread(target=self._fetch_punches, daemon=True, name='PunchFetcherOlresultatSeThread')
 
@@ -402,11 +402,6 @@ class PunchSourceOlresultatSe(StateSaverMixin, _PunchSourceBase):
         self.url = self.CONFIG_OPTION_PUNCH_SOURCE_OL_RESULTAT_SE_URL.get_value(config_section)
         self.competition_id = self.CONFIG_OPTION_PUNCH_SOURCE_OL_RESULTAT_SE_COMPETITION_ID.get_value(config_section)
 
-        new_last_received_punch_id = self.CONFIG_OPTION_PUNCH_SOURCE_OL_RESULTAT_SE_LAST_RECEIVED_PUNCH_ID.get_value(
-            config_section)
-        self.logger.debug('_parse_config: old %s new %s', self.last_received_punch_id, new_last_received_punch_id)
-        self.last_received_punch_id = new_last_received_punch_id
-
         self.from_date = self.CONFIG_OPTION_PUNCH_SOURCE_OL_RESULTAT_SE_FROM_DATE.get_value(config_section)
         self.from_time = self.CONFIG_OPTION_PUNCH_SOURCE_OL_RESULTAT_SE_FROM_TIME.get_value(config_section)
         self.fetch_interval_seconds = self.CONFIG_OPTION_PUNCH_SOURCE_OL_RESULTAT_SE_FETCH_INTERVAL_SECONDS.get_value(
@@ -416,15 +411,34 @@ class PunchSourceOlresultatSe(StateSaverMixin, _PunchSourceBase):
         if new_control_codes is not None:
             self.control_codes.extend(new_control_codes.split())
 
+    def _get_tracking_state(self) -> Dict[str, str]:
+        return {
+            self.CONFIG_OPTION_PUNCH_SOURCE_OL_RESULTAT_SE_LAST_RECEIVED_PUNCH_ID.name: str(self.last_received_punch_id),
+        }
+
+    def get_runtime_value(self, option_definition: ConfigOptionDefinition):
+        if option_definition is self.CONFIG_OPTION_PUNCH_SOURCE_OL_RESULTAT_SE_LAST_RECEIVED_PUNCH_ID:
+            return self.last_received_punch_id
+        return None
+
+    def set_runtime_value(self, option_definition: ConfigOptionDefinition, value: str):
+        if option_definition is self.CONFIG_OPTION_PUNCH_SOURCE_OL_RESULTAT_SE_LAST_RECEIVED_PUNCH_ID:
+            self.last_received_punch_id = int(value) if value else 0
+        else:
+            return
+        self._save_state()
+
+    def reset_tracking(self):
+        self.last_received_punch_id = 0
+        self._save_state()
+
     def _save_state(self):
         self.logger.debug('_save_state: %s', self.last_received_punch_id)
 
         self._save_value(self.CONFIG_OPTION_PUNCH_SOURCE_OL_RESULTAT_SE_LAST_RECEIVED_PUNCH_ID,
                          self.last_received_punch_id)
 
-        Config().update_live_section_option(self.name,
-                                            self.CONFIG_OPTION_PUNCH_SOURCE_OL_RESULTAT_SE_LAST_RECEIVED_PUNCH_ID,
-                                            self.last_received_punch_id)
+        self._notify_tracking_listeners()
 
     def _fetch_punches(self):
         self.logger.debug('Started')
@@ -466,4 +480,3 @@ class PunchSourceOlresultatSe(StateSaverMixin, _PunchSourceBase):
             sleep(self.fetch_interval_seconds)
         self.logger.debug('Stopped')
         Config().write()
-        self._cleanup()

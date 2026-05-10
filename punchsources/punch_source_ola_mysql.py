@@ -167,6 +167,7 @@ class PunchSourceOlaMySql(StateSaverMixin, _PunchSourceBase):
                     'On the format of "YYYY-MM-DD hh:mm:ss.fff".',
         default_value='',
         validator=is_timestamp,
+        runtime_state_only=True,
     )
 
     CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_RECEIVED_PUNCH_ID = ConfigOptionDefinition(
@@ -178,6 +179,7 @@ class PunchSourceOlaMySql(StateSaverMixin, _PunchSourceBase):
                     'from the table `SplitTimes`, example "1_1_1".',
         default_value='',
         validator=is_punch_id,
+        runtime_state_only=True,
     )
 
     PUNCH_SOURCE_OLA_MYSQL_CONFIG_SECTION_DEFINITION = ConfigSectionDefinition(
@@ -399,21 +401,17 @@ class PunchSourceOlaMySql(StateSaverMixin, _PunchSourceBase):
         if self._data_read(self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_MODIFIED_TIME):
             self.last_modify_time = self._get_value(
                 self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_MODIFIED_TIME)
-            Config().update_live_section_option(self.name,
-                                                self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_MODIFIED_TIME,
-                                                self.last_modify_time)
             self.logger.info('Read %s value from state file: %s',
                              self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_MODIFIED_TIME.name,
                              self.last_modify_time)
         if self._data_read(self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_RECEIVED_PUNCH_ID):
             self.last_received_punch_id = self._get_value(
                 self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_RECEIVED_PUNCH_ID)
-            Config().update_live_section_option(self.name,
-                                                self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_RECEIVED_PUNCH_ID,
-                                                self.last_received_punch_id)
             self.logger.info('Read %s value from state file: %s',
                              self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_RECEIVED_PUNCH_ID.name,
                              self.last_received_punch_id)
+
+        self._notify_tracking_listeners()
 
         self.punch_fetcher = Thread(target=self._fetch_punches, daemon=True, name='PunchFetcherOlaMySqlThread')
 
@@ -442,18 +440,38 @@ class PunchSourceOlaMySql(StateSaverMixin, _PunchSourceBase):
         self.logger.debug('_parse_config')
         config_section = Config().get_section(self.name)
 
-        new_last_received_punch_id = self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_RECEIVED_PUNCH_ID.get_value(
-            config_section)
-        self.logger.debug('_parse_config: old %s new %s', self.last_received_punch_id, new_last_received_punch_id)
-        self.last_received_punch_id = new_last_received_punch_id
-        self.last_modify_time = self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_MODIFIED_TIME.get_value(
-            config_section)
-
         self.fetch_interval_seconds = self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_FETCH_INTERVAL_SECONDS\
             .get_value(config_section)
         self.control_ids = self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_CONTROL_IDS.get_value(config_section)
         if self.control_ids is not None:
             self.control_ids = self.control_ids.split()
+
+    def _get_tracking_state(self) -> Dict[str, str]:
+        return {
+            self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_MODIFIED_TIME.name: str(self.last_modify_time or ''),
+            self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_RECEIVED_PUNCH_ID.name: str(self.last_received_punch_id or ''),
+        }
+
+    def get_runtime_value(self, option_definition: ConfigOptionDefinition):
+        if option_definition is self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_MODIFIED_TIME:
+            return self.last_modify_time
+        if option_definition is self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_RECEIVED_PUNCH_ID:
+            return self.last_received_punch_id
+        return None
+
+    def set_runtime_value(self, option_definition: ConfigOptionDefinition, value: str):
+        if option_definition is self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_MODIFIED_TIME:
+            self.last_modify_time = value
+        elif option_definition is self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_RECEIVED_PUNCH_ID:
+            self.last_received_punch_id = value
+        else:
+            return
+        self._save_state()
+
+    def reset_tracking(self):
+        self.last_modify_time = None
+        self.last_received_punch_id = None
+        self._save_state()
 
     def _save_state(self):
         self.logger.debug('_save_state: %s %s', self.last_modify_time, self.last_received_punch_id)
@@ -463,12 +481,7 @@ class PunchSourceOlaMySql(StateSaverMixin, _PunchSourceBase):
         self._save_value(self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_RECEIVED_PUNCH_ID,
                          self.last_received_punch_id)
 
-        Config().update_live_section_option(self.name,
-                                            self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_MODIFIED_TIME,
-                                            self.last_modify_time)
-        Config().update_live_section_option(self.name,
-                                            self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_RECEIVED_PUNCH_ID,
-                                            self.last_received_punch_id)
+        self._notify_tracking_listeners()
 
     def _fetch_punches(self):
         self.logger.debug('Started')
@@ -492,4 +505,3 @@ class PunchSourceOlaMySql(StateSaverMixin, _PunchSourceBase):
             sleep(self.fetch_interval_seconds)
         self.logger.debug('Stopped')
         Config().write()
-        self._cleanup()
