@@ -918,16 +918,18 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
             punch = self.punch_queue.get()
             self.logger.debug('Processing: %s from: %s', punch['cardNumber'], punch['controlCode'])
 
+            source = self.start_list_source
+            source_name = self.start_list_source_name
             if 'bibNumber' in punch:
-                if self.start_list_source_name != StartListSourceOlaMySql.__qualname__:
-                    pre_warn_data = self.start_list_source.lookup_from_card_number(punch['cardNumber'])
+                if source_name != StartListSourceOlaMySql.__qualname__:
+                    pre_warn_data = source.lookup_from_card_number(punch['cardNumber'])
                     if pre_warn_data is None:
                         self.logger.debug('Could not find the team connected to the card number.'
                                           ' Using already existing data.')
                     else:
                         punch.update(pre_warn_data)
             else:
-                pre_warn_data = self.start_list_source.lookup_from_card_number(punch['cardNumber'])
+                pre_warn_data = source.lookup_from_card_number(punch['cardNumber'])
                 if pre_warn_data is None:
                     self.logger.debug('Could not find the team connected to the card number. Skipping!')
                     continue
