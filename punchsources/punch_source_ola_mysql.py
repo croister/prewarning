@@ -57,6 +57,8 @@ def _split_time_control_description(control_id: Dict[str, Any]) -> str:
     split_time_control_name = _split_time_control_name(control_id)
 
     class_names = control_id['classNames']
+    if class_names is None:
+        class_names = ''
     if len(class_names) > 50:
         class_names = '{class_names:.46} ...'.format(class_names=class_names)
 
