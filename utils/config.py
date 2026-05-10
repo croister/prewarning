@@ -32,7 +32,7 @@ class Config(LoggingEventHandler, Singleton):
     @classmethod
     def register_config_section_definition(cls, config_section_definition: ConfigSectionDefinition):
         if config_section_definition.name in cls.CONFIG_SECTION_DEFINITIONS:
-            raise
+            raise ValueError('Duplicate config section definition "{}".'.format(config_section_definition.name))
 
         temp_config_section_name = '_{}'.format(config_section_definition.name)
         if temp_config_section_name in cls.CONFIG_SECTION_DEFINITIONS:
