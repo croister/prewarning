@@ -49,12 +49,12 @@ class _PunchSourceBase(ConfigConsumer):
         return repr(self)
 
     @abstractmethod
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
         self.logger = logging.getLogger(self.__class__.__name__)
 
-        self.punch_listeners = set()
+        self.punch_listeners: set[PunchListener] = set()
         self._tracking_listeners: List[Callable] = []
 
     @abstractmethod

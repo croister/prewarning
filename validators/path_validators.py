@@ -16,7 +16,7 @@ def _to_path(value: str | Path) -> Path:
 
     :param str or Path value: The string to validate.
     """
-    if issubclass(type(value), Path):
+    if isinstance(value, Path):
         path = value
     else:
         try:

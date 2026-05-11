@@ -134,7 +134,7 @@ class SoundFolder(LoggingEventHandler, Singleton):
 LOGGER_NAME = 'Sound'
 
 
-class _SoundMeta(type(ConfigConsumer), type(Singleton)):
+class _SoundMeta(type(ConfigConsumer), type(Singleton)):  # type: ignore[misc]
     pass
 
 

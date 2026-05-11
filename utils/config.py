@@ -4,7 +4,7 @@ from configparser import ConfigParser, SectionProxy
 import logging
 from pathlib import Path
 from threading import RLock
-from typing import List, Dict, Any
+from typing import Callable, List, Dict, Any
 
 from natsort import natsorted
 from watchdog.events import LoggingEventHandler, DirModifiedEvent, FileModifiedEvent
@@ -27,7 +27,7 @@ class Config(LoggingEventHandler, Singleton):
 
     SECTION_COMMON = 'Common'
 
-    CONFIG_SECTION_DEFINITIONS = dict()
+    CONFIG_SECTION_DEFINITIONS: dict[str, ConfigSectionDefinition] = dict()
 
     @classmethod
     def register_config_section_definition(cls, config_section_definition: ConfigSectionDefinition):
@@ -81,7 +81,7 @@ class Config(LoggingEventHandler, Singleton):
                                                                                               config_section_name)
         return config_section_name
 
-    CONFIG_SECTION_LISTENERS = dict()
+    CONFIG_SECTION_LISTENERS: dict[str, list[ConfigConsumer]] = dict()
 
     @classmethod
     def register_config_section_listener(cls, config_section_name: str, config_section_listener: ConfigConsumer):
@@ -125,8 +125,8 @@ class Config(LoggingEventHandler, Singleton):
 
         self.config = ConfigParser()
 
-        self.config_sections = dict()
-        self.prev_config_sections = dict()
+        self.config_sections: dict[str, SectionProxy] = dict()
+        self.prev_config_sections: dict[str, SectionProxy] = dict()
 
         self.observer = Observer()
         self.observer.name = 'ConfigFileObserverThread'
@@ -149,7 +149,7 @@ class Config(LoggingEventHandler, Singleton):
 
         src_path = event.src_path
         try:
-            if Path(src_path).resolve() == self.config_file_location:
+            if Path(str(src_path)).resolve() == self.config_file_location:
                 self.logger.debug('Configuration file modification detected, reloading.')
                 self.read_config()
                 validation_errors = self.validate()
@@ -186,11 +186,12 @@ class Config(LoggingEventHandler, Singleton):
 
     def config_option_definition_added(self, config_section_name: str, config_option_definition_name: str):
         with self._config_lock:
+            if config_section_name not in self.config or config_section_name not in self.config_sections:
+                return
             config_section = self.config[config_section_name]
             section_definition = self.CONFIG_SECTION_DEFINITIONS[config_section_name]
-            option_definition = section_definition[config_option_definition_name]
-            value = config_section.get(option_definition.name, fallback=option_definition.default_value)
-            self._validate_config_option(config_section_name, option_definition, value)
+            option_definition = section_definition.option_definitions[config_option_definition_name]
+            self._validate_config_option(config_section, section_definition, option_definition)
 
     def config_section_definition_changed(self, config_section_name: str):
         with self._config_lock:
@@ -261,7 +262,7 @@ class Config(LoggingEventHandler, Singleton):
         self.write()
 
     def _notify_updates(self, updated_sections: List[str]):
-        notifications = dict()
+        notifications: dict[ConfigConsumer, list[str]] = dict()
         for updated_section in updated_sections:
             if updated_section in self.CONFIG_SECTION_LISTENERS:
                 listeners = self.CONFIG_SECTION_LISTENERS[updated_section]
@@ -302,16 +303,22 @@ class Config(LoggingEventHandler, Singleton):
         :return: The validation errors detected for this config section
         :rtype: Dict[ConfigOptionDefinition, List[str]]
         """
-        validation_errors = dict()
+        validation_errors: dict[ConfigOptionDefinition, list[str]] = dict()
         if self._is_config_section_enabled(config_section_definition):
             for option_definition in config_section_definition.option_definitions.values():
-                if isinstance(option_definition, RuntimeStateOptionDefinition):
-                    continue
-                if self._is_config_option_enabled(config_section_definition, option_definition):
-                    value = option_definition.get_value(config_section)
-                    option_validation_errors = option_definition.validate(value)
-                    if len(option_validation_errors):
-                        validation_errors[option_definition] = option_validation_errors
+                validation_errors |= self._validate_config_option(config_section, config_section_definition, option_definition)
+        return validation_errors
+
+    def _validate_config_option(self, config_section: SectionProxy,
+                                config_section_definition: ConfigSectionDefinition,
+                                option_definition: ConfigOptionDefinition) -> dict[ConfigOptionDefinition, list[str]]:
+        validation_errors: dict[ConfigOptionDefinition, list[str]] = dict()
+        if not isinstance(option_definition, RuntimeStateOptionDefinition):
+            if self._is_config_option_enabled(config_section_definition, option_definition):
+                value = option_definition.get_value(config_section)
+                option_validation_errors = option_definition.validate(value)
+                if len(option_validation_errors):
+                    validation_errors[option_definition] = option_validation_errors
         return validation_errors
 
     def _is_config_section_enabled(self, config_section_definition: ConfigSectionDefinition) -> bool:

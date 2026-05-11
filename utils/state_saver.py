@@ -37,7 +37,7 @@ class _StateSaverGroup:
 
         self._config = ConfigParser()
 
-        self._config_section = None
+        self._config_section: SectionProxy | None = None
 
         self._read_state()
 
@@ -123,30 +123,18 @@ class _StateSaverGroup:
         return option_definition.name in self._data_read_state and self._data_read_state[option_definition.name]
 
     def _get_value(self, option_definition: RuntimeStateOptionDefinition) -> Any:
-        """Returns the value with the correct type for a ConfigOptionDefinition
-
-        :param ConfigOptionDefinition option_definition: The ConfigOptionDefinition to get the value for
-        :return: The value
-        :rtype: Any
-        """
+        assert self._config_section is not None
         return option_definition.get_value(self._config_section)
 
     def _save_value(self, option_definition: RuntimeStateOptionDefinition, value: Any):
-        """Saves the value for a ConfigOptionDefinition to the state file
-
-        :param ConfigOptionDefinition option_definition: The ConfigOptionDefinition to write the value for
-        :param Any value: The value to write
-        """
         self.logger.debug('_save_value: %s=%s', str(option_definition), value)
+        assert self._config_section is not None
         option_definition.set_value(self._config_section, value)
         self.__write()
 
     def _save_values(self, values: Dict[RuntimeStateOptionDefinition, Any]):
-        """Saves the values for the ConfigOptionDefinitions to the state file
-
-        :param Dict[ConfigOptionDefinition, Any] values: The values to write
-        """
         self.logger.debug('_save_values: %s', str(values))
+        assert self._config_section is not None
         for option_definition in values.keys():
             option_definition.set_value(self._config_section, values[option_definition])
         self.__write()
@@ -212,7 +200,7 @@ class StateSaverMixin(ABC):
 
         :param Dict[ConfigOptionDefinition, Any] values: The values to write
         """
-        state_saver_groups = dict()
+        state_saver_groups: dict[str, dict[RuntimeStateOptionDefinition, Any]] = dict()
         for option_definition, value in values.items():
             state_saver_groups_key = self.__state_saver_groups_key(option_definition)
             if state_saver_groups_key not in state_saver_groups:

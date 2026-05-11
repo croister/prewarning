@@ -3,7 +3,7 @@
 import logging
 from pathlib import Path
 from threading import Lock, RLock
-from typing import List, Dict
+from typing import Any, List, Dict
 from xml.etree import ElementTree
 from zipfile import ZipFile
 
@@ -26,11 +26,11 @@ _MODULE_LOGGER_NAME = 'StartListSourceFile'
 DEFAULT_START_LIST_FILE_FOLDER = Path(__file__).resolve().parent.parent.absolute()
 
 
-def _select_start_list_file(parent: wx.Window, prev_file: str | Path = None) -> SelectionResult | bool:
+def _select_start_list_file(parent: wx.Window, prev_file: str | Path | None = None) -> SelectionResult | bool:
 
     if prev_file is None:
         default_dir = DEFAULT_START_LIST_FILE_FOLDER.as_posix()
-    elif issubclass(type(prev_file), Path):
+    elif isinstance(prev_file, Path):
         default_dir = prev_file.resolve().parent.absolute().as_posix()
     else:
         default_dir = Path(prev_file).resolve().parent.absolute().as_posix()
@@ -67,7 +67,7 @@ def _get_data(element, selector, ns):
 def _read_start_list(start_list_file: str):
     if start_list_file.lower().endswith('.zip'):
         archive = ZipFile(start_list_file, 'r')
-        data = archive.read('SOFTSTRT.XML')
+        data: bytes | str = archive.read('SOFTSTRT.XML')
     else:
         f = open(start_list_file, 'r', encoding='windows-1252')
         data = f.read()
@@ -100,7 +100,7 @@ def _read_start_list(start_list_file: str):
         team_bib_number = _get_data(xml_team, 'ns:BibNumber', ns)
         team_names[team_bib_number] = team_name
 
-        team = dict()
+        team: dict[str, Any] = dict()
         team_members = xml_team.findall('ns:TeamMemberStart', ns)
         for team_member in team_members:
             team_member_id = _get_data(team_member, 'ns:Person/ns:Id', ns)
@@ -302,14 +302,10 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
     def is_running(self) -> bool:
         return self._running
 
-    def get_config_section_definitions(self) -> List[ConfigSectionDefinition]:
-        """Returns a list of configuration section definitions.
-
-        :return: A list of configuration section definitions
-        :rtype: List[ConfigSectionDefinition]
-        """
+    @classmethod
+    def get_config_section_definitions(cls) -> List[ConfigSectionDefinition]:
         definitions = super().get_config_section_definitions()
-        definitions.append(self.START_LIST_SOURCE_FILE_CONFIG_SECTION_DEFINITION)
+        definitions.append(cls.START_LIST_SOURCE_FILE_CONFIG_SECTION_DEFINITION)
         return definitions
 
     def on_modified(self, event):

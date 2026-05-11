@@ -30,9 +30,9 @@ DEFAULT_RESPONSE_ENCODING = 'utf-8'
 def _fetch_punches(url_str: str,
                    unit_id: str,
                    last_id: int,
-                   from_date: str = None,
-                   from_time: str = None,
-                   control_codes: List[str] = None):
+                   from_date: str | None = None,
+                   from_time: str | None = None,
+                   control_codes: List[str] | None = None):
     if url_str is None or len(url_str) == 0:
         raise ValueError('URL must be configured.')
     if unit_id is None or len(unit_id) == 0:

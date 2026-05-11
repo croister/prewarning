@@ -11,7 +11,7 @@ def add_sources(classes, sources_dict, subclass_map=None):
 
 
 class _MockAbstractBase(ABC):
-    name = NotImplemented
+    name: str
 
     @abstractmethod
     def required_method(self):

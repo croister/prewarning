@@ -34,11 +34,11 @@ class ConfigOptionDefinition:
                  description: str,
                  mandatory: bool = False,
                  default_value: Any = None,
-                 valid_values: List[Any] = None,
-                 valid_values_gen: Callable = None,
-                 enabled_by: ConfigOptionDefinition = None,
-                 enables: List[ConfigSectionDefinition | ConfigOptionDefinition] = None,
-                 validator: Callable = None):
+                 valid_values: List[Any] | None = None,
+                 valid_values_gen: Callable | None = None,
+                 enabled_by: ConfigOptionDefinition | None = None,
+                 enables: List[ConfigSectionDefinition | ConfigOptionDefinition] | None = None,
+                 validator: Callable | None = None):
         super().__init__()
         self.logger = logging.getLogger(self.__class__.__name__)
 
@@ -56,8 +56,8 @@ class ConfigOptionDefinition:
         self.enabled_by = enabled_by
         self.enables = enables
         self.validator = validator
-        self.verifier = None
-        self.selector = None
+        self.verifier: ConfigVerifierDefinition | None = None
+        self.selector: ConfigSelectorDefinition | None = None
 
         if enabled_by is not None:
             if enabled_by.value_type != bool:
@@ -192,15 +192,15 @@ class ConfigOptionDefinition:
 
         try:
             if self.value_type is str:
-                converted_value = str(value)
+                return str(value)
             elif self.value_type is int:
-                converted_value = int(value)
+                return int(value)
             elif self.value_type is float:
-                converted_value = float(value)
+                return float(value)
             elif self.value_type is bool:
-                converted_value = bool(value)
+                return bool(value)
             elif self.value_type is Path:
-                converted_value = Path(str(value))
+                return Path(str(value))
             else:
                 self.logger.error(
                     'Unknown value type "%s" for the configuration option %s.', self.value_type.__name__, self.name)
@@ -213,7 +213,6 @@ class ConfigOptionDefinition:
                 value_name, value, self.name, self.value_type.__name__, type(value).__name__)
             raise ValueError('The {} is expected to have the type "{}" but has the type "{}".'
                              .format(value_name, self.value_type.__name__, type(value).__name__))
-        return converted_value
 
     def get_value(self, config_section: SectionProxy) -> Any:
         """Returns the value with the correct type from a config section
@@ -432,9 +431,9 @@ class ConfigSectionDefinition:
     def __init__(self,
                  name: str,
                  display_name: str,
-                 option_definitions: List[ConfigOptionDefinition] = None,
+                 option_definitions: List[ConfigOptionDefinition] | None = None,
                  enable_type: ConfigSectionEnableType = ConfigSectionEnableType.ALWAYS,
-                 requires: List['ConfigSectionDefinition'] = None,
+                 requires: List['ConfigSectionDefinition'] | None = None,
                  sort_key_prefix: int = 100,
                  #runtime_state_group: 'RuntimeStateGroup' = None,
                  ):
@@ -456,8 +455,8 @@ class ConfigSectionDefinition:
         self.sort_key_prefix = sort_key_prefix
         #self.runtime_state_group = runtime_state_group
 
-        self.enabled_by = None
-        self.required_by = list()
+        self.enabled_by: ConfigSectionOptionDefinition | None = None
+        self.required_by: list[ConfigSectionDefinition] = list()
 
         self.logger.debug(self)
 
@@ -625,7 +624,7 @@ class VerificationResult:
 
 class VerificationError(Exception):
 
-    def __init__(self, function: Callable, message: str, args: Iterable[Tuple[str, Any]]):
+    def __init__(self, function: Callable, message: str, args: dict[str, Any]):
         self.function = function
         self.message = message
         self.__dict__.update(args)
@@ -664,8 +663,8 @@ class ConfigVerifierDefinition:
 
     def __init__(self,
                  function: Callable,
-                 parameters: List[ConfigSectionOptionDefinition],
-                 message: str = None):
+                 parameters: List[ConfigSectionOptionDefinition | Any],
+                 message: str | None = None):
         super().__init__()
         self.logger = logging.getLogger(self.__class__.__name__)
 
@@ -725,7 +724,7 @@ class SelectionType(Enum):
 
 class SelectionResult(Exception):
 
-    def __init__(self, caption: str = None, message: str = None, selection_type: SelectionType = SelectionType.SINGLE):
+    def __init__(self, caption: str | None = None, message: str | None = None, selection_type: SelectionType = SelectionType.SINGLE):
 
         if caption is None:
             caption = 'Values'
@@ -736,7 +735,7 @@ class SelectionResult(Exception):
         self.message = message
         self.selection_type = selection_type
 
-        self.values = []
+        self.values: list[SelectionData] = []
 
     def add_value(self, value: SelectionData):
         self.values.append(value)
@@ -757,7 +756,7 @@ class SelectionResult(Exception):
 
 class SelectionError(Exception):
 
-    def __init__(self, function: Callable, message: str, args: Iterable[Tuple[str, Any]]):
+    def __init__(self, function: Callable, message: str, args: dict[str, Any]):
         self.function = function
         self.message = message
         self.__dict__.update(args)
@@ -797,7 +796,7 @@ class ConfigSelectorDefinition:
     def __init__(self,
                  function: Callable,
                  parameters: List[ConfigSectionOptionDefinition] | List[Any],
-                 message: str = None):
+                 message: str | None = None):
         super().__init__()
         self.logger = logging.getLogger(self.__class__.__name__)
 

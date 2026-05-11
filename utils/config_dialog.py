@@ -10,7 +10,7 @@ import wx.lib.scrolledpanel
 
 from utils.config import Config
 from utils.config_definitions import ConfigSectionDefinition, ConfigOptionDefinition, SelectionError, SelectionType, \
-    SelectionResult, VerificationResult, SelectionData, RuntimeStateOptionDefinition
+    SelectionResult, VerificationError, VerificationResult, SelectionData, RuntimeStateOptionDefinition
 
 
 def _default_value(option_definition: ConfigOptionDefinition):
@@ -509,13 +509,18 @@ class ConfigSectionPanel(wx.Panel):
                 self.update()
 
             elif function == 'verify':
+                if option_definition.verifier is None:
+                    return
                 result = option_definition.verifier.verify()
 
                 self.update()
 
                 if not result:
                     button.SetBackgroundColour(wx.Colour('pink'))
-                    button.SetToolTip(result.message)
+                    if isinstance(result, VerificationError):
+                        button.SetToolTip(result.message)
+                    else:
+                        button.SetToolTip('Verification failed.')
                     button.SetFocus()
                     button.Refresh()
                 else:
@@ -529,25 +534,27 @@ class ConfigSectionPanel(wx.Panel):
 
             elif function == 'select':
                 valid_values = option_definition.get_valid_values()
+                if valid_values is None:
+                    valid_values = []
                 if option_definition.selector is not None:
-                    result = option_definition.selector.select(parent=self.GetParent())
+                    select_result = option_definition.selector.select(parent=self.GetParent())
                 elif ConfigSectionPanel._use_selector_for(valid_values):
-                    result = SelectionResult(caption='Valid Values',
+                    select_result = SelectionResult(caption='Valid Values',
                                              message='Select a Value:')
                     for value in valid_values:
-                        result.add_value(SelectionData(value, value))
+                        select_result.add_value(SelectionData(value, value))
                 else:
                     self.logger.error('Unknown select method.')
                     raise ValueError('Unknown select method.')
 
-                if result is not None:
-                    if type(result) == SelectionError:
+                if select_result is not None:
+                    if type(select_result) == SelectionError:
                         button.SetBackgroundColour(wx.Colour('pink'))
-                        button.SetToolTip(result.message)
+                        button.SetToolTip(select_result.message)
                         button.SetFocus()
                         button.Refresh()
 
-                    elif type(result) == SelectionResult:
+                    elif type(select_result) == SelectionResult:
                         option_input = wx.FindWindowByName(name, parent=self)
                         if option_input is None:
                             self.logger.error('Unable to find the %s input.', name)
@@ -555,16 +562,16 @@ class ConfigSectionPanel(wx.Panel):
 
                         selected = None
 
-                        if len(result.values) > 1:
+                        if len(select_result.values) > 1:
                             old_value = str(option_definition.get_value(self.config.get_section(
                                 self.config_section_definition.name)))
-                            new_values = [str(s.value) for s in result.values]
+                            new_values = [str(s.value) for s in select_result.values]
 
-                            value_dict = {str(r.display_name): r for r in result.values}
+                            value_dict = {str(r.display_name): r for r in select_result.values}
                             value_list = list(value_dict.keys())
 
-                            if result.selection_type == SelectionType.SINGLE:
-                                old_selected = 0
+                            if select_result.selection_type == SelectionType.SINGLE:
+                                old_selected: int = 0
                                 if old_value is not None and old_value in new_values:
                                     old_selected = new_values.index(old_value)
 
@@ -578,27 +585,27 @@ class ConfigSectionPanel(wx.Panel):
                                         self.logger.debug('You selected: "%s"', dialog.GetStringSelection())
                                         selected = [value_dict[dialog.GetStringSelection()]]
 
-                            elif result.selection_type == SelectionType.MULTIPLE:
-                                old_selected = []
+                            elif select_result.selection_type == SelectionType.MULTIPLE:
+                                multi_old_selected: list[int] = []
                                 if old_value is not None:
                                     old_values = old_value.split()
                                     for old_val in old_values:
                                         if old_val in new_values:
-                                            old_selected.append(new_values.index(old_val))
+                                            multi_old_selected.append(new_values.index(old_val))
 
                                 with wx.MultiChoiceDialog(self.GetParent(),
                                                           'Select value(s)',
                                                           'Values',
                                                           value_list) as dialog:
-                                    dialog.SetSelections(old_selected)
+                                    dialog.SetSelections(multi_old_selected)
 
                                     if dialog.ShowModal() == wx.ID_OK:
                                         selections = dialog.GetSelections()
                                         selected = [value_dict[value_list[x]] for x in selections]
                                         self.logger.debug('You selected: "%s"', selected)
 
-                        elif len(result.values) == 1:
-                            selected = result.values
+                        elif len(select_result.values) == 1:
+                            selected = select_result.values
 
                         if selected is not None:
                             value = ' '.join([str(s.value) for s in selected])
@@ -641,7 +648,7 @@ class ConfigDialog(wx.Dialog):
         self.state_providers = state_providers if state_providers is not None else {}
 
         self.sections_sizer = None
-        self._panels = []
+        self._panels: list[ConfigSectionPanel] = []
 
         self.SetMinSize(self.GetParent().GetMinSize())
         self.SetSize(self.GetParent().GetMinSize())

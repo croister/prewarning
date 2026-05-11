@@ -8,7 +8,7 @@ class _Singleton(type):
     Defines a metaclass for singleton classes.
     """
 
-    _instances = {}
+    _instances: dict[type, Any] = {}
 
     def __call__(cls, *args, **kwargs):
         if cls not in cls._instances:
@@ -22,5 +22,5 @@ class _Singleton(type):
         return cls._instances[cls]
 
 
-class Singleton(_Singleton('SingletonMeta', (object,), {})):
+class Singleton(metaclass=_Singleton):
     pass

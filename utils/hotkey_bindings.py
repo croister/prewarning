@@ -253,10 +253,10 @@ class HotKeyBindingDefinition:
                  hotkey: HotKeyDefinition,
                  handler: Callable,
                  description: str,
-                 alternate_hotkeys: List[HotKeyDefinition] = None,
+                 alternate_hotkeys: List[HotKeyDefinition] | None = None,
                  hidden: bool = False,
                  window_id: wx.WindowIDRef = None,
-                 bitmap_name: str = None):
+                 bitmap_name: str | None = None):
         super().__init__()
         self.logger = logging.getLogger(self.__class__.__name__)
 

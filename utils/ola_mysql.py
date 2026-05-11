@@ -20,7 +20,7 @@ from validators.host_and_domain_name_validators import is_hostname_or_ip
 LOGGER_NAME = 'OlaMySql'
 
 
-def connect(host: str, user: str, password: str, database: str = None) -> Connection:
+def connect(host: str, user: str, password: str, database: str | None = None) -> Connection:
     logging.getLogger(LOGGER_NAME).debug('connect')
 
     connection = pymysql.connect(host=host,
@@ -28,7 +28,7 @@ def connect(host: str, user: str, password: str, database: str = None) -> Connec
                                  password=password,
                                  database=database,
                                  cursorclass=DictCursor)
-    return connection
+    return connection  # type: ignore[return-value]
 
 
 BUILT_IN_DATABASES = ['information_schema', 'mysql', 'performance_schema', 'sys']
@@ -58,14 +58,14 @@ def is_ola_database(connection: Connection) -> bool:
     logging.getLogger(LOGGER_NAME).debug('is_ola_database')
 
     is_ola_db = get_ola_db_version(connection) != 0
-    logging.getLogger(LOGGER_NAME).debug('is_ola_database({}) == {}'.format(connection.db, is_ola_db))
+    logging.getLogger(LOGGER_NAME).debug('is_ola_database({}) == {}'.format(str(connection.db), is_ola_db))
     return is_ola_db
 
 
 def get_ola_db_version(connection: Connection) -> int:
     logging.getLogger(LOGGER_NAME).debug('get_ola_db_version')
 
-    versions = []
+    versions: list[dict[str, Any]] = []
     with connection.cursor(DictCursor) as cursor:
         sql = 'SELECT' \
               '  `versionNumber`,' \
@@ -149,13 +149,12 @@ def _generate_in_format_str(no_of_values: int):
     return ', '.join(['%s'] * no_of_values)
 
 
-def get_events(connection: Connection, event_forms: EventForm | EventFormType = None) -> List[Dict[str, Any]]:
-    logging.getLogger(LOGGER_NAME).debug('get_events')
+def get_events(connection: Connection, event_forms: EventForm | EventFormType | None = None) -> List[Dict[str, Any]]:
 
     if event_forms is None:
         event_forms = EventFormType.ALL
 
-    events = []
+    events: list[dict[str, Any]] = []
     with connection.cursor(DictCursor) as cursor:
         event_forms_format_str = _generate_in_format_str(len(event_forms.as_list()))
         sql = 'SELECT' \
@@ -177,7 +176,7 @@ def get_events(connection: Connection, event_forms: EventForm | EventFormType = 
     return events
 
 
-def get_event(connection: Connection, event_id: int) -> Dict[str, Any]:
+def get_event(connection: Connection, event_id: int) -> dict[str, Any] | None:
     logging.getLogger(LOGGER_NAME).debug('get_event')
 
     with connection.cursor(DictCursor) as cursor:
@@ -201,7 +200,7 @@ def get_event(connection: Connection, event_id: int) -> Dict[str, Any]:
     return event
 
 
-def is_valid_event(connection: Connection, event_id: int, event_forms: EventForm | EventFormType = None) -> bool:
+def is_valid_event(connection: Connection, event_id: int, event_forms: EventForm | EventFormType | None = None) -> bool:
     logging.getLogger(LOGGER_NAME).debug('is_valid_event')
 
     if event_forms is None:
@@ -212,6 +211,7 @@ def is_valid_event(connection: Connection, event_id: int, event_forms: EventForm
     correct_event_type = False
     event_exists = event is not None
     if event_exists:
+        assert event is not None
         event_form_str = event['eventForm']
         correct_event_type = event_forms == event_form_str
 
@@ -231,7 +231,7 @@ def is_relay_event(connection: Connection, event_id: int) -> bool:
 def get_event_races(connection: Connection, event_id: int) -> List[Dict[str, Any]]:
     logging.getLogger(LOGGER_NAME).debug('get_event_races')
 
-    event_races = []
+    event_races: list[dict[str, Any]] = []
     with connection.cursor(DictCursor) as cursor:
         sql = 'SELECT *' \
               '  FROM `EventRaces`' \
@@ -265,7 +265,7 @@ def get_event_race_split_time_controls(connection: Connection,
                             'DISTINCT CONCAT(`EventClasses`.`name`, " - ", `RaceClasses`.`raceClassName`) ' \
                             'SEPARATOR ", ")'
 
-    event_split_time_controls = []
+    event_split_time_controls: list[dict[str, Any]] = []
     with connection.cursor(DictCursor) as cursor:
         if ola_db_version >= 565:  # OLA 6.3.9
             sql = 'SELECT DISTINCT' \
@@ -445,7 +445,7 @@ def _verify_database(host: str, user: str, password: str, database: str) -> bool
 
 
 def _select_event(host: str, user: str, password: str, database: str,
-                  event_forms: EventForm | EventFormType = None) -> SelectionResult | bool:
+                  event_forms: EventForm | EventFormType | None = None) -> SelectionResult | bool:
     try:
         connection = connect(host, user, password, database)
         with connection:
@@ -470,7 +470,7 @@ def _select_event(host: str, user: str, password: str, database: str,
 
 
 def _verify_event(host: str, user: str, password: str, database: str, event_id: int,
-                  event_forms: EventForm | EventFormType = None):
+                  event_forms: EventForm | EventFormType | None = None):
     if event_forms is None:
         event_forms = EventFormType.ALL
 
@@ -526,7 +526,7 @@ def get_event_race_split_times(connection: Connection,
     if last_modify_time is None:
         last_modify_time = '0000-00-00 00:00:00.000'
 
-    event_split_times = []
+    event_split_times: list[dict[str, Any]] = []
     with connection.cursor(DictCursor) as cursor:
         control_ids_format_str = _generate_in_format_str(len(control_ids))
         if ola_db_version >= 564:
@@ -593,7 +593,7 @@ def get_event_race_split_times(connection: Connection,
                   ' ORDER BY' \
                   '  `SplitTimes`.`modifyDate` ASC' \
                   ';'.format(control_ids_format_str)
-        args = list()
+        args: list[int | str] = list()
         args.append(event_id)
         args.append(event_race_id)
         args.extend(control_ids)
@@ -604,7 +604,7 @@ def get_event_race_split_times(connection: Connection,
     return event_split_times
 
 
-class _OlaMySqlMeta(type(ConfigConsumer), type(Singleton)):
+class _OlaMySqlMeta(type(ConfigConsumer), type(Singleton)):  # type: ignore[misc]
     pass
 
 
@@ -962,7 +962,7 @@ class OlaMySql(ConfigConsumer, Singleton, metaclass=_OlaMySqlMeta):
             connection.close()
         return self.ola_db_version
 
-    def get_events(self, event_forms: EventForm | EventFormType = None) -> List[Dict[str, Any]]:
+    def get_events(self, event_forms: EventForm | EventFormType | None = None) -> List[Dict[str, Any]]:
         self.logger.debug('get_events')
 
         connection = self._connect()

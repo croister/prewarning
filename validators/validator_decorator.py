@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 
+import functools
 import inspect
 import itertools
 from typing import Callable
-
-from decorator import decorator
 
 from validators.validation_error import ValidationError
 
@@ -30,10 +29,9 @@ def func_args_as_dict(func: Callable, args, kwargs):
     )
 
 
-@decorator
-def validator(function, message=None, *args, **kwargs):
+def validator(*, message=None):
     """
-    A decorator that makes given function a validator.
+    A decorator factory that makes given function a validator.
 
     Whenever the given function is called and returns ``False`` value
     this decorator returns :class:`ValidationError` object.
@@ -60,14 +58,15 @@ def validator(function, message=None, *args, **kwargs):
         >>> is_ip('300.10.10.22')
         ValidationError(function=is_ip, message='Not a valid IP address.', args={'value': '300.10.10.22'})
 
-    :param Callable function: The function to decorate
     :param str message: The validation error message
-    :param args: positional function arguments
-    :param kwargs: key value function arguments
     """
-    result = function(*args, **kwargs)
-    if not result:
-        if message is None:
-            message = 'Not valid according to the "{}" validator.'.format(function.__name__)
-        return ValidationError(function, message, func_args_as_dict(function, args, kwargs))
-    return True
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            result = func(*args, **kwargs)
+            if not result:
+                msg = message if message is not None else 'Not valid according to the "{}" validator.'.format(func.__name__)
+                return ValidationError(func, msg, func_args_as_dict(func, args, kwargs))
+            return True
+        return wrapper
+    return decorator

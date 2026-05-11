@@ -98,7 +98,7 @@ CONFIGURATION_FILE_NAME = 'prewarning.ini'
 CONFIGURATION_FILE = CONFIGURATION_DIR / CONFIGURATION_FILE_NAME
 
 
-class PreWarningMeta(type(wx.Frame), type(ConfigConsumer)):
+class PreWarningMeta(type(wx.Frame), type(ConfigConsumer)):  # type: ignore[misc]
     pass
 
 
@@ -489,7 +489,7 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
         super().on_modified(event)
 
         src_path = event.src_path
-        if Path(src_path).resolve() == LOGGING_CONFIGURATION_FILE:
+        if Path(str(src_path)).resolve() == LOGGING_CONFIGURATION_FILE:
             logging.debug('Updating logging configuration - before')
             _update_logging_configuration()
             logging.debug('Updating logging configuration - after')
