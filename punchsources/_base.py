@@ -28,16 +28,19 @@ class PunchListener(ABC):
         pass
 
 
+_NOT_OVERRIDDEN = object()
+
+
 class _PunchSourceBase(ConfigConsumer):
     """
     Base class for Punch Sources.
     """
 
-    name = NotImplemented
+    name = _NOT_OVERRIDDEN
 
-    display_name = NotImplemented
+    display_name = _NOT_OVERRIDDEN
 
-    description = NotImplemented
+    description = _NOT_OVERRIDDEN
 
     def __repr__(self) -> str:
         return f'_PunchSourceBase(name={self.name})'

@@ -15,13 +15,11 @@ class _Singleton(type):
             cls._instances[cls] = super(_Singleton, cls).__call__(*args, **kwargs)
         return cls._instances[cls]
 
-    @classmethod
-    def has_instance(mcs) -> bool:
-        return mcs in mcs._instances
+    def has_instance(cls) -> bool:
+        return cls in cls._instances
 
-    @classmethod
-    def get_instance(mcs) -> Any:
-        return mcs._instances[mcs]
+    def get_instance(cls) -> Any:
+        return cls._instances[cls]
 
 
 class Singleton(_Singleton('SingletonMeta', (object,), {})):

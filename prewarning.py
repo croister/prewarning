@@ -86,10 +86,6 @@ def _update_logging_configuration():
         logging.error('OSError in accessing the logging configuration file: "%s" %s', src_path, e)
     except Exception as e:
         logging.error('Exception in accessing the logging configuration file: "%s" %s', src_path, e)
-    except BaseException as e:
-        logging.error('BaseException in accessing the logging configuration file: "%s" %s', src_path, e)
-    except:
-        logging.error('Unknown exception in accessing the logging configuration file: "%s"', src_path)
 
 
 _update_logging_configuration()
@@ -243,7 +239,7 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
 
         # Config variables
         self.interactive_mode = None
-        self.announce_ip_on_Startup = None
+        self.announce_ip_on_startup = None
         self.intro_sound_trigger_timeout_seconds = None
         self.intro_sound_file = None
         self.test_sound_file = None
@@ -845,7 +841,7 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
         wx.CallAfter(self._refresh)
 
     def _on_key_press(self, key_event: wx.KeyEvent):
-        self.logger.debug(f'_on_key_press: {key_event_to_str(key_event)} pushed!')
+        self.logger.debug('_on_key_press: %s pushed!', key_event_to_str(key_event))
 
         for key_binding in self.hotkey_bindings:
             if key_binding.matches(key_event):
@@ -906,7 +902,7 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
         config_section = self.config.get_section(Config.SECTION_COMMON)
 
         self.interactive_mode = self.CONFIG_OPTION_INTERACTIVE_MODE.get_value(config_section)
-        self.announce_ip_on_Startup = self.CONFIG_OPTION_ANNOUNCE_IP_ON_STARTUP.get_value(config_section)
+        self.announce_ip_on_startup = self.CONFIG_OPTION_ANNOUNCE_IP_ON_STARTUP.get_value(config_section)
 
         seconds = self.CONFIG_OPTION_INTRO_SOUND_TRIGGER_TIMEOUT_SECONDS.get_value(config_section)
         sound_file = self.CONFIG_OPTION_INTRO_SOUND_FILE.get_value(config_section)
@@ -922,7 +918,7 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
         self.start_list_source_name = COMMON_START_LIST_SOURCE.get_value(config_section)
 
     def start(self):
-        if self.announce_ip_on_Startup:
+        if self.announce_ip_on_startup:
             self._notify_ip()
         self.punch_processor.start()
         self.announcement_processor.start()
@@ -940,6 +936,9 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
 
             source = self.start_list_source
             source_name = self.start_list_source_name
+            if source is None or source_name is None:
+                self.logger.warning('Start list source not yet initialized, deferring punch.')
+                continue
             if 'bibNumber' in punch:
                 if source_name != StartListSourceOlaMySql.__qualname__:
                     pre_warn_data = source.lookup_from_card_number(punch['cardNumber'])

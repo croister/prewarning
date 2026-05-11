@@ -70,9 +70,18 @@ This project uses [uv](https://docs.astral.sh/uv/) for dependency management and
 | Add a dependency | `uv add <package>` |
 | Remove a dependency | `uv remove <package>` |
 | Update lockfile | `uv lock` |
+| Run tests | `uv run pytest` |
 | Build Python package (sdist/wheel) | `uv build` |
 | Build executable (PyInstaller) | `uv run scripts/package.py` |
 | Clean build artifacts | `uv run scripts/clean.py` |
+
+### Test structure
+
+Tests live in `tests/` and use [pytest](https://docs.pytest.org/). Run them with:
+
+```
+uv run pytest
+```
 
 ### Upgrading
 

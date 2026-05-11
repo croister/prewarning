@@ -3,7 +3,7 @@
 import logging
 from datetime import date
 from threading import Event, Thread
-from typing import List
+from typing import List, Dict
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
@@ -12,7 +12,7 @@ from imurl import URL
 from utils.state_saver import StateSaverMixin
 from utils.config import ConfigSectionDefinition, ConfigOptionDefinition, Config
 from utils.config_definitions import ConfigSectionEnableType, ConfigVerifierDefinition, ConfigSectionOptionDefinition, \
-    VerificationResult
+    VerificationResult, RuntimeStateGroup, RuntimeStateOptionDefinition
 from validators.datetime_validators import is_date, is_time
 from validators.number_validators import is_not_negative_int
 from validators.regex_validators import is_control_ids
@@ -20,7 +20,9 @@ from validators.url_validators import is_http_or_https_url
 from ._base import _PunchSourceBase
 
 
-LOGGER_NAME = 'PunchSourceOlresultatSe'
+_MODULE_LOGGER_NAME = 'PunchSourceOlresultatSe'
+
+PUNCH_SOURCE_OL_RESULTAT_SE_RUNTIME_STATE = RuntimeStateGroup('ps_olresultatse.dat')
 
 DEFAULT_RESPONSE_ENCODING = 'utf-8'
 
@@ -45,7 +47,7 @@ def _fetch_punches(url_str: str,
     if from_time is not None:
         url = url.set_query('time', from_time)
 
-    logging.getLogger(LOGGER_NAME).debug('_fetch_punches url: "%s"', url)
+    logging.getLogger(_MODULE_LOGGER_NAME).debug('_fetch_punches url: "%s"', url)
 
     req = Request(url.url)
     try:
@@ -57,22 +59,22 @@ def _fetch_punches(url_str: str,
         splitlines = data.splitlines()
         punches = list()
         if splitlines:
-            logging.getLogger(LOGGER_NAME).debug('_fetch_punches data: "%s"', data)
+            logging.getLogger(_MODULE_LOGGER_NAME).debug('_fetch_punches data: "%s"', data)
             for line in splitlines:
                 punch_dict = dict(zip(('id', 'controlCode', 'cardNumber', 'passedTime'), line.split(';')))
                 if control_codes is None or punch_dict['controlCode'] in control_codes:
                     punches.append(punch_dict)
-        logging.getLogger(LOGGER_NAME).debug('_fetch_punches punches: %d "%s"', len(punches), punches)
+        logging.getLogger(_MODULE_LOGGER_NAME).debug('_fetch_punches punches: %d "%s"', len(punches), punches)
         return punches
     except HTTPError as e:
-        logging.getLogger(LOGGER_NAME).error('_fetch_punches: The server could not fulfill the request. Error code: %s',
+        logging.getLogger(_MODULE_LOGGER_NAME).error('_fetch_punches: The server could not fulfill the request. Error code: %s',
                                              e.code)
         raise
     except URLError as e:
-        logging.getLogger(LOGGER_NAME).error('_fetch_punches: We failed to reach a server. Reason: %s', e.reason)
+        logging.getLogger(_MODULE_LOGGER_NAME).error('_fetch_punches: We failed to reach a server. Reason: %s', e.reason)
         raise
     except Exception as e:
-        logging.getLogger(LOGGER_NAME).error('_fetch_punches: Unknown Exception. %s', e)
+        logging.getLogger(_MODULE_LOGGER_NAME).error('_fetch_punches: Unknown Exception. %s', e)
         raise
 
 
@@ -87,7 +89,7 @@ def _verify_last_id(url_str: str,
 
         return VerificationResult(message=f'{len(punches)} Punches received.')
     except Exception as e:
-        logging.getLogger(LOGGER_NAME).debug('_verify_last_id: %s', e)
+        logging.getLogger(_MODULE_LOGGER_NAME).debug('_verify_last_id: %s', e)
         return VerificationResult(message=str(e), status=False)
 
 
@@ -108,7 +110,7 @@ def _verify_date_time(url_str: str,
 
         return VerificationResult(message=f'{len(punches)} Punches received.')
     except Exception as e:
-        logging.getLogger(LOGGER_NAME).debug('_verify_date_time: %s', e)
+        logging.getLogger(_MODULE_LOGGER_NAME).debug('_verify_date_time: %s', e)
         return VerificationResult(message=str(e), status=False)
 
 
@@ -117,7 +119,7 @@ def _verify_control_codes(url_str: str,
                           last_id: int,
                           from_date: str,
                           from_time: str,
-                          control_codes: List[str]):
+                          control_codes: List[str]) -> VerificationResult:
     try:
         if control_codes is None:
             return VerificationResult(message='Control Codes must be configured.', status=False)
@@ -134,7 +136,7 @@ def _verify_control_codes(url_str: str,
 
         return VerificationResult(message=f'{len(punches)} Punches received.')
     except Exception as e:
-        logging.getLogger(LOGGER_NAME).debug('_verify_control_codes: %s', e)
+        logging.getLogger(_MODULE_LOGGER_NAME).debug('_verify_control_codes: %s', e)
         return VerificationResult(message=str(e), status=False)
 
 
@@ -169,14 +171,14 @@ class PunchSourceOlresultatSe(StateSaverMixin, _PunchSourceBase):
         mandatory=True,
     )
 
-    CONFIG_OPTION_PUNCH_SOURCE_OL_RESULTAT_SE_LAST_RECEIVED_PUNCH_ID = ConfigOptionDefinition(
+    CONFIG_OPTION_PUNCH_SOURCE_OL_RESULTAT_SE_LAST_RECEIVED_PUNCH_ID = RuntimeStateOptionDefinition(
+        runtime_state_group=PUNCH_SOURCE_OL_RESULTAT_SE_RUNTIME_STATE,
         name='LastReceivedPunchId',
         display_name='Last Received Punch Id',
         value_type=int,
         description='The Id of the last received Punch, used to only fetch Punches with a higher Id.',
         default_value=0,
         validator=is_not_negative_int,
-        runtime_state_only=True,
     )
 
     CONFIG_OPTION_PUNCH_SOURCE_OL_RESULTAT_SE_FROM_DATE = ConfigOptionDefinition(
@@ -338,13 +340,10 @@ class PunchSourceOlresultatSe(StateSaverMixin, _PunchSourceBase):
 
     def __init__(self):
         _PunchSourceBase.__init__(self)
-        StateSaverMixin.__init__(self,
-                                 'ps_olresultatse.dat',
-                                 self.name,
-                                 [self.CONFIG_OPTION_PUNCH_SOURCE_OL_RESULTAT_SE_LAST_RECEIVED_PUNCH_ID])
+        StateSaverMixin.__init__(self, self.name, [PUNCH_SOURCE_OL_RESULTAT_SE_RUNTIME_STATE])
 
-        if LOGGER_NAME != self.__class__.__name__:
-            raise ValueError('LOGGER_NAME not correct: {} vs {}'.format(LOGGER_NAME, self.__class__.__name__))
+        if _MODULE_LOGGER_NAME != self.__class__.__name__:
+            raise ValueError('_MODULE_LOGGER_NAME not correct: {} vs {}'.format(_MODULE_LOGGER_NAME, self.__class__.__name__))
 
         self.logger = logging.getLogger(self.__class__.__name__)
 
@@ -476,6 +475,8 @@ class PunchSourceOlresultatSe(StateSaverMixin, _PunchSourceBase):
                 self.logger.error('The server could not fulfill the request. Error code: %s', e.code)
             except URLError as e:
                 self.logger.error('We failed to reach a server. Reason: %s', e.reason)
+            except Exception as e:
+                self.logger.error('Unexpected error fetching punches: %s', e)
 
             self._stop_event.wait(timeout=self.fetch_interval_seconds)
         self.logger.debug('Stopped')

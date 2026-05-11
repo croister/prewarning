@@ -13,7 +13,7 @@ from watchdog.events import LoggingEventHandler, DirMovedEvent, FileMovedEvent, 
 from watchdog.observers import Observer
 
 from utils.config import ConfigConsumer, ConfigSectionDefinition, ConfigOptionDefinition, Config
-from utils.config_definitions import Path
+from utils.config_definitions import Path, VerificationResult
 from utils.singleton import Singleton
 
 
@@ -176,11 +176,11 @@ class Sound(ConfigConsumer, Singleton, metaclass=_SoundMeta):
         try:
             self._run_cmd(['mpg123', '--version'])
             return 'mpg123'
-        except FileNotFoundError:
+        except (FileNotFoundError, subprocess.CalledProcessError):
             try:
                 self._run_cmd(['../mpg123/win/mpg123', '--version'])
                 return '../mpg123/win/mpg123'
-            except FileNotFoundError:
+            except (FileNotFoundError, subprocess.CalledProcessError):
                 self.logger.error('Unable to locate the mpg123 binary, please install it and add it to the path.')
                 raise FileNotFoundError('Unable to locate the mpg123 binary, please install it and add it to the path.')
 
@@ -301,6 +301,9 @@ class Sound(ConfigConsumer, Singleton, metaclass=_SoundMeta):
 
 
 def verify_sound(sound: str):
+    sound_file = SoundFolder().get_sounds_dir() / sound
+    if not sound_file.is_file():
+        return VerificationResult(message=f'The sound file "{sound}" does not exist.', status=False)
     try:
         Sound.play(sound, True)
         return True

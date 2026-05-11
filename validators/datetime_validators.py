@@ -17,7 +17,7 @@ def _timestamp_pattern(value: str, datetime_pattern: str) -> bool:
     try:
         parsed = datetime.strptime(value, datetime_pattern)
         return type(parsed) == datetime
-    except TypeError or ValueError as e:
+    except (TypeError, ValueError) as e:
         logging.getLogger(LOGGER_NAME).debug('timestamp_pattern: %s', e)
         return False
 

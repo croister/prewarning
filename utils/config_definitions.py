@@ -9,6 +9,8 @@ from typing import Any, Dict, List, Callable, Iterable, Tuple
 
 import wx
 
+from utils.constants import DATA_DIR
+
 
 class ConfigOptionDefinition:
     """
@@ -34,10 +36,9 @@ class ConfigOptionDefinition:
                  default_value: Any = None,
                  valid_values: List[Any] = None,
                  valid_values_gen: Callable = None,
-                 enabled_by: 'ConfigOptionDefinition' = None,
-                 enables: List['ConfigSectionDefinition' or 'ConfigOptionDefinition'] = None,
-                 validator: Callable = None,
-                 runtime_state_only: bool = False):
+                 enabled_by: ConfigOptionDefinition = None,
+                 enables: List[ConfigSectionDefinition | ConfigOptionDefinition] = None,
+                 validator: Callable = None):
         super().__init__()
         self.logger = logging.getLogger(self.__class__.__name__)
 
@@ -57,7 +58,6 @@ class ConfigOptionDefinition:
         self.validator = validator
         self.verifier = None
         self.selector = None
-        self.runtime_state_only = runtime_state_only
 
         if enabled_by is not None:
             if enabled_by.value_type != bool:
@@ -436,6 +436,7 @@ class ConfigSectionDefinition:
                  enable_type: ConfigSectionEnableType = ConfigSectionEnableType.ALWAYS,
                  requires: List['ConfigSectionDefinition'] = None,
                  sort_key_prefix: int = 100,
+                 #runtime_state_group: 'RuntimeStateGroup' = None,
                  ):
         super().__init__()
 
@@ -453,6 +454,7 @@ class ConfigSectionDefinition:
         self.enable_type = enable_type
         self.requires = requires
         self.sort_key_prefix = sort_key_prefix
+        #self.runtime_state_group = runtime_state_group
 
         self.enabled_by = None
         self.required_by = list()
@@ -600,7 +602,7 @@ class ConfigSectionDefinition:
 
 class VerificationResult:
 
-    def __init__(self, message: str, status: bool = True):
+    def __init__(self, message: str | None, status: bool = True):
 
         if message is None:
             message = 'Select value:'
@@ -678,7 +680,10 @@ class ConfigVerifierDefinition:
 
     def verify(self) -> bool | VerificationError:
         from utils.config import Config
-        args = [p.option_definition.get_value(Config().get_section(p.section_name)) for p in self.parameters]
+        args = [p.option_definition.get_value(Config().get_section(p.section_name))
+                if type(p) == ConfigSectionOptionDefinition
+                else p
+                for p in self.parameters]
 
         result = self.function(*args)
         if not result:
@@ -819,3 +824,75 @@ class ConfigSelectorDefinition:
         if not result:
             return SelectionError(self.function, self.message, dict(zip(arg_names, args)))
         return result
+
+
+class RuntimeStateGroup:
+    """Groups runtime state only options together with their storage file."""
+
+    def __repr__(self) -> str:
+        return (f'RuntimeStateGroup(state_file_name={self.state_file_name},'
+                f' option_definitions={list(self._option_definitions.keys())})')
+
+    def __str__(self) -> str:
+        return repr(self)
+
+    def __init__(self, state_file_name: str):
+        self.logger = logging.getLogger(self.__class__.__name__)
+
+        self.state_file_name = state_file_name
+
+        self._option_definitions: Dict[str, 'RuntimeStateOptionDefinition'] = {}
+
+        self.state_file_location = DATA_DIR / state_file_name
+
+        if not self.state_file_location.is_file():
+            self.logger.info('The state file "%s" was not found.', self.state_file_location)
+
+        self.logger.debug(self)
+
+    def _register(self, option_definition: 'RuntimeStateOptionDefinition'):
+        if option_definition.name in self._option_definitions:
+            raise ValueError(
+                f'Option definition "{option_definition.name}" is already registered in this RuntimeStateGroup.')
+        self._option_definitions[option_definition.name] = option_definition
+
+    @property
+    def option_definitions(self) -> Dict[str, 'RuntimeStateOptionDefinition']:
+        return dict(self._option_definitions)
+
+    def get_value(self, section_name: str, option_definition: ConfigOptionDefinition) -> Any:
+        from configparser import ConfigParser
+
+        config = ConfigParser()
+        config.read(self.state_file_location)
+        if config.has_section(section_name) and option_definition.name in config[section_name]:
+            return option_definition.get_value(config[section_name])
+        return None
+
+    def set_value(self, section_name: str, option_definition: ConfigOptionDefinition, value: Any):
+        from configparser import ConfigParser
+
+        config = ConfigParser()
+        config.read(self.state_file_location)
+        if not config.has_section(section_name):
+            config[section_name] = {}
+        option_definition.set_value(config[section_name], value)
+        with open(self.state_file_location, 'w') as f:
+            config.write(f)
+
+
+class RuntimeStateOptionDefinition(ConfigOptionDefinition):
+    """ConfigOptionDefinition for runtime state only values, associated with a RuntimeStateGroup."""
+
+    def __repr__(self) -> str:
+        return (f'RuntimeStateOptionDefinition(name={self.name},'
+                f' runtime_state_group={self._runtime_state_group.state_file_name})')
+
+    def __init__(self, runtime_state_group: RuntimeStateGroup, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._runtime_state_group = runtime_state_group
+        runtime_state_group._register(self)
+
+    @property
+    def runtime_state_group(self) -> RuntimeStateGroup:
+        return self._runtime_state_group

@@ -12,7 +12,7 @@ from utils.config import Config
 from utils.config_consumer import ConfigConsumer
 from utils.config_definitions import ConfigOptionDefinition, ConfigSectionDefinition, ConfigSectionEnableType, \
     ConfigSectionOptionDefinition, ConfigSelectorDefinition, SelectionData, SelectionResult
-from utils.config_verification import ConfigVerifierDefinition
+from utils.config_definitions import ConfigVerifierDefinition
 from utils.singleton import Singleton
 from validators.host_and_domain_name_validators import is_hostname_or_ip
 
@@ -434,7 +434,7 @@ def _select_database(host: str, user: str, password: str) -> SelectionResult | b
         return False
 
 
-def _verify_database(host: str, user: str, password: str, database: str):
+def _verify_database(host: str, user: str, password: str, database: str) -> bool:
     try:
         connection = connect(host, user, password, database)
         with connection:

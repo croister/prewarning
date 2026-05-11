@@ -9,7 +9,8 @@ from pymysql import OperationalError
 from utils.state_saver import StateSaverMixin
 from utils.config import ConfigSectionDefinition, ConfigOptionDefinition, Config
 from utils.config_definitions import ConfigSectionEnableType, ConfigVerifierDefinition, ConfigSectionOptionDefinition, \
-    ConfigSelectorDefinition, SelectionData, SelectionType, SelectionResult, VerificationResult
+    ConfigSelectorDefinition, SelectionData, SelectionType, SelectionResult, VerificationResult, \
+    RuntimeStateGroup, RuntimeStateOptionDefinition
 from utils.ola_mysql import OlaMySql, connect, get_event_race_split_time_controls, are_valid_event_race_control_ids, \
     get_event_race_split_times, get_ola_db_version, is_relay_event
 from validators.datetime_validators import is_timestamp
@@ -17,7 +18,9 @@ from validators.regex_validators import is_control_ids, is_punch_id
 from ._base import _PunchSourceBase
 
 
-LOGGER_NAME = 'PunchSourceOlaMySql'
+_MODULE_LOGGER_NAME = 'PunchSourceOlaMySql'
+
+PUNCH_SOURCE_OLA_MYSQL_RUNTIME_STATE = RuntimeStateGroup('ps_ola_mysql.dat')
 
 
 def _select_control_ids(host: str, user: str, password: str, database: str, event_id: int, event_race_id: int):
@@ -39,7 +42,7 @@ def _select_control_ids(host: str, user: str, password: str, database: str, even
                                                _split_time_control_description(control_id)))
             return result
     except Exception as e:
-        logging.getLogger(LOGGER_NAME).debug('_select_control_ids: %s', e)
+        logging.getLogger(_MODULE_LOGGER_NAME).debug('_select_control_ids: %s', e)
         return False
 
 
@@ -72,7 +75,7 @@ def _split_time_control_description(control_id: Dict[str, Any]) -> str:
 
 
 def _verify_control_ids(host: str, user: str, password: str, database: str,
-                        event_id: int, event_race_id: int, control_ids: str):
+                        event_id: int, event_race_id: int, control_ids: str) -> bool:
     try:
         if control_ids is None or len(control_ids) == 0:
             control_id_ints = []
@@ -89,13 +92,13 @@ def _verify_control_ids(host: str, user: str, password: str, database: str,
                                                     event_race_id=event_race_id,
                                                     control_ids=control_id_ints)
     except Exception as e:
-        logging.getLogger(LOGGER_NAME).debug('_select_control_ids: %s', e)
+        logging.getLogger(_MODULE_LOGGER_NAME).debug('_select_control_ids: %s', e)
         return False
 
 
 def _verify_fetch(host: str, user: str, password: str, database: str,
                   event_id: int, event_race_id: int, control_ids: str,
-                  last_modify_time: str | None, last_received_punch_id: str = None) -> VerificationResult:
+                  last_modify_time: str | None, last_received_punch_id: str | None = None) -> VerificationResult:
     try:
         if control_ids is None or len(control_ids) == 0:
             control_id_ints = []
@@ -122,7 +125,7 @@ def _verify_fetch(host: str, user: str, password: str, database: str,
 
             return VerificationResult(message=f'{len(event_split_times)} Punches received.')
     except Exception as e:
-        logging.getLogger(LOGGER_NAME).debug('_verify_fetch: %s', e)
+        logging.getLogger(_MODULE_LOGGER_NAME).debug('_verify_fetch: %s', e)
         return VerificationResult(message=str(e), status=False)
 
 
@@ -160,7 +163,8 @@ class PunchSourceOlaMySql(StateSaverMixin, _PunchSourceBase):
         valid_values=list(range(1, 121)),
     )
 
-    CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_MODIFIED_TIME = ConfigOptionDefinition(
+    CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_MODIFIED_TIME = RuntimeStateOptionDefinition(
+        runtime_state_group=PUNCH_SOURCE_OLA_MYSQL_RUNTIME_STATE,
         name='LastModifiedTime',
         display_name='Last Modified Time',
         value_type=str,
@@ -168,10 +172,10 @@ class PunchSourceOlaMySql(StateSaverMixin, _PunchSourceBase):
                     'On the format of "YYYY-MM-DD hh:mm:ss.fff".',
         default_value='',
         validator=is_timestamp,
-        runtime_state_only=True,
     )
 
-    CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_RECEIVED_PUNCH_ID = ConfigOptionDefinition(
+    CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_RECEIVED_PUNCH_ID = RuntimeStateOptionDefinition(
+        runtime_state_group=PUNCH_SOURCE_OLA_MYSQL_RUNTIME_STATE,
         name='LastReceivedPunchId',
         display_name='Last Received Punch Id',
         value_type=str,
@@ -180,7 +184,6 @@ class PunchSourceOlaMySql(StateSaverMixin, _PunchSourceBase):
                     'from the table `SplitTimes`, example "1_1_1".',
         default_value='',
         validator=is_punch_id,
-        runtime_state_only=True,
     )
 
     PUNCH_SOURCE_OLA_MYSQL_CONFIG_SECTION_DEFINITION = ConfigSectionDefinition(
@@ -197,6 +200,7 @@ class PunchSourceOlaMySql(StateSaverMixin, _PunchSourceBase):
             OlaMySql.config_section_definition(),
         ],
         sort_key_prefix=30,
+        #runtime_state_group=PUNCH_SOURCE_OLA_MYSQL_RUNTIME_STATE,
     )
 
     PUNCH_SOURCE_OLA_MYSQL_CONTROL_IDS_SELECTOR = ConfigSelectorDefinition(
@@ -375,14 +379,10 @@ class PunchSourceOlaMySql(StateSaverMixin, _PunchSourceBase):
 
     def __init__(self):
         _PunchSourceBase.__init__(self)
-        StateSaverMixin.__init__(self,
-                                 'ps_ola_mysql.dat',
-                                 self.name,
-                                 [self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_MODIFIED_TIME,
-                                  self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_RECEIVED_PUNCH_ID])
+        StateSaverMixin.__init__(self, self.name, [PUNCH_SOURCE_OLA_MYSQL_RUNTIME_STATE])
 
-        if LOGGER_NAME != self.__class__.__name__:
-            raise ValueError('LOGGER_NAME not correct: {} vs {}'.format(LOGGER_NAME, self.__class__.__name__))
+        if _MODULE_LOGGER_NAME != self.__class__.__name__:
+            raise ValueError('_MODULE_LOGGER_NAME not correct: {} vs {}'.format(_MODULE_LOGGER_NAME, self.__class__.__name__))
 
         self.logger = logging.getLogger(self.__class__.__name__)
 
@@ -478,10 +478,10 @@ class PunchSourceOlaMySql(StateSaverMixin, _PunchSourceBase):
     def _save_state(self):
         self.logger.debug('_save_state: %s %s', self.last_modify_time, self.last_received_punch_id)
 
-        self._save_value(self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_MODIFIED_TIME,
-                         self.last_modify_time)
-        self._save_value(self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_RECEIVED_PUNCH_ID,
-                         self.last_received_punch_id)
+        values = {self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_MODIFIED_TIME: self.last_modify_time,
+                  self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_RECEIVED_PUNCH_ID: self.last_received_punch_id}
+
+        self._save_values(values)
 
         self._notify_tracking_listeners()
 
@@ -503,6 +503,8 @@ class PunchSourceOlaMySql(StateSaverMixin, _PunchSourceBase):
                     self._save_state()
             except OperationalError as oe:
                 self.logger.error(oe)
+            except Exception as e:
+                self.logger.error('Unexpected error fetching punches: %s', e)
 
             self._stop_event.wait(timeout=self.fetch_interval_seconds)
         self.logger.debug('Stopped')

@@ -10,7 +10,7 @@ import wx.lib.scrolledpanel
 
 from utils.config import Config
 from utils.config_definitions import ConfigSectionDefinition, ConfigOptionDefinition, SelectionError, SelectionType, \
-    SelectionResult, VerificationResult, SelectionData
+    SelectionResult, VerificationResult, SelectionData, RuntimeStateOptionDefinition
 
 
 def _default_value(option_definition: ConfigOptionDefinition):
@@ -36,7 +36,7 @@ def _has_default_value(option_definition: ConfigOptionDefinition, config_section
     return value == default_value
 
 
-def _set_value(control: wx.TextEntry | wx.CheckBox, value: Any):
+def _set_value(control: wx.TextEntry | wx.CheckBox | wx.ListBox, value: Any):
     if type(control) == wx.TextCtrl:
         control.ChangeValue(str(value))
     elif type(control) == wx.ComboBox:
@@ -47,7 +47,7 @@ def _set_value(control: wx.TextEntry | wx.CheckBox, value: Any):
         control.SetValue(value)
 
 
-def _get_value(control: wx.TextEntry | wx.CheckBox) -> str | None:
+def _get_value(control: wx.TextEntry | wx.CheckBox | wx.ListBox) -> str | None:
     if type(control) == wx.ListBox:
         selection = control.GetSelection()
         if selection != wx.NOT_FOUND:
@@ -115,7 +115,7 @@ class ConfigOptionValidator(wx.Validator):
             return True
 
     def TransferToWindow(self):
-        if self.config_option_definition.runtime_state_only:
+        if isinstance(self.config_option_definition, RuntimeStateOptionDefinition):
             return True
         control = self.GetWindow()
         value = _value(self.config_option_definition, self.config_section)
@@ -142,6 +142,7 @@ class ConfigSectionPanel(wx.Panel):
                  config: Config,
                  *args,
                  state_provider=None,
+                 dialog=None,
                  **kwargs):
         wx.Panel.__init__(self, *args, **kwargs, name=config_section_definition.name)
 
@@ -151,6 +152,7 @@ class ConfigSectionPanel(wx.Panel):
         self.config_section = config_section
         self.config = config
         self.state_provider = state_provider
+        self._dialog = dialog
 
         self.options_sizer = None
 
@@ -164,7 +166,7 @@ class ConfigSectionPanel(wx.Panel):
 
         if self.state_provider is not None:
             for option_definition in self.config_section_definition.option_definitions.values():
-                if option_definition.runtime_state_only:
+                if isinstance(option_definition, RuntimeStateOptionDefinition):
                     control = self._tracking_controls.get(option_definition.name)
                     if control is not None:
                         value = self.state_provider.get_runtime_value(option_definition)
@@ -172,6 +174,17 @@ class ConfigSectionPanel(wx.Panel):
                             _set_value(control, value)
                             self._tracking_dirty[option_definition.name] = False
             self.state_provider.register_tracking_listener(self._on_tracking_update)
+        else:
+            section_name = self.config_section_definition.name
+            for option_definition in self.config_section_definition.option_definitions.values():
+                if isinstance(option_definition, RuntimeStateOptionDefinition):
+                    group = option_definition.runtime_state_group
+                    control = self._tracking_controls.get(option_definition.name)
+                    if control is not None:
+                        value = group.get_value(section_name, option_definition)
+                        if value is not None:
+                            _set_value(control, value)
+                            self._tracking_dirty[option_definition.name] = False
 
         self.logger.debug(self)
 
@@ -197,17 +210,26 @@ class ConfigSectionPanel(wx.Panel):
                         return
 
     def _save_runtime_state(self):
-        if self.state_provider is None:
-            return
-        for option_name, control in self._tracking_controls.items():
-            if self._tracking_dirty.get(option_name, False):
-                option_definition = self.config_section_definition.option_definitions.get(option_name)
-                if option_definition is not None and option_definition.runtime_state_only:
-                    value = _get_value(control)
-                    self.state_provider.set_runtime_value(option_definition, value)
-                    # Defer dirty clear so stale wx.CallAfter updates from
-                    # before/ during save are processed first and skipped.
-                    wx.CallAfter(lambda n=option_name: self._tracking_dirty.update({n: False}))
+        if self.state_provider is not None:
+            for option_name, control in self._tracking_controls.items():
+                if self._tracking_dirty.get(option_name, False):
+                    option_definition = self.config_section_definition.option_definitions.get(option_name)
+                    if option_definition is not None and isinstance(option_definition, RuntimeStateOptionDefinition):
+                        value = _get_value(control)
+                        self.state_provider.set_runtime_value(option_definition, value)
+                        # Defer dirty clear so stale wx.CallAfter updates from
+                        # before/ during save are processed first and skipped.
+                        wx.CallAfter(lambda n=option_name: self._tracking_dirty.update({n: False}))
+        else:
+            section_name = self.config_section_definition.name
+            for option_name, control in self._tracking_controls.items():
+                if self._tracking_dirty.get(option_name, False):
+                    option_definition = self.config_section_definition.option_definitions.get(option_name)
+                    if option_definition is not None and isinstance(option_definition, RuntimeStateOptionDefinition):
+                        group = option_definition.runtime_state_group
+                        value = _get_value(control)
+                        group.set_value(section_name, option_definition, value)
+                        wx.CallAfter(lambda n=option_name: self._tracking_dirty.update({n: False}))
 
     def _create_widgets(self):
         main_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -288,7 +310,7 @@ class ConfigSectionPanel(wx.Panel):
 
             self.options_sizer.Add(option_input, 1, wx.ALL | wx.EXPAND, 5)
 
-            if option_definition.runtime_state_only:
+            if isinstance(option_definition, RuntimeStateOptionDefinition):
                 self._tracking_controls[option_definition_name] = option_input
                 self._tracking_dirty[option_definition_name] = False
 
@@ -306,7 +328,7 @@ class ConfigSectionPanel(wx.Panel):
                 option_buttons_sizer.Add(option_default_button)
 
                 if not option_definition.is_enabled(self.config_section) \
-                        or (not option_definition.runtime_state_only
+                        or (not isinstance(option_definition, RuntimeStateOptionDefinition)
                             and _has_default_value(option_definition, self.config_section)):
                     option_default_button.Disable()
             if option_definition.selector is not None or ConfigSectionPanel._use_selector_for(valid_values):
@@ -378,9 +400,10 @@ class ConfigSectionPanel(wx.Panel):
 
     def update(self, validate=True):
         self.update_visibility()
-        self.GetParent().GetParent().update_visibility()
-        if validate:
-            self.GetParent().GetParent().Validate()
+        if self._dialog is not None:
+            self._dialog.update_visibility()
+            if validate:
+                self._dialog.Validate()
 
     def update_visibility(self):
         self.TransferDataFromWindow()
@@ -410,7 +433,7 @@ class ConfigSectionPanel(wx.Panel):
             if config_option_definition.is_enabled(self.config_section):
                 option_input.Enable()
                 if option_default_button is not None:
-                    if config_option_definition.runtime_state_only:
+                    if isinstance(config_option_definition, RuntimeStateOptionDefinition):
                         option_default_button.Enable()
                     elif _has_default_value(config_option_definition, self.config_section):
                         option_default_button.Disable()
@@ -456,7 +479,8 @@ class ConfigSectionPanel(wx.Panel):
         self.update()
 
     def on_button(self, event: wx.CommandEvent):
-        self.GetParent().GetParent().TransferDataFromWindow()
+        if self._dialog is not None:
+            self._dialog.TransferDataFromWindow()
 
         button = event.GetEventObject()
         if isinstance(button, wx.Button):
@@ -475,7 +499,7 @@ class ConfigSectionPanel(wx.Panel):
                 if name in self._tracking_controls:
                     self._tracking_dirty[name] = True
                     for opt_def in self.config_section_definition.option_definitions.values():
-                        if opt_def.runtime_state_only:
+                        if isinstance(opt_def, RuntimeStateOptionDefinition):
                             ctrl = self._tracking_controls.get(opt_def.name)
                             if ctrl is not None:
                                 _set_value(ctrl, _default_value(opt_def))
@@ -608,7 +632,7 @@ class ConfigDialog(wx.Dialog):
     def __str__(self) -> str:
         return repr(self)
 
-    def __init__(self, config: Config, *args, state_providers: Dict[str, Any] = None, **kwargs):
+    def __init__(self, config: Config, *args, state_providers: Dict[str, Any] | None = None, **kwargs):
         wx.Dialog.__init__(self, *args, **kwargs, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
 
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -647,7 +671,8 @@ class ConfigDialog(wx.Dialog):
                                                        self.config.get_section(config_section_definition_name),
                                                        self.config,
                                                        scroll_panel,
-                                                       state_provider=state_provider)
+                                                       state_provider=state_provider,
+                                                       dialog=self)
 
             self.sections_sizer.Add(config_section_panel, proportion=0, flag=wx.EXPAND | wx.ALL, border=5)
             self._panels.append(config_section_panel)

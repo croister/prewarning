@@ -12,7 +12,7 @@ from watchdog.observers import Observer
 
 from utils.config_consumer import ConfigConsumer
 from utils.config_definitions import ConfigSectionDefinition, ConfigOptionDefinition, ConfigSectionOptionDefinition, \
-    config_section_definitions_sort_key
+    config_section_definitions_sort_key, RuntimeStateOptionDefinition
 from utils.singleton import Singleton
 
 
@@ -162,10 +162,6 @@ class Config(LoggingEventHandler, Singleton):
             logging.error('OSError in accessing the file: "%s" %s', src_path, e)
         except Exception as e:
             logging.error('Exception in accessing the file: "%s" %s', src_path, e)
-        except BaseException as e:
-            logging.error('BaseException in accessing the file: "%s" %s', src_path, e)
-        except:
-            logging.error('Unknown exception in accessing the file: "%s"', src_path)
 
     def start(self):
         self.read_config()
@@ -198,6 +194,8 @@ class Config(LoggingEventHandler, Singleton):
 
     def config_section_definition_changed(self, config_section_name: str):
         with self._config_lock:
+            if config_section_name not in self.config or config_section_name not in self.config_sections:
+                return
             config_section = self.config[config_section_name]
             config_section_definition = self.CONFIG_SECTION_DEFINITIONS[config_section_name]
             self._validate_config_section(config_section, config_section_definition)
@@ -234,7 +232,7 @@ class Config(LoggingEventHandler, Singleton):
             self._create_initial_config_section(config_section_definition)
 
         for option_definition in config_section_definition.option_definitions.values():
-            if option_definition.runtime_state_only:
+            if isinstance(option_definition, RuntimeStateOptionDefinition):
                 continue
             if option_definition.name not in self.config[config_section_name]:
                 self.logger.warning('The configuration file is missing the "%s" option in the "%s" section,'
@@ -307,7 +305,7 @@ class Config(LoggingEventHandler, Singleton):
         validation_errors = dict()
         if self._is_config_section_enabled(config_section_definition):
             for option_definition in config_section_definition.option_definitions.values():
-                if option_definition.runtime_state_only:
+                if isinstance(option_definition, RuntimeStateOptionDefinition):
                     continue
                 if self._is_config_option_enabled(config_section_definition, option_definition):
                     value = option_definition.get_value(config_section)
@@ -347,7 +345,7 @@ class Config(LoggingEventHandler, Singleton):
                     continue
                 removed = []
                 for option_def in section_def.option_definitions.values():
-                    if option_def.runtime_state_only and option_def.name in self.config[section_name]:
+                    if isinstance(option_def, RuntimeStateOptionDefinition) and option_def.name in self.config[section_name]:
                         removed.append(option_def.name)
                         del self.config[section_name][option_def.name]
                 if removed:

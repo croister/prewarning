@@ -22,7 +22,7 @@ def _int(value: str, min_limit: int = MIN_SIZE, max_limit: int = MAX_SIZE) -> bo
     try:
         int_value = int(value)
         return min_limit <= int_value <= max_limit
-    except TypeError or ValueError as e:
+    except (TypeError, ValueError) as e:
         logging.getLogger(LOGGER_NAME).debug('_int: %s', e)
         return False
 

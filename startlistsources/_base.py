@@ -7,16 +7,19 @@ from typing import Dict
 from utils.config_consumer import ConfigConsumer
 
 
+_NOT_OVERRIDDEN = object()
+
+
 class _StartListSourceBase(ConfigConsumer):
     """
     Base class for Start List Sources.
     """
 
-    name = NotImplemented
+    name = _NOT_OVERRIDDEN
 
-    display_name = NotImplemented
+    display_name = _NOT_OVERRIDDEN
 
-    description = NotImplemented
+    description = _NOT_OVERRIDDEN
 
     def __repr__(self) -> str:
         return f'_StartListSourceBase()'

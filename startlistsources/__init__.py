@@ -1,9 +1,8 @@
 import inspect
 import logging
-import sys
 
 from startlistsources import start_list_source_file, start_list_source_ola_mysql
-from startlistsources._base import _StartListSourceBase
+from startlistsources._base import _StartListSourceBase, _NOT_OVERRIDDEN
 from startlistsources.start_list_source_ola_mysql import StartListSourceOlaMySql
 from utils.config import Config
 from utils.config_definitions import ConfigOptionDefinition
@@ -11,9 +10,22 @@ from utils.config_definitions import ConfigOptionDefinition
 
 LOGGER_NAME = 'StartListSources'
 
+_module_initialized = False
+
+
+def _ensure_init():
+    global _module_initialized
+    if _module_initialized:
+        return
+    _module_initialized = True
+
+    _import_all_modules()
+    _populate_start_list_sources()
+    _validate_sources()
+    _register_common_source()
+
 
 def _import_all_modules():
-    """ Dynamically imports all modules in this package. """
     import importlib
     import os
     import traceback
@@ -21,14 +33,10 @@ def _import_all_modules():
     __all__ = []
     globals_, locals_ = globals(), locals()
 
-    # Dynamically import all the package modules in this file's directory.
     os.chdir(os.path.dirname(__file__))
     for filename in os.listdir(os.getcwd()):
-        # Process all python files in directory that don't start
-        # with underscore (which also prevents this module from
-        # importing itself).
         if filename[0] != '_' and filename.split('.')[-1] in ('py', 'pyw', 'pyc', 'pyo'):
-            modulename = filename.split('.')[0]  # Filename sans extension.
+            modulename = filename.split('.')[0]
             package_module = '.'.join([__name__, modulename])
             try:
                 module = importlib.import_module(package_module)
@@ -41,51 +49,54 @@ def _import_all_modules():
                     __all__.append(name)
 
 
-_import_all_modules()
+def _populate_start_list_sources():
+    global START_LIST_SOURCES, __all__
+    START_LIST_SOURCES = dict()
+    __all__.append('START_LIST_SOURCES')
 
-""" Dynamically generated dict with all available Start List Sources. """
-START_LIST_SOURCES = dict()
-__all__.append('START_LIST_SOURCES')
+    def add_start_list_sources(classes):
+        for cls in classes:
+            if not inspect.isabstract(cls):
+                START_LIST_SOURCES[cls.name] = cls
+            add_start_list_sources(cls.__subclasses__())
+
+    add_start_list_sources(_StartListSourceBase.__subclasses__())
 
 
-def add_start_list_sources(classes):
-    for cls in classes:
-        if not inspect.isabstract(cls):
-            START_LIST_SOURCES[cls.name] = cls
-        add_start_list_sources(cls.__subclasses__())
+def _validate_sources():
+    if not START_LIST_SOURCES:
+        raise RuntimeError('Error: No Start List Sources found.')
+    if _NOT_OVERRIDDEN in START_LIST_SOURCES:
+        source = START_LIST_SOURCES[_NOT_OVERRIDDEN]
+        raise RuntimeError(f'Error: "{source.__qualname__}" must override the "name" variable.')
+    for source_name, source in START_LIST_SOURCES.items():
+        if source.display_name is _NOT_OVERRIDDEN:
+            raise RuntimeError(f'Error: "{source_name}" must override the "display_name" variable.')
+        if source.description is _NOT_OVERRIDDEN:
+            raise RuntimeError(f'Error: "{source_name}" must override the "description" variable.')
 
 
-add_start_list_sources(_StartListSourceBase.__subclasses__())
+def _register_common_source():
+    global COMMON_START_LIST_SOURCE, __all__
 
-if not START_LIST_SOURCES:
-    logging.getLogger(LOGGER_NAME).error('Error: No Start List Sources found.')
-    sys.exit(1)
+    COMMON_START_LIST_SOURCE = ConfigOptionDefinition(
+        name='StartListSource',
+        display_name='Start List Source',
+        value_type=str,
+        description='Determines the source of the Start List to look up team information from.',
+        default_value=StartListSourceOlaMySql.__qualname__,
+        valid_values=list(START_LIST_SOURCES.keys()),
+        mandatory=True,
+        enables=[START_LIST_SOURCES[source_name].config_section_definition()
+                 for source_name in START_LIST_SOURCES]
+    )
 
-if NotImplemented in START_LIST_SOURCES.keys():
-    logging.getLogger(LOGGER_NAME).error('Error: "%s" must override the "name" variable.', str(START_LIST_SOURCES[NotImplemented].__qualname__))
-    sys.exit(1)
+    Config.register_config_option_definition(Config.SECTION_COMMON, COMMON_START_LIST_SOURCE)
+    __all__.append('COMMON_START_LIST_SOURCE')
 
-COMMON_START_LIST_SOURCE = ConfigOptionDefinition(
-    name='StartListSource',
-    display_name='Start List Source',
-    value_type=str,
-    description='Determines the source of the Start List to look up team information from.',
-    default_value=StartListSourceOlaMySql.__qualname__,
-    valid_values=list(START_LIST_SOURCES.keys()),
-    mandatory=True,
-    enables=[START_LIST_SOURCES[start_list_source_name].config_section_definition()
-             for start_list_source_name in START_LIST_SOURCES]
-)
 
-Config.register_config_option_definition(Config.SECTION_COMMON, COMMON_START_LIST_SOURCE)
-
-for start_list_source_name in START_LIST_SOURCES:
-    start_list_source = START_LIST_SOURCES[start_list_source_name]
-
-    if start_list_source.display_name == NotImplemented:
-        logging.getLogger(LOGGER_NAME).error('Error: "%s" must override the "display_name" variable.', start_list_source_name)
-        sys.exit(1)
-
-    if start_list_source.description == NotImplemented:
-        logging.getLogger(LOGGER_NAME).error('Error: "%s" must override the "description" variable.', start_list_source_name)
-        sys.exit(1)
+def __getattr__(name):
+    if name in ('START_LIST_SOURCES', 'COMMON_START_LIST_SOURCE'):
+        _ensure_init()
+        return globals()[name]
+    raise AttributeError(f'module {__name__!r} has no attribute {name!r}')

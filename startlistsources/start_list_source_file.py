@@ -21,7 +21,7 @@ from validators.path_validators import file_exists
 from ._base import _StartListSourceBase
 
 
-LOGGER_NAME = 'StartListSourceFile'
+_MODULE_LOGGER_NAME = 'StartListSourceFile'
 
 DEFAULT_START_LIST_FILE_FOLDER = Path(__file__).resolve().parent.parent.absolute()
 
@@ -85,9 +85,9 @@ def _read_start_list(start_list_file: str):
     organiser_id = _get_data(start_list, 'ns:Event/ns:Organiser/ns:Id', ns)
     organiser_name = _get_data(start_list, 'ns:Event/ns:Organiser/ns:Name', ns)
 
-    logging.getLogger(LOGGER_NAME).debug('_read_start_list - Event: %s (%s) %s',
+    logging.getLogger(_MODULE_LOGGER_NAME).debug('_read_start_list - Event: %s (%s) %s',
                                          str(event_name), str(event_id), str(event_date))
-    logging.getLogger(LOGGER_NAME).debug('_read_start_list - Organiser: %s (%s)',
+    logging.getLogger(_MODULE_LOGGER_NAME).debug('_read_start_list - Organiser: %s (%s)',
                                          str(organiser_name), str(organiser_id))
 
     team_names = dict()
@@ -133,8 +133,8 @@ def _read_start_list(start_list_file: str):
     team_names = dict(natsorted(team_names.items()))
     teams = dict(natsorted(teams.items()))
 
-    logging.getLogger(LOGGER_NAME).debug('_read_start_list - Teams: %s', str(team_names))
-    logging.getLogger(LOGGER_NAME).debug('_read_start_list - Runners: %s', str(runners))
+    logging.getLogger(_MODULE_LOGGER_NAME).debug('_read_start_list - Teams: %s', str(team_names))
+    logging.getLogger(_MODULE_LOGGER_NAME).debug('_read_start_list - Runners: %s', str(runners))
 
     return team_names, teams, runners
 
@@ -154,7 +154,7 @@ def _verify_start_list_file(start_list_file: Path):
 
         return VerificationResult(message=f'{len(team_names)} Teams in the Start List File.')
     except Exception as e:
-        logging.getLogger(LOGGER_NAME).debug('_verify_start_list_file: %s', e)
+        logging.getLogger(_MODULE_LOGGER_NAME).debug('_verify_start_list_file: %s', e)
         return VerificationResult(message=str(e), status=False)
 
 
@@ -261,8 +261,8 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
     def __init__(self):
         self.observer = None
 
-        if LOGGER_NAME != self.__class__.__name__:
-            raise ValueError('LOGGER_NAME not correct: {} vs {}'.format(LOGGER_NAME, self.__class__.__name__))
+        if _MODULE_LOGGER_NAME != self.__class__.__name__:
+            raise ValueError('_MODULE_LOGGER_NAME not correct: {} vs {}'.format(_MODULE_LOGGER_NAME, self.__class__.__name__))
 
         self.logger = logging.getLogger(self.__class__.__name__)
 
@@ -335,7 +335,7 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
 
         start_list_file = self.CONFIG_OPTION_START_LIST_FILE.get_value(config_section)
 
-        if start_list_file.is_file():
+        if start_list_file and start_list_file.is_file():
             resolved = start_list_file
         else:
             resolved = DEFAULT_START_LIST_FILE_FOLDER / start_list_file
