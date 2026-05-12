@@ -429,14 +429,12 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
 
                 self.teams[team_bib_number] = team
 
-            self.team_names = dict(natsorted(self.team_names.items()))
-            self.teams = dict(natsorted(self.teams.items()))
             # for leg in team.items():
             # 	for subleg in leg:
             #
 
-            self.team_names = natsorted(self.team_names.items())
-            self.teams = natsorted(self.teams.items())
+            self.team_names = dict(natsorted(self.team_names.items()))
+            self.teams = dict(natsorted(self.teams.items()))
             # self.start_list_file_time = stat(self.add_path(self.start_list_file)).st_mtime
             self.logger.debug('Teams: %s', str(self.team_names))
             self.logger.debug('Runners: %s', str(self.runners))
