@@ -23,9 +23,9 @@ if IS_WINDOWS:
 
 icon = None
 if IS_WINDOWS and os.path.exists('favicon.ico'):
-    icon = ['favicon.ico']
+    icon = 'favicon.ico'
 elif IS_MACOS and os.path.exists('favicon.icns'):
-    icon = ['favicon.icns']
+    icon = 'favicon.icns'
 
 a = Analysis(
     ['prewarning.py'],
