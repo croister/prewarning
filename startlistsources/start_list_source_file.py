@@ -67,9 +67,9 @@ def _get_data(element, selector, ns):
 def _read_start_list(start_list_file: str):
     if start_list_file.lower().endswith('.zip'):
         archive = ZipFile(start_list_file, 'r')
-        data: bytes | str = archive.read('SOFTSTRT.XML')
+        data = archive.read('SOFTSTRT.XML')
     else:
-        f = open(start_list_file, 'r', encoding='windows-1252')
+        f = open(start_list_file, 'rb')
         data = f.read()
 
     start_list = ElementTree.fromstring(data)
@@ -357,7 +357,7 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
                 with ZipFile(self.start_list_file, 'r') as archive:
                     data = archive.read('SOFTSTRT.XML')
             else:
-                with open(self.start_list_file.as_posix(), 'r', encoding='windows-1252') as f:
+                with open(self.start_list_file.as_posix(), 'rb') as f:
                     data = f.read()
 
             start_list = ElementTree.fromstring(data)
