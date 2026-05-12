@@ -1,0 +1,155 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+    tags: [v*]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+env:
+  UV_SYNC_GROUP: dev
+
+jobs:
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version-file: .python-version
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y libgtk-3-dev libnotify-dev
+      - run: uv sync --group dev
+      - name: Run tests
+        run: xvfb-run -a uv run pytest -v
+
+  typecheck:
+    name: Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version-file: .python-version
+      - run: uv sync --group dev
+      - name: Run mypy
+        run: uv run mypy prewarning.py utils validators punchsources startlistsources
+
+  build:
+    name: Build (${{ matrix.target }})
+    needs: [test, typecheck]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            target: windows
+          - os: macos-latest
+            target: macos
+          - os: ubuntu-latest
+            target: linux
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version-file: .python-version
+      - name: Compute version
+        id: version
+        shell: bash
+        run: |
+          python -c '
+          import os, re
+          content = open("pyproject.toml").read()
+          base = re.search(r"version = \"(.*?)\"", content).group(1)
+          ref = os.environ.get("GITHUB_REF", "")
+          sha = os.environ.get("GITHUB_SHA", "")[:7]
+          if ref.startswith("refs/tags/v"):
+              version = base.replace("-dev", "")
+          else:
+              version = f"{base}+{sha}" if sha else base
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write(f"version={version}\n")
+          open("pyproject.toml", "w").write(
+              re.sub(r"version = \".*?\"", f"version = \"{version}\"", content)
+          )
+          '
+      - name: Install Linux system dependencies
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libgtk-3-dev libnotify-dev
+      - run: uv sync --group dev
+      - name: Build with PyInstaller
+        run: uv run python scripts/package.py
+      - name: Create archive
+        shell: bash
+        run: |
+          python -c '
+          import shutil, os
+          name = "prewarning.app" if os.path.isdir("dist/prewarning.app") else "prewarning"
+          shutil.make_archive("prewarning-${{ steps.version.outputs.version }}-${{ matrix.target }}", "zip", "dist", name)
+          '
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: prewarning-${{ steps.version.outputs.version }}-${{ matrix.target }}
+          path: prewarning-${{ steps.version.outputs.version }}-${{ matrix.target }}.zip
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: prewarning-*
+          merge-multiple: true
+          path: release-artifacts
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ github.ref_name }}" \
+            --title "${{ github.ref_name }}" \
+            --generate-notes \
+            release-artifacts/*.zip
+      - uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+      - name: Bump version to next dev (minor)
+        id: bump
+        shell: bash
+        run: |
+          python -c '
+          import os, re
+          content = open("pyproject.toml").read()
+          current = re.search(r"version = \"(.*?)\"", content).group(1)
+          base = current.replace("-dev", "")
+          major, minor, _ = map(int, base.split("."))
+          next_ver = f"{major}.{minor + 1}.0-dev"
+          content = re.sub(r"version = \".*?\"", f"version = \"{next_ver}\"", content)
+          open("pyproject.toml", "w").write(content)
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write(f"version={next_ver}\n")
+          '
+      - name: Commit and push version bump
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add pyproject.toml
+          git commit -m "Bump version to ${{ steps.bump.outputs.version }}"
+          git push
