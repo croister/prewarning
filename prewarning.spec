@@ -1,7 +1,9 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+import importlib.metadata
 import platform
 import os
+from PyInstaller.utils.hooks import copy_metadata
 
 
 IS_WINDOWS = platform.system() == 'Windows'
@@ -17,6 +19,14 @@ datas = [
     ('logs', 'logs'),
     ('favicon.ico', '.'),
 ]
+
+datas += copy_metadata('prewarning')
+for req in (importlib.metadata.requires('prewarning') or []):
+    name = req.split(';')[0].split('==')[0].split('>=')[0].split('~=')[0].split('!=')[0].strip()
+    try:
+        datas += copy_metadata(name)
+    except Exception:
+        pass
 
 if IS_WINDOWS:
     datas.append(('mpg123', 'mpg123'))
