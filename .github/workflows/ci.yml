@@ -93,19 +93,19 @@ jobs:
       - run: uv sync --group dev
       - name: Build with PyInstaller
         run: uv run python scripts/package.py
-      - name: Create archive
+      - name: Rename dist directory
         shell: bash
         run: |
           python -c '
-          import shutil, os
+          import os
           name = "prewarning.app" if os.path.isdir("dist/prewarning.app") else "prewarning"
-          shutil.make_archive("prewarning-${{ steps.version.outputs.version }}-${{ matrix.target }}", "zip", "dist", name)
+          os.rename(os.path.join("dist", name), "prewarning-${{ steps.version.outputs.version }}-${{ matrix.target }}")
           '
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: prewarning-${{ steps.version.outputs.version }}-${{ matrix.target }}
-          path: prewarning-${{ steps.version.outputs.version }}-${{ matrix.target }}.zip
+          path: prewarning-${{ steps.version.outputs.version }}-${{ matrix.target }}
 
   release:
     if: startsWith(github.ref, 'refs/tags/v')
@@ -117,16 +117,19 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           pattern: prewarning-*
-          merge-multiple: true
           path: release-artifacts
-      - name: Create GitHub Release
+      - name: Create archives and GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          cd release-artifacts
+          for d in */; do
+            zip -r "${d%/}.zip" "$d"
+          done
           gh release create "${{ github.ref_name }}" \
             --title "${{ github.ref_name }}" \
             --generate-notes \
-            release-artifacts/*.zip
+            *.zip
       - uses: actions/checkout@v4
         with:
           ref: master
