@@ -1,3 +1,4 @@
+import os
 from unittest.mock import patch, MagicMock
 import subprocess
 import pytest
@@ -51,6 +52,7 @@ class TestRunCmd:
             with pytest.raises(subprocess.CalledProcessError):
                 sound._run_cmd(['cmd'])
 
+    @pytest.mark.skipif(os.name != 'nt', reason='STARTUPINFO is Windows-only')
     def test_passes_startupinfo(self, sound):
         with patch('utils.sound.subprocess.STARTUPINFO') as mock_si, \
              patch('utils.sound.run') as mock_run:

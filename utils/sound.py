@@ -161,9 +161,11 @@ class Sound(ConfigConsumer, Singleton, metaclass=_SoundMeta):
 
     def _run_cmd(self, cmd: List[str]) -> int:
         self.logger.debug('_run_cmd(%s)', cmd)
-        si = subprocess.STARTUPINFO()
-        si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-        result = run(cmd, capture_output=True, text=True, startupinfo=si)
+        startupinfo = None
+        if os.name == 'nt':
+            startupinfo = subprocess.STARTUPINFO()  # type: ignore[attr-defined]
+            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW  # type: ignore[attr-defined]
+        result = run(cmd, capture_output=True, text=True, startupinfo=startupinfo)
         self.logger.debug('_run_cmd(%s) -> %d', cmd, result.returncode)
         if result.stdout:
             self.logger.debug('_run_cmd(%s) stdout: %s', cmd, result.stdout)
