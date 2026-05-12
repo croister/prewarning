@@ -8,8 +8,6 @@ on:
     branches: [master]
   workflow_dispatch:
 
-env:
-  UV_SYNC_GROUP: dev
 
 jobs:
   test:
@@ -40,6 +38,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version-file: .python-version
+      - name: Install system dependencies
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libgtk-3-dev libnotify-dev
       - run: uv sync --group dev
       - name: Run mypy
         run: uv run mypy prewarning.py utils validators punchsources startlistsources
