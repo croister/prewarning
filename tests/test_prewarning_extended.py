@@ -27,7 +27,7 @@ class TestStop:
         pw.observer.join.assert_called_once()
 
     def test_stops_config(self, pw):
-        with patch('prewarning.Config') as mock_config:
+        with patch("prewarning.Config") as mock_config:
             PreWarning.stop(pw)
             mock_config.return_value.stop.assert_called_once()
 
@@ -61,20 +61,20 @@ class TestFontSize:
         return inst
 
     def test_increase_font_size(self, pw):
-        with patch('prewarning.wx.CallAfter'):
+        with patch("prewarning.wx.CallAfter"):
             PreWarning._increase_font_size(pw)
         assert pw.font_factor_offset == -1
         pw._calculate_sizes.assert_called_once()
 
     def test_decrease_font_size(self, pw):
-        with patch('prewarning.wx.CallAfter'):
+        with patch("prewarning.wx.CallAfter"):
             PreWarning._decrease_font_size(pw)
         assert pw.font_factor_offset == 1
         pw._calculate_sizes.assert_called_once()
 
     def test_restore_font_size(self, pw):
         pw.font_factor_offset = 5
-        with patch('prewarning.wx.CallAfter'):
+        with patch("prewarning.wx.CallAfter"):
             PreWarning._restore_font_size(pw)
         assert pw.font_factor_offset == 0
         pw._calculate_sizes.assert_called_once()
@@ -83,10 +83,10 @@ class TestFontSize:
 class TestPlayTestSound:
     def test_plays_sound(self):
         pw = MagicMock()
-        pw.test_sound_file = 'test.mp3'
+        pw.test_sound_file = "test.mp3"
         pw.sound = MagicMock()
         PreWarning._play_test_sound(pw)
-        pw.sound.play_sound.assert_called_once_with('test.mp3')
+        pw.sound.play_sound.assert_called_once_with("test.mp3")
 
 
 class TestSimulatePunch:
@@ -108,7 +108,8 @@ class TestSimulatePunch:
     def test_queues_announcement(self, pw):
         PreWarning._simulate_punch(pw)
         pw.announcement_queue.put.assert_called_once_with(
-            {'language': None, 'sound': '10'})
+            {"language": None, "sound": "10"}
+        )
 
 
 class TestPunchReceived:
@@ -116,7 +117,7 @@ class TestPunchReceived:
         pw = MagicMock()
         pw.logger = MagicMock()
         pw.punch_queue = MagicMock()
-        punch = {'cardNumber': '123'}
+        punch = {"cardNumber": "123"}
         PreWarning.punch_received(pw, punch)
         pw.punch_queue.put.assert_called_once_with(punch)
 
@@ -124,8 +125,8 @@ class TestPunchReceived:
 class TestConfigUpdated:
     def test_calls_apply_with_callafter(self):
         pw = MagicMock()
-        with patch('prewarning.wx.CallAfter') as callafter:
-            PreWarning.config_updated(pw, ['Common'])
+        with patch("prewarning.wx.CallAfter") as callafter:
+            PreWarning.config_updated(pw, ["Common"])
             callafter.assert_called_once_with(pw._apply_config_update)
 
 
@@ -140,10 +141,11 @@ class TestApplyConfigUpdate:
 class TestOnTimer:
     def test_updates_time_label(self):
         from time import strftime
+
         pw = MagicMock()
         pw.time_label = MagicMock()
         PreWarning._on_timer(pw, None)
-        pw.time_label.SetLabel.assert_called_once_with(strftime('%H:%M:%S'))
+        pw.time_label.SetLabel.assert_called_once_with(strftime("%H:%M:%S"))
 
 
 class TestToggleFullScreen:
@@ -169,21 +171,23 @@ class TestNotifyIp:
         pw = MagicMock()
         pw.logger = MagicMock()
         pw.announcement_queue = MagicMock()
-        with patch('prewarning.socket.socket') as mock_socket:
+        with patch("prewarning.socket.socket") as mock_socket:
             sock = MagicMock()
             mock_socket.return_value = sock
-            sock.getsockname.return_value = ('192.168.1.42', 0)
+            sock.getsockname.return_value = ("192.168.1.42", 0)
 
             PreWarning._notify_ip(pw)
 
-            sock.connect.assert_called_once_with(('8.8.8.8', 0))
+            sock.connect.assert_called_once_with(("8.8.8.8", 0))
             assert pw.announcement_queue.put.call_count == 4
-            pw.announcement_queue.put.assert_has_calls([
-                call({'language': 'en', 'sound': '192'}),
-                call({'language': 'en', 'sound': '168'}),
-                call({'language': 'en', 'sound': '1'}),
-                call({'language': 'en', 'sound': '42'}),
-            ])
+            pw.announcement_queue.put.assert_has_calls(
+                [
+                    call({"language": "en", "sound": "192"}),
+                    call({"language": "en", "sound": "168"}),
+                    call({"language": "en", "sound": "1"}),
+                    call({"language": "en", "sound": "42"}),
+                ]
+            )
             sock.close.assert_called_once()
 
 
@@ -202,7 +206,7 @@ class TestGetInteractiveMode:
         pw = MagicMock()
         pw.CONFIG_OPTION_INTERACTIVE_MODE = MagicMock()
         pw.CONFIG_OPTION_INTERACTIVE_MODE.get_value.return_value = True
-        with patch('prewarning.Config') as mock_config:
+        with patch("prewarning.Config") as mock_config:
             mock_config.return_value.get_section.return_value = {}
             PreWarning._get_interactive_mode(pw)
         assert pw.interactive_mode is True
@@ -211,7 +215,7 @@ class TestGetInteractiveMode:
         pw = MagicMock()
         pw.CONFIG_OPTION_INTERACTIVE_MODE = MagicMock()
         pw.CONFIG_OPTION_INTERACTIVE_MODE.get_value.return_value = None
-        with patch('prewarning.Config') as mock_config:
+        with patch("prewarning.Config") as mock_config:
             mock_config.return_value.get_section.return_value = {}
             PreWarning._get_interactive_mode(pw)
         assert pw.interactive_mode is True
@@ -277,9 +281,10 @@ class TestOnKeyPress:
 class TestAboutDialog:
     def test_creates_and_shows(self):
         from prewarning import __version__ as ver
+
         pw = MagicMock()
         pw.logger = MagicMock()
-        with patch('prewarning.AboutDialog') as mock_dlg:
+        with patch("prewarning.AboutDialog") as mock_dlg:
             PreWarning._about_dialog(pw)
             mock_dlg.assert_called_once_with(pw, app_version=ver)
             mock_dlg.return_value.Show.assert_called_once()
@@ -288,13 +293,15 @@ class TestAboutDialog:
 class TestHelpDialog:
     def test_creates_and_shows(self):
         from prewarning import __version__ as ver
+
         pw = MagicMock()
         pw.logger = MagicMock()
         pw.hotkey_bindings = []
-        with patch('prewarning.HelpDialog') as mock_dlg:
+        with patch("prewarning.HelpDialog") as mock_dlg:
             PreWarning._help_dialog(pw)
-            mock_dlg.assert_called_once_with(pw, app_version=ver,
-                                             hotkey_bindings=pw.hotkey_bindings)
+            mock_dlg.assert_called_once_with(
+                pw, app_version=ver, hotkey_bindings=pw.hotkey_bindings
+            )
             mock_dlg.return_value.Show.assert_called_once()
 
 
@@ -306,18 +313,21 @@ class TestSetScreenAndSize:
         class _FakeClientArea:
             width = 1200
             height = 1920
+
             def GetTopLeft(self):
                 return wx.Point(0, 0)
 
         class _FakeMode:
             def GetWidth(self):
                 return 1200
+
             def GetHeight(self):
                 return 1920
 
         class _FakeDisplay:
             def GetClientArea(self):
                 return _FakeClientArea()
+
             def GetCurrentMode(self):
                 return _FakeMode()
 
@@ -331,30 +341,55 @@ class TestSetScreenAndSize:
 
 
 class _MockPunchSource:
-    name = 'MockPunch'
+    name = "MockPunch"
+
     def __init__(self):
         self.register_punch_listener = MagicMock()
-    def stop(self): pass
-    def is_running(self): return False
-    def start(self): pass
+
+    def stop(self):
+        pass
+
+    def is_running(self):
+        return False
+
+    def start(self):
+        pass
+
 
 class _OldMockPunchSource:
-    name = 'OldPunchName'
+    name = "OldPunchName"
+
     def __init__(self):
         self.register_punch_listener = MagicMock()
-    def stop(self): pass
-    def is_running(self): return False
-    def start(self): pass
+
+    def stop(self):
+        pass
+
+    def is_running(self):
+        return False
+
+    def start(self):
+        pass
+
 
 class _MockStartListSource:
-    name = 'MockStartList'
-    def __init__(self): pass
-    def stop(self): pass
-    def is_running(self): return False
-    def start(self): pass
+    name = "MockStartList"
 
-MOCK_PUNCH_SOURCES = {'MockPunch': _MockPunchSource}
-MOCK_START_LIST_SOURCES = {'MockStartList': _MockStartListSource}
+    def __init__(self):
+        pass
+
+    def stop(self):
+        pass
+
+    def is_running(self):
+        return False
+
+    def start(self):
+        pass
+
+
+MOCK_PUNCH_SOURCES = {"MockPunch": _MockPunchSource}
+MOCK_START_LIST_SOURCES = {"MockStartList": _MockStartListSource}
 
 
 class TestUpdateSources:
@@ -363,75 +398,75 @@ class TestUpdateSources:
         pw.logger = MagicMock()
         return pw
 
-    @patch('prewarning.PUNCH_SOURCES', MOCK_PUNCH_SOURCES)
-    @patch('prewarning.START_LIST_SOURCES', MOCK_START_LIST_SOURCES)
+    @patch("prewarning.PUNCH_SOURCES", MOCK_PUNCH_SOURCES)
+    @patch("prewarning.START_LIST_SOURCES", MOCK_START_LIST_SOURCES)
     def test_punch_source_not_in_PUNCH_SOURCES_raises(self):
         pw = self._make_pw()
-        pw.punch_source_name = 'Unknown'
-        pw.start_list_source_name = 'MockStartList'
+        pw.punch_source_name = "Unknown"
+        pw.start_list_source_name = "MockStartList"
         pw.punch_source = None
         pw.start_list_source = None
-        with pytest.raises(ValueError, match='not a valid Punch Source'):
+        with pytest.raises(ValueError, match="not a valid Punch Source"):
             PreWarning.update_sources(pw)
 
-    @patch('prewarning.PUNCH_SOURCES', {'MockPunch': _MockPunchSource})
-    @patch('prewarning.START_LIST_SOURCES', MOCK_START_LIST_SOURCES)
+    @patch("prewarning.PUNCH_SOURCES", {"MockPunch": _MockPunchSource})
+    @patch("prewarning.START_LIST_SOURCES", MOCK_START_LIST_SOURCES)
     def test_start_list_source_not_in_START_LIST_SOURCES_raises(self):
         pw = self._make_pw()
-        pw.punch_source_name = 'MockPunch'
-        pw.start_list_source_name = 'Unknown'
+        pw.punch_source_name = "MockPunch"
+        pw.start_list_source_name = "Unknown"
         pw.punch_source = None
         pw.start_list_source = None
-        with pytest.raises(ValueError, match='not a valid Start List Source'):
+        with pytest.raises(ValueError, match="not a valid Start List Source"):
             PreWarning.update_sources(pw)
 
-    @patch('prewarning.PUNCH_SOURCES', MOCK_PUNCH_SOURCES)
-    @patch('prewarning.START_LIST_SOURCES', MOCK_START_LIST_SOURCES)
+    @patch("prewarning.PUNCH_SOURCES", MOCK_PUNCH_SOURCES)
+    @patch("prewarning.START_LIST_SOURCES", MOCK_START_LIST_SOURCES)
     def test_creates_new_punch_source_when_none(self):
         pw = self._make_pw()
-        pw.punch_source_name = 'MockPunch'
-        pw.start_list_source_name = 'MockStartList'
+        pw.punch_source_name = "MockPunch"
+        pw.start_list_source_name = "MockStartList"
         pw.punch_source = None
         pw.start_list_source = None
         PreWarning.update_sources(pw)
         assert isinstance(pw.punch_source, _MockPunchSource)
         assert isinstance(pw.start_list_source, _MockStartListSource)
 
-    @patch('prewarning.PUNCH_SOURCES', MOCK_PUNCH_SOURCES)
-    @patch('prewarning.START_LIST_SOURCES', MOCK_START_LIST_SOURCES)
+    @patch("prewarning.PUNCH_SOURCES", MOCK_PUNCH_SOURCES)
+    @patch("prewarning.START_LIST_SOURCES", MOCK_START_LIST_SOURCES)
     def test_registers_punch_listener(self):
         pw = self._make_pw()
-        pw.punch_source_name = 'MockPunch'
-        pw.start_list_source_name = 'MockStartList'
+        pw.punch_source_name = "MockPunch"
+        pw.start_list_source_name = "MockStartList"
         pw.punch_source = None
         pw.start_list_source = None
         PreWarning.update_sources(pw)
         pw.punch_source.register_punch_listener.assert_called_once_with(pw)
 
-    @patch('prewarning.PUNCH_SOURCES', MOCK_PUNCH_SOURCES)
-    @patch('prewarning.START_LIST_SOURCES', MOCK_START_LIST_SOURCES)
+    @patch("prewarning.PUNCH_SOURCES", MOCK_PUNCH_SOURCES)
+    @patch("prewarning.START_LIST_SOURCES", MOCK_START_LIST_SOURCES)
     def test_switches_punch_source_when_name_changes(self):
         old_source = _OldMockPunchSource()
         old_source.is_running = MagicMock(return_value=False)
         old_source.stop = MagicMock()
         pw = self._make_pw()
-        pw.punch_source_name = 'MockPunch'
-        pw.start_list_source_name = 'MockStartList'
+        pw.punch_source_name = "MockPunch"
+        pw.start_list_source_name = "MockStartList"
         pw.punch_source = old_source
         pw.start_list_source = _MockStartListSource()
         PreWarning.update_sources(pw)
         old_source.stop.assert_called_once()
         assert isinstance(pw.punch_source, _MockPunchSource)
 
-    @patch('prewarning.PUNCH_SOURCES', MOCK_PUNCH_SOURCES)
-    @patch('prewarning.START_LIST_SOURCES', MOCK_START_LIST_SOURCES)
+    @patch("prewarning.PUNCH_SOURCES", MOCK_PUNCH_SOURCES)
+    @patch("prewarning.START_LIST_SOURCES", MOCK_START_LIST_SOURCES)
     def test_restarts_source_when_running(self):
         old_source = _OldMockPunchSource()
         old_source.is_running = MagicMock(return_value=True)
         old_source.stop = MagicMock()
         pw = self._make_pw()
-        pw.punch_source_name = 'MockPunch'
-        pw.start_list_source_name = 'MockStartList'
+        pw.punch_source_name = "MockPunch"
+        pw.start_list_source_name = "MockStartList"
         pw.punch_source = old_source
         pw.start_list_source = _MockStartListSource()
         PreWarning.update_sources(pw)

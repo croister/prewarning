@@ -26,8 +26,10 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: astral-sh/setup-uv@v8.1.0
-      - name: Lint (Python)
+      - name: Lint (Python) - check
         run: uvx ruff check .
+      - name: Lint (Python) - format
+        run: uvx ruff format --check .
 
   test:
     name: Tests

@@ -10,8 +10,8 @@ class TestPunchListener:
             PunchListener()
 
     def test_str_repr(self):
-        assert 'PunchListener' in repr(PunchListener)
-        assert 'PunchListener' in str(PunchListener)
+        assert "PunchListener" in repr(PunchListener)
+        assert "PunchListener" in str(PunchListener)
 
     def test_concrete_subclass(self):
         class MyListener(PunchListener):
@@ -27,7 +27,7 @@ class TestPunchListener:
                 super().__init__()
 
         listener = MyListener()
-        result = listener.punch_received({'card_number': '123'})
+        result = listener.punch_received({"card_number": "123"})
         assert result is None
 
 
@@ -42,17 +42,19 @@ class TestPunchSourceBase:
         assert _PunchSourceBase.description is _NOT_OVERRIDDEN
 
     def test_str_repr(self):
-        assert '_PunchSourceBase' in repr(_PunchSourceBase)
-        assert '_PunchSourceBase' in str(_PunchSourceBase)
+        assert "_PunchSourceBase" in repr(_PunchSourceBase)
+        assert "_PunchSourceBase" in str(_PunchSourceBase)
 
-    @patch('utils.config.Config.register_config_section_listener')
+    @patch("utils.config.Config.register_config_section_listener")
     def test_concrete_subclass(self, mock_register):
-        with patch('wx.CallAfter'):
+        with patch("wx.CallAfter"):
+
             class MySource(_PunchSourceBase):
                 @classmethod
                 def config_section_definition(cls):
                     from utils.config_definitions import ConfigSectionDefinition
-                    return ConfigSectionDefinition('my_source', 'My Source')
+
+                    return ConfigSectionDefinition("my_source", "My Source")
 
                 def __init__(self):
                     super().__init__()
@@ -71,14 +73,16 @@ class TestPunchSourceBase:
             assert s.punch_listeners == set()
             assert s._tracking_listeners == []
 
-    @patch('utils.config.Config.register_config_section_listener')
+    @patch("utils.config.Config.register_config_section_listener")
     def test_register_punch_listener(self, mock_register):
-        with patch('wx.CallAfter'):
+        with patch("wx.CallAfter"):
+
             class MySource(_PunchSourceBase):
                 @classmethod
                 def config_section_definition(cls):
                     from utils.config_definitions import ConfigSectionDefinition
-                    return ConfigSectionDefinition('ms', 'MS')
+
+                    return ConfigSectionDefinition("ms", "MS")
 
                 def __init__(self):
                     super().__init__()
@@ -97,14 +101,16 @@ class TestPunchSourceBase:
             s.register_punch_listener(listener)
             assert listener in s.punch_listeners
 
-    @patch('utils.config.Config.register_config_section_listener')
+    @patch("utils.config.Config.register_config_section_listener")
     def test_notify_punch_listeners(self, mock_register):
-        with patch('wx.CallAfter'):
+        with patch("wx.CallAfter"):
+
             class MySource(_PunchSourceBase):
                 @classmethod
                 def config_section_definition(cls):
                     from utils.config_definitions import ConfigSectionDefinition
-                    return ConfigSectionDefinition('ms', 'MS')
+
+                    return ConfigSectionDefinition("ms", "MS")
 
                 def __init__(self):
                     super().__init__()
@@ -121,18 +127,20 @@ class TestPunchSourceBase:
             s = MySource()
             listener = MagicMock()
             s.register_punch_listener(listener)
-            punch_data = {'card_number': '999', 'time': '12:00'}
+            punch_data = {"card_number": "999", "time": "12:00"}
             s._notify_punch_listeners(punch_data)
             listener.punch_received.assert_called_once_with(punch_data)
 
-    @patch('utils.config.Config.register_config_section_listener')
+    @patch("utils.config.Config.register_config_section_listener")
     def test_register_tracking_listener(self, mock_register):
-        with patch('wx.CallAfter'):
+        with patch("wx.CallAfter"):
+
             class MySource(_PunchSourceBase):
                 @classmethod
                 def config_section_definition(cls):
                     from utils.config_definitions import ConfigSectionDefinition
-                    return ConfigSectionDefinition('ms', 'MS')
+
+                    return ConfigSectionDefinition("ms", "MS")
 
                 def __init__(self):
                     super().__init__()
@@ -151,14 +159,16 @@ class TestPunchSourceBase:
             s.register_tracking_listener(callback)
             assert callback in s._tracking_listeners
 
-    @patch('utils.config.Config.register_config_section_listener')
+    @patch("utils.config.Config.register_config_section_listener")
     def test_register_tracking_listener_no_duplicate(self, mock_register):
-        with patch('wx.CallAfter'):
+        with patch("wx.CallAfter"):
+
             class MySource(_PunchSourceBase):
                 @classmethod
                 def config_section_definition(cls):
                     from utils.config_definitions import ConfigSectionDefinition
-                    return ConfigSectionDefinition('ms', 'MS')
+
+                    return ConfigSectionDefinition("ms", "MS")
 
                 def __init__(self):
                     super().__init__()
@@ -178,14 +188,16 @@ class TestPunchSourceBase:
             s.register_tracking_listener(callback)
             assert len(s._tracking_listeners) == 1
 
-    @patch('utils.config.Config.register_config_section_listener')
+    @patch("utils.config.Config.register_config_section_listener")
     def test_unregister_tracking_listener(self, mock_register):
-        with patch('wx.CallAfter'):
+        with patch("wx.CallAfter"):
+
             class MySource(_PunchSourceBase):
                 @classmethod
                 def config_section_definition(cls):
                     from utils.config_definitions import ConfigSectionDefinition
-                    return ConfigSectionDefinition('ms', 'MS')
+
+                    return ConfigSectionDefinition("ms", "MS")
 
                 def __init__(self):
                     super().__init__()
@@ -205,14 +217,16 @@ class TestPunchSourceBase:
             s.unregister_tracking_listener(callback)
             assert callback not in s._tracking_listeners
 
-    @patch('utils.config.Config.register_config_section_listener')
+    @patch("utils.config.Config.register_config_section_listener")
     def test_unregister_nonexistent(self, mock_register):
-        with patch('wx.CallAfter'):
+        with patch("wx.CallAfter"):
+
             class MySource(_PunchSourceBase):
                 @classmethod
                 def config_section_definition(cls):
                     from utils.config_definitions import ConfigSectionDefinition
-                    return ConfigSectionDefinition('ms', 'MS')
+
+                    return ConfigSectionDefinition("ms", "MS")
 
                 def __init__(self):
                     super().__init__()
@@ -229,14 +243,16 @@ class TestPunchSourceBase:
             s = MySource()
             s.unregister_tracking_listener(MagicMock())
 
-    @patch('utils.config.Config.register_config_section_listener')
+    @patch("utils.config.Config.register_config_section_listener")
     def test_notify_tracking_listeners_no_listeners(self, mock_register):
-        with patch('wx.CallAfter') as mock_callafter:
+        with patch("wx.CallAfter") as mock_callafter:
+
             class MySource(_PunchSourceBase):
                 @classmethod
                 def config_section_definition(cls):
                     from utils.config_definitions import ConfigSectionDefinition
-                    return ConfigSectionDefinition('ms', 'MS')
+
+                    return ConfigSectionDefinition("ms", "MS")
 
                 def __init__(self):
                     super().__init__()
@@ -254,14 +270,16 @@ class TestPunchSourceBase:
             s._notify_tracking_listeners()
             mock_callafter.assert_not_called()
 
-    @patch('utils.config.Config.register_config_section_listener')
+    @patch("utils.config.Config.register_config_section_listener")
     def test_notify_tracking_listeners_with_listeners(self, mock_register):
-        with patch('wx.CallAfter') as mock_callafter:
+        with patch("wx.CallAfter") as mock_callafter:
+
             class MySource(_PunchSourceBase):
                 @classmethod
                 def config_section_definition(cls):
                     from utils.config_definitions import ConfigSectionDefinition
-                    return ConfigSectionDefinition('ms', 'MS')
+
+                    return ConfigSectionDefinition("ms", "MS")
 
                 def __init__(self):
                     super().__init__()
@@ -281,17 +299,19 @@ class TestPunchSourceBase:
             s._notify_tracking_listeners()
             mock_callafter.assert_called_once_with(callback, {})
 
-    @patch('utils.config.Config.register_config_section_listener')
+    @patch("utils.config.Config.register_config_section_listener")
     def test_notify_tracking_listeners_with_state(self, mock_register):
-        with patch('wx.CallAfter') as mock_callafter:
+        with patch("wx.CallAfter") as mock_callafter:
+
             class MySource(_PunchSourceBase):
                 @classmethod
                 def config_section_definition(cls):
                     from utils.config_definitions import ConfigSectionDefinition
-                    return ConfigSectionDefinition('ms', 'MS')
+
+                    return ConfigSectionDefinition("ms", "MS")
 
                 def _get_tracking_state(self):
-                    return {'opt1': 'val1', 'opt2': 'val2'}
+                    return {"opt1": "val1", "opt2": "val2"}
 
                 def __init__(self):
                     super().__init__()
@@ -309,16 +329,20 @@ class TestPunchSourceBase:
             callback = MagicMock()
             s.register_tracking_listener(callback)
             s._notify_tracking_listeners()
-            mock_callafter.assert_called_once_with(callback, {'opt1': 'val1', 'opt2': 'val2'})
+            mock_callafter.assert_called_once_with(
+                callback, {"opt1": "val1", "opt2": "val2"}
+            )
 
-    @patch('utils.config.Config.register_config_section_listener')
+    @patch("utils.config.Config.register_config_section_listener")
     def test_get_tracking_state_default(self, mock_register):
-        with patch('wx.CallAfter'):
+        with patch("wx.CallAfter"):
+
             class MySource(_PunchSourceBase):
                 @classmethod
                 def config_section_definition(cls):
                     from utils.config_definitions import ConfigSectionDefinition
-                    return ConfigSectionDefinition('ms', 'MS')
+
+                    return ConfigSectionDefinition("ms", "MS")
 
                 def __init__(self):
                     super().__init__()
@@ -335,14 +359,16 @@ class TestPunchSourceBase:
             s = MySource()
             assert s._get_tracking_state() == {}
 
-    @patch('utils.config.Config.register_config_section_listener')
+    @patch("utils.config.Config.register_config_section_listener")
     def test_runtime_value_defaults(self, mock_register):
-        with patch('wx.CallAfter'):
+        with patch("wx.CallAfter"):
+
             class MySource(_PunchSourceBase):
                 @classmethod
                 def config_section_definition(cls):
                     from utils.config_definitions import ConfigSectionDefinition
-                    return ConfigSectionDefinition('ms', 'MS')
+
+                    return ConfigSectionDefinition("ms", "MS")
 
                 def __init__(self):
                     super().__init__()
@@ -357,20 +383,23 @@ class TestPunchSourceBase:
                     return False
 
             from utils.config_definitions import ConfigOptionDefinition
+
             s = MySource()
-            opt = ConfigOptionDefinition('test', 'Test', str, 'desc')
+            opt = ConfigOptionDefinition("test", "Test", str, "desc")
             assert s.get_runtime_value(opt) is None
-            s.set_runtime_value(opt, 'val')
+            s.set_runtime_value(opt, "val")
             s.reset_tracking()
 
-    @patch('utils.config.Config.register_config_section_listener')
+    @patch("utils.config.Config.register_config_section_listener")
     def test_is_running(self, mock_register):
-        with patch('wx.CallAfter'):
+        with patch("wx.CallAfter"):
+
             class MySource(_PunchSourceBase):
                 @classmethod
                 def config_section_definition(cls):
                     from utils.config_definitions import ConfigSectionDefinition
-                    return ConfigSectionDefinition('ms', 'MS')
+
+                    return ConfigSectionDefinition("ms", "MS")
 
                 def __init__(self):
                     super().__init__()

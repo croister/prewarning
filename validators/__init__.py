@@ -1,1 +1,1 @@
-LOGGER_NAME = 'Validators'
+LOGGER_NAME = "Validators"

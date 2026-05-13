@@ -18,14 +18,14 @@ def _timestamp_pattern(value: str, datetime_pattern: str) -> bool:
         parsed = datetime.strptime(value, datetime_pattern)
         return type(parsed) is datetime
     except (TypeError, ValueError) as e:
-        logging.getLogger(LOGGER_NAME).debug('timestamp_pattern: %s', e)
+        logging.getLogger(LOGGER_NAME).debug("timestamp_pattern: %s", e)
         return False
 
 
-TIMESTAMP_PATTERN = '%Y-%m-%d %H:%M:%S.%f'
+TIMESTAMP_PATTERN = "%Y-%m-%d %H:%M:%S.%f"
 
 
-@validator(message='Not a valid timestamp.')
+@validator(message="Not a valid timestamp.")
 def is_timestamp(value: str) -> bool:
     """
     Validate if the given value is a valid timestamp.
@@ -36,10 +36,10 @@ def is_timestamp(value: str) -> bool:
     return result
 
 
-DATE_PATTERN = '%Y-%m-%d'
+DATE_PATTERN = "%Y-%m-%d"
 
 
-@validator(message='Not a valid date.')
+@validator(message="Not a valid date.")
 def is_date(value: str) -> bool:
     """
     Validate if the given value is a valid date.
@@ -50,10 +50,10 @@ def is_date(value: str) -> bool:
     return result
 
 
-TIME_PATTERN = '%H:%M:%S'
+TIME_PATTERN = "%H:%M:%S"
 
 
-@validator(message='Not a valid timestamp.')
+@validator(message="Not a valid timestamp.")
 def is_time(value: str) -> bool:
     """
     Validate if the given value is a valid time.

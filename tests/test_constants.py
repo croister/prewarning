@@ -10,9 +10,9 @@ class TestConstants:
     def test_configuration_dir(self):
         assert isinstance(CONFIGURATION_DIR, Path)
         assert CONFIGURATION_DIR.parent == APPLICATION_DIR
-        assert CONFIGURATION_DIR.name == 'config'
+        assert CONFIGURATION_DIR.name == "config"
 
     def test_data_dir(self):
         assert isinstance(DATA_DIR, Path)
         assert DATA_DIR.parent == APPLICATION_DIR
-        assert DATA_DIR.name == 'data'
+        assert DATA_DIR.name == "data"

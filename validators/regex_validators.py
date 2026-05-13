@@ -22,14 +22,14 @@ def _regex(value: str, regex_pattern: str | Pattern, flags: int = 0) -> bool:
         match = regex_pattern.match(value)
         return bool(match)
     except TypeError as e:
-        logging.getLogger(LOGGER_NAME).debug('regex: %s', e)
+        logging.getLogger(LOGGER_NAME).debug("regex: %s", e)
         return False
 
 
-CONTROL_IDS_PATTERN = re.compile(r'^(\d+)(\s(\d+))*$')
+CONTROL_IDS_PATTERN = re.compile(r"^(\d+)(\s(\d+))*$")
 
 
-@validator(message='Not a valid list of Control IDs.')
+@validator(message="Not a valid list of Control IDs.")
 def is_control_ids(value: str) -> bool:
     """
     Validate if the given value is a list of Control IDs separated by spaces.
@@ -40,10 +40,10 @@ def is_control_ids(value: str) -> bool:
     return result
 
 
-PUNCH_ID_PATTERN = re.compile(r'^(\d+)_(\d+)_(\d+)$')
+PUNCH_ID_PATTERN = re.compile(r"^(\d+)_(\d+)_(\d+)$")
 
 
-@validator(message='Not a valid Punch ID.')
+@validator(message="Not a valid Punch ID.")
 def is_punch_id(value: str) -> bool:
     """
     Validate if the given value is a Punch ID.

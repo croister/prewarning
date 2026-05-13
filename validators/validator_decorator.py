@@ -16,17 +16,9 @@ def func_args_as_dict(func: Callable, args, kwargs):
     _getargspec = inspect.getfullargspec
 
     arg_names = list(
-        dict.fromkeys(
-            itertools.chain(
-                _getargspec(func)[0],
-                kwargs.keys()
-            )
-        )
+        dict.fromkeys(itertools.chain(_getargspec(func)[0], kwargs.keys()))
     )
-    return dict(
-        list(zip(arg_names, args)) +
-        list(kwargs.items())
-    )
+    return dict(list(zip(arg_names, args)) + list(kwargs.items()))
 
 
 def validator(*, message=None):
@@ -60,13 +52,22 @@ def validator(*, message=None):
 
     :param str message: The validation error message
     """
+
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
             result = func(*args, **kwargs)
             if not result:
-                msg = message if message is not None else 'Not valid according to the "{}" validator.'.format(func.__name__)
+                msg = (
+                    message
+                    if message is not None
+                    else 'Not valid according to the "{}" validator.'.format(
+                        func.__name__
+                    )
+                )
                 return ValidationError(func, msg, func_args_as_dict(func, args, kwargs))
             return True
+
         return wrapper
+
     return decorator

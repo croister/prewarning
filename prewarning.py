@@ -4,7 +4,7 @@
 PreWarning main file.
 """
 
-__author__ = 'Christian Lindblom croister@croister.se'
+__author__ = "Christian Lindblom croister@croister.se"
 
 import logging
 import logging.config
@@ -30,13 +30,21 @@ from startlistsources import START_LIST_SOURCES, COMMON_START_LIST_SOURCE
 from startlistsources.start_list_source_ola_mysql import StartListSourceOlaMySql
 from utils.config import Config
 from utils.config_consumer import ConfigConsumer
-from utils.config_definitions import ConfigOptionDefinition, ConfigSectionDefinition, ConfigVerifierDefinition, \
-    ConfigSectionOptionDefinition
+from utils.config_definitions import (
+    ConfigOptionDefinition,
+    ConfigSectionDefinition,
+    ConfigVerifierDefinition,
+    ConfigSectionOptionDefinition,
+)
 from utils.config_dialog import ConfigDialog
 from utils.constants import CONFIGURATION_DIR, APPLICATION_DIR
 from utils.about_dialog import AboutDialog
 from utils.help_dialog import HelpDialog
-from utils.hotkey_bindings import HotKeyBindingDefinition, HotKeyDefinition, key_event_to_str
+from utils.hotkey_bindings import (
+    HotKeyBindingDefinition,
+    HotKeyDefinition,
+    key_event_to_str,
+)
 from utils.sound import Sound, verify_sound, get_all_sounds
 from utils.version import __version__
 
@@ -49,7 +57,7 @@ COL_NR_LEG = 2
 ROW_ZERO = 0
 
 # Name of the logging configuration file
-LOGGING_CONFIGURATION_FILE_NAME = 'logging.yaml'
+LOGGING_CONFIGURATION_FILE_NAME = "logging.yaml"
 
 # Logging configuration file location
 LOGGING_CONFIGURATION_FILE = CONFIGURATION_DIR / LOGGING_CONFIGURATION_FILE_NAME
@@ -65,7 +73,7 @@ def _filter_logging_configuration(config_dict: dict):
             _filter_logging_configuration(value)
         elif isinstance(value, str):
             value = value.format(**LOGGING_CONFIGURATION_FILE_FILTER_VALUES)
-            if key == 'filename':
+            if key == "filename":
                 value = str(Path(value).resolve())
             config_dict[key] = value
 
@@ -74,24 +82,34 @@ def _update_logging_configuration():
     # noinspection PyBroadException
     src_path = APPLICATION_DIR / LOGGING_CONFIGURATION_FILE
     try:
-        yaml = YAML(typ='safe', pure=True)
-        with open(src_path, 'r') as f:
+        yaml = YAML(typ="safe", pure=True)
+        with open(src_path, "r") as f:
             config = yaml.load(f.read())
             _filter_logging_configuration(config)
             logging.config.dictConfig(config)
     except PermissionError as e:
-        logging.error('PermissionError in accessing the logging configuration file: "%s" %s', src_path, e)
+        logging.error(
+            'PermissionError in accessing the logging configuration file: "%s" %s',
+            src_path,
+            e,
+        )
     except OSError as e:
-        logging.error('OSError in accessing the logging configuration file: "%s" %s', src_path, e)
+        logging.error(
+            'OSError in accessing the logging configuration file: "%s" %s', src_path, e
+        )
     except Exception as e:
-        logging.error('Exception in accessing the logging configuration file: "%s" %s', src_path, e)
+        logging.error(
+            'Exception in accessing the logging configuration file: "%s" %s',
+            src_path,
+            e,
+        )
 
 
 _update_logging_configuration()
 
 
 # Name of the configuration file
-CONFIGURATION_FILE_NAME = 'prewarning.ini'
+CONFIGURATION_FILE_NAME = "prewarning.ini"
 
 # Configuration file location
 CONFIGURATION_FILE = CONFIGURATION_DIR / CONFIGURATION_FILE_NAME
@@ -101,78 +119,86 @@ class PreWarningMeta(type(wx.Frame), type(ConfigConsumer)):  # type: ignore[misc
     pass
 
 
-class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, metaclass=PreWarningMeta):
+class PreWarning(
+    wx.Frame,
+    ConfigConsumer,
+    PunchListener,
+    LoggingEventHandler,
+    metaclass=PreWarningMeta,
+):
     """
     The PreWarning main class
     """
 
     CONFIG_OPTION_INTERACTIVE_MODE = ConfigOptionDefinition(
-        name='InteractiveMode',
-        display_name='Interactive Mode',
+        name="InteractiveMode",
+        display_name="Interactive Mode",
         value_type=bool,
-        description='Enables or disables the interactive mode. '
-                    'If this is enabled the default method of configuration is via the GUI and if errors are detected '
-                    'in the configuration the Settings Dialog is opened. '
-                    'If this is disabled the configuration file is expected to be used as the means of changing the '
-                    'configuration and if errors are detected in the configuration errors are written to the log '
-                    'and the program exits.',
+        description="Enables or disables the interactive mode. "
+        "If this is enabled the default method of configuration is via the GUI and if errors are detected "
+        "in the configuration the Settings Dialog is opened. "
+        "If this is disabled the configuration file is expected to be used as the means of changing the "
+        "configuration and if errors are detected in the configuration errors are written to the log "
+        "and the program exits.",
         default_value=True,
     )
 
     CONFIG_OPTION_ANNOUNCE_IP_ON_STARTUP = ConfigOptionDefinition(
-        name='AnnounceIpOnStartup',
-        display_name='Announce IP on Startup',
+        name="AnnounceIpOnStartup",
+        display_name="Announce IP on Startup",
         value_type=bool,
-        description='Enables or disables the readout of the current IP address at startup.',
+        description="Enables or disables the readout of the current IP address at startup.",
         default_value=False,
     )
 
     CONFIG_OPTION_ENABLE_INTRO_SOUND = ConfigOptionDefinition(
-        name='EnableIntroSound',
-        display_name='Enable Intro Sound',
+        name="EnableIntroSound",
+        display_name="Enable Intro Sound",
         value_type=bool,
-        description='Enable or disable the intro sound played before the first team number is read after a timeout.',
+        description="Enable or disable the intro sound played before the first team number is read after a timeout.",
         default_value=True,
     )
 
     CONFIG_OPTION_INTRO_SOUND_TRIGGER_TIMEOUT_SECONDS = ConfigOptionDefinition(
-        name='IntroSoundTriggerTimeoutSeconds',
-        display_name='Intro Sound Timeout',
+        name="IntroSoundTriggerTimeoutSeconds",
+        display_name="Intro Sound Timeout",
         value_type=int,
-        description='The timeout in seconds after the last announcement before the intro sound is played again before'
-                    ' the next announcement.',
+        description="The timeout in seconds after the last announcement before the intro sound is played again before"
+        " the next announcement.",
         default_value=10,
         valid_values=list(range(0, 121)),
         enabled_by=CONFIG_OPTION_ENABLE_INTRO_SOUND,
     )
 
     CONFIG_OPTION_INTRO_SOUND_FILE = ConfigOptionDefinition(
-        name='IntroSoundFile',
-        display_name='Intro Sound',
+        name="IntroSoundFile",
+        display_name="Intro Sound",
         value_type=Path,
-        description='The path to the sound file to use as the intro sound before announcements.',
-        default_value=Path('ding.mp3'),
+        description="The path to the sound file to use as the intro sound before announcements.",
+        default_value=Path("ding.mp3"),
         valid_values_gen=get_all_sounds,
         enabled_by=CONFIG_OPTION_ENABLE_INTRO_SOUND,
     )
 
-    CONFIG_OPTION_ENABLE_INTRO_SOUND.enables.append(CONFIG_OPTION_INTRO_SOUND_TRIGGER_TIMEOUT_SECONDS)
+    CONFIG_OPTION_ENABLE_INTRO_SOUND.enables.append(
+        CONFIG_OPTION_INTRO_SOUND_TRIGGER_TIMEOUT_SECONDS
+    )
     CONFIG_OPTION_ENABLE_INTRO_SOUND.enables.append(CONFIG_OPTION_INTRO_SOUND_FILE)
 
     CONFIG_OPTION_TEST_SOUND_FILE = ConfigOptionDefinition(
-        name='TestSoundFile',
-        display_name='Test Sound',
+        name="TestSoundFile",
+        display_name="Test Sound",
         value_type=Path,
-        description='The path to the sound file to use as the test sound.',
-        default_value=Path('en/Testing.mp3'),
+        description="The path to the sound file to use as the test sound.",
+        default_value=Path("en/Testing.mp3"),
         valid_values_gen=get_all_sounds,
     )
 
     CONFIG_OPTION_ADD_PRE_WARNINGS_TO_BOTTOM = ConfigOptionDefinition(
-        name='AddPreWarningsToBottom',
-        display_name='Add Pre-Warnings to Bottom',
+        name="AddPreWarningsToBottom",
+        display_name="Add Pre-Warnings to Bottom",
         value_type=bool,
-        description='Set to True if new Pre-Warnings should be added to the bottom of the screen.',
+        description="Set to True if new Pre-Warnings should be added to the bottom of the screen.",
         default_value=False,
     )
 
@@ -199,10 +225,12 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
                 option_definition=CONFIG_OPTION_INTRO_SOUND_FILE,
             ),
         ],
-        message='The selected sound could not be played.',
+        message="The selected sound could not be played.",
     )
 
-    CONFIG_OPTION_INTRO_SOUND_FILE.set_verifier(COMMON_CONFIG_SECTION_INTRO_SOUND_VERIFIER)
+    CONFIG_OPTION_INTRO_SOUND_FILE.set_verifier(
+        COMMON_CONFIG_SECTION_INTRO_SOUND_VERIFIER
+    )
 
     COMMON_CONFIG_SECTION_TEST_SOUND_VERIFIER = ConfigVerifierDefinition(
         function=verify_sound,
@@ -212,10 +240,12 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
                 option_definition=CONFIG_OPTION_TEST_SOUND_FILE,
             ),
         ],
-        message='The selected sound could not be played.',
+        message="The selected sound could not be played.",
     )
 
-    CONFIG_OPTION_TEST_SOUND_FILE.set_verifier(COMMON_CONFIG_SECTION_TEST_SOUND_VERIFIER)
+    CONFIG_OPTION_TEST_SOUND_FILE.set_verifier(
+        COMMON_CONFIG_SECTION_TEST_SOUND_VERIFIER
+    )
 
     Config.register_config_section_definition(COMMON_CONFIG_SECTION_DEFINITION)
 
@@ -255,123 +285,123 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
         # Hotkey binding definitions
         self.hotkey_bindings = [
             HotKeyBindingDefinition(
-                name='Settings',
-                hotkey=HotKeyDefinition(key_code=ord('S')).with_ctrl(),
+                name="Settings",
+                hotkey=HotKeyDefinition(key_code=ord("S")).with_ctrl(),
                 handler=self._config_dialog,
                 description="Opens the Settings Dialog",
                 bitmap_name=wx.ART_EXECUTABLE_FILE,
             ),
             HotKeyBindingDefinition(
-                name='Help',
+                name="Help",
                 hotkey=HotKeyDefinition(key_code=wx.WXK_F1),
                 handler=self._help_dialog,
                 description="Opens the Help Dialog",
                 alternate_hotkeys=[
-                    HotKeyDefinition(key_code=ord('H')).with_ctrl(),
+                    HotKeyDefinition(key_code=ord("H")).with_ctrl(),
                 ],
                 bitmap_name=wx.ART_HELP,
             ),
             HotKeyBindingDefinition(
-                name='About',
-                hotkey=HotKeyDefinition(key_code=ord('A')).with_ctrl(),
+                name="About",
+                hotkey=HotKeyDefinition(key_code=ord("A")).with_ctrl(),
                 handler=self._about_dialog,
                 description="Opens the About Dialog",
                 bitmap_name=wx.ART_INFORMATION,
             ),
             HotKeyBindingDefinition(
-                name='Full Screen',
+                name="Full Screen",
                 hotkey=HotKeyDefinition(key_code=wx.WXK_F11),
                 handler=self._toggle_full_screen,
                 description="Switches full screen on and off",
                 bitmap_name=wx.ART_FIND,
             ),
             HotKeyBindingDefinition(
-                name='Fake Punch',
+                name="Fake Punch",
                 hotkey=HotKeyDefinition(key_code=wx.WXK_SPACE).with_ctrl(),
                 handler=self._simulate_punch,
                 description="Simulates a pre-warning",
                 alternate_hotkeys=[
-                    HotKeyDefinition(key_code=ord('P')).with_ctrl(),
+                    HotKeyDefinition(key_code=ord("P")).with_ctrl(),
                 ],
                 bitmap_name=wx.ART_GO_DOWN,
             ),
             HotKeyBindingDefinition(
-                name='Refresh Display',
+                name="Refresh Display",
                 hotkey=HotKeyDefinition(key_code=wx.WXK_F5),
                 handler=self._refresh,
                 description="Refreshes the display",
                 alternate_hotkeys=[
-                    HotKeyDefinition(key_code=ord('R')).with_ctrl(),
+                    HotKeyDefinition(key_code=ord("R")).with_ctrl(),
                 ],
                 bitmap_name=wx.ART_LIST_VIEW,
             ),
             HotKeyBindingDefinition(
-                name='Clear Display',
-                hotkey=HotKeyDefinition(key_code=ord('C')).with_ctrl(),
+                name="Clear Display",
+                hotkey=HotKeyDefinition(key_code=ord("C")).with_ctrl(),
                 handler=self._clear,
                 description="Clears the display from pre-warning entries",
                 bitmap_name=wx.ART_DELETE,
             ),
             HotKeyBindingDefinition(
-                name='Play Testing Sound',
-                hotkey=HotKeyDefinition(key_code=ord('T')).with_ctrl(),
+                name="Play Testing Sound",
+                hotkey=HotKeyDefinition(key_code=ord("T")).with_ctrl(),
                 handler=self._play_test_sound,
                 description="Plays a test sound",
                 bitmap_name=wx.ART_QUESTION,
             ),
             HotKeyBindingDefinition(
-                name='Announce IP Address',
-                hotkey=HotKeyDefinition(key_code=ord('I')).with_ctrl(),
+                name="Announce IP Address",
+                hotkey=HotKeyDefinition(key_code=ord("I")).with_ctrl(),
                 handler=self._notify_ip,
                 description="Reads the IP (v4) address aloud section for section",
                 bitmap_name=wx.ART_INFORMATION,
             ),
             HotKeyBindingDefinition(
-                name='Print Sizes (debug)',
-                hotkey=HotKeyDefinition(key_code=ord('V')).with_ctrl(),
+                name="Print Sizes (debug)",
+                hotkey=HotKeyDefinition(key_code=ord("V")).with_ctrl(),
                 handler=self._print_sizes,
                 description="Prints out sizes of GUI components (for debug purpose)",
                 hidden=True,
                 bitmap_name=wx.ART_TIP,
             ),
             HotKeyBindingDefinition(
-                name='Increase Font Size',
+                name="Increase Font Size",
                 hotkey=HotKeyDefinition(key_code=wx.WXK_NUMPAD_ADD).with_ctrl(),
                 handler=self._increase_font_size,
                 description="Increases the font size",
                 alternate_hotkeys=[
-                    HotKeyDefinition(key_code=ord('+')).with_ctrl(),
+                    HotKeyDefinition(key_code=ord("+")).with_ctrl(),
                 ],
                 bitmap_name=wx.ART_PLUS,
             ),
             HotKeyBindingDefinition(
-                name='Decrease Font Size',
+                name="Decrease Font Size",
                 hotkey=HotKeyDefinition(key_code=wx.WXK_NUMPAD_SUBTRACT).with_ctrl(),
                 handler=self._decrease_font_size,
                 description="Decreases the font size",
                 alternate_hotkeys=[
-                    HotKeyDefinition(key_code=ord('-')).with_ctrl(),
+                    HotKeyDefinition(key_code=ord("-")).with_ctrl(),
                 ],
                 bitmap_name=wx.ART_MINUS,
             ),
             HotKeyBindingDefinition(
-                name='Restore Font Size',
+                name="Restore Font Size",
                 hotkey=HotKeyDefinition(key_code=wx.WXK_NUMPAD0).with_ctrl(),
                 handler=self._restore_font_size,
                 description="Restores the font size to default",
                 alternate_hotkeys=[
-                    HotKeyDefinition(key_code=ord('0')).with_ctrl(),
+                    HotKeyDefinition(key_code=ord("0")).with_ctrl(),
                 ],
                 bitmap_name=wx.ART_UNDO,
             ),
             HotKeyBindingDefinition(
-                name='Exit',
-                hotkey=HotKeyDefinition(key_code=ord('X')).with_ctrl(),
+                name="Exit",
+                hotkey=HotKeyDefinition(key_code=ord("X")).with_ctrl(),
                 handler=self.Close,
                 description="Exits the application",
                 alternate_hotkeys=[
-                    HotKeyDefinition(key_code=ord('Q')).with_ctrl(),
-                    HotKeyDefinition(key_code=ord('D')).with_ctrl(),
+                    HotKeyDefinition(key_code=ord("Q")).with_ctrl(),
+                    HotKeyDefinition(key_code=ord("D")).with_ctrl(),
                 ],
                 bitmap_name=wx.ART_QUIT,
             ),
@@ -407,8 +437,11 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
                 self._config_dialog(True)
                 validation_errors = self.config.validate()
             else:
-                raise ValueError('The configuration contains the following errors: {}.'
-                                 .format(str(validation_errors)))
+                raise ValueError(
+                    "The configuration contains the following errors: {}.".format(
+                        str(validation_errors)
+                    )
+                )
         self._parse_config()
 
         # Init the sound util
@@ -419,22 +452,26 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
         self.announcement_queue = Queue()
 
         # Init the thread used to process punches from the punch queue
-        self.punch_processor = Thread(target=self._process_punches,
-                                      daemon=True,
-                                      name='PunchProcessorThread')
+        self.punch_processor = Thread(
+            target=self._process_punches, daemon=True, name="PunchProcessorThread"
+        )
 
         # Init the thread used to process announcements from the announcement queue
-        self.announcement_processor = Thread(target=self._process_announcements,
-                                             daemon=True,
-                                             name='AnnouncementProcessorThread')
+        self.announcement_processor = Thread(
+            target=self._process_announcements,
+            daemon=True,
+            name="AnnouncementProcessorThread",
+        )
         self.last_sound_time = None
 
         self.update_sources()
 
         self.observer = Observer()
-        self.observer.name = 'LoggingConfFileObserverThread'
+        self.observer.name = "LoggingConfFileObserverThread"
         self.observer.start()
-        self.observer.schedule(event_handler=self, path=LOGGING_CONFIGURATION_FILE.parent.as_posix())
+        self.observer.schedule(
+            event_handler=self, path=LOGGING_CONFIGURATION_FILE.parent.as_posix()
+        )
 
         if not self.interactive_mode:
             self._toggle_full_screen()
@@ -468,9 +505,13 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
         self.SetPosition(display.GetClientArea().GetTopLeft())
 
         current_mode = display.GetCurrentMode()
-        self.logger.debug('Screen size: %dx%d', current_mode.GetWidth(), current_mode.GetHeight())
+        self.logger.debug(
+            "Screen size: %dx%d", current_mode.GetWidth(), current_mode.GetHeight()
+        )
         client_area = display.GetClientArea()
-        self.logger.debug('Client Area size: %dx%d', client_area.width, client_area.height)
+        self.logger.debug(
+            "Client Area size: %dx%d", client_area.width, client_area.height
+        )
 
         width = 600
         height = 800
@@ -478,7 +519,7 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
         width = min(width, client_area.width)
         height = min(height, client_area.height)
 
-        self.logger.debug('Frame size: %dx%d', width, height)
+        self.logger.debug("Frame size: %dx%d", width, height)
 
         self.SetMinSize(wx.Size(width, height))
         self.SetSize(wx.Size(width, height))
@@ -489,12 +530,12 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
 
         src_path = event.src_path
         if Path(str(src_path)).resolve() == LOGGING_CONFIGURATION_FILE:
-            logging.debug('Updating logging configuration - before')
+            logging.debug("Updating logging configuration - before")
             _update_logging_configuration()
-            logging.debug('Updating logging configuration - after')
+            logging.debug("Updating logging configuration - after")
 
     def _create_gui(self):
-        self.SetIcon(wx.Icon((APPLICATION_DIR / 'favicon.ico').as_posix()))
+        self.SetIcon(wx.Icon((APPLICATION_DIR / "favicon.ico").as_posix()))
 
         # Create the main panel
         self.main_panel = wx.Panel(parent=self, id=wx.ID_ANY, style=wx.WANTS_CHARS)
@@ -507,26 +548,39 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
         self.header_color = wx.LIGHT_GREY
 
         # Create the header panel
-        self.header_panel = wx.Panel(parent=self.main_panel, id=wx.ID_ANY, style=wx.BORDER_SIMPLE)
+        self.header_panel = wx.Panel(
+            parent=self.main_panel, id=wx.ID_ANY, style=wx.BORDER_SIMPLE
+        )
         self.header_panel.SetBackgroundColour(self.header_color)
 
         self.header_panel_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
         # Create the header label
-        self.header_label = wx.StaticText(self.header_panel, label='Förvarning', style=wx.ALIGN_CENTER)
+        self.header_label = wx.StaticText(
+            self.header_panel, label="Förvarning", style=wx.ALIGN_CENTER
+        )
         self.header_label.SetBackgroundColour(self.header_color)
 
         self.header_panel_sizer.Add(self.header_label, proportion=1, flag=wx.EXPAND)
 
         # Create the clock/time label
-        self.time_label = wx.lib.stattext.GenStaticText(self.header_panel, label='00:00:00')
+        self.time_label = wx.lib.stattext.GenStaticText(
+            self.header_panel, label="00:00:00"
+        )
         self.time_label.SetBackgroundColour(self.header_color)
 
-        self.header_panel_sizer.Add(self.time_label, proportion=0, flag=wx.RIGHT, border=5)
+        self.header_panel_sizer.Add(
+            self.time_label, proportion=0, flag=wx.RIGHT, border=5
+        )
 
         self.header_panel.SetSizer(self.header_panel_sizer)
 
-        self.main_panel_sizer.Add(self.header_panel, proportion=0, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=2)
+        self.main_panel_sizer.Add(
+            self.header_panel,
+            proportion=0,
+            flag=wx.EXPAND | wx.LEFT | wx.RIGHT,
+            border=2,
+        )
 
         # Create the pre-warning grid panel
         self.grid_panel = wx.Panel(parent=self.main_panel, id=wx.ID_ANY)
@@ -536,16 +590,20 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
         # Create the pre-warning grid
         self.prewarning_grid = wx.grid.Grid(self.grid_panel)
         self.prewarning_grid.CreateGrid(0, 3)
-        self.prewarning_grid.SetColLabelValue(COL_NR_TIME, 'Tid')
-        self.prewarning_grid.SetColLabelValue(COL_NR_TEAM, 'Lag')
-        self.prewarning_grid.SetColLabelValue(COL_NR_LEG, 'Sträcka')
+        self.prewarning_grid.SetColLabelValue(COL_NR_TIME, "Tid")
+        self.prewarning_grid.SetColLabelValue(COL_NR_TEAM, "Lag")
+        self.prewarning_grid.SetColLabelValue(COL_NR_LEG, "Sträcka")
         self.prewarning_grid.SetColLabelAlignment(wx.LEFT, wx.CENTER)
         self.prewarning_grid.EnableEditing(False)
         self.prewarning_grid.EnableVisibleFocus(False)
         self.prewarning_grid.SetCellHighlightPenWidth(0)
         self.prewarning_grid.SetCellHighlightROPenWidth(0)
-        self.prewarning_grid.SetSelectionBackground(self.prewarning_grid.GetDefaultCellBackgroundColour())
-        self.prewarning_grid.SetSelectionForeground(self.prewarning_grid.GetDefaultCellTextColour())
+        self.prewarning_grid.SetSelectionBackground(
+            self.prewarning_grid.GetDefaultCellBackgroundColour()
+        )
+        self.prewarning_grid.SetSelectionForeground(
+            self.prewarning_grid.GetDefaultCellTextColour()
+        )
         self.prewarning_grid.SetSelectionMode(wx.grid.Grid.GridSelectNone)
         self.prewarning_grid.DisableKeyboardScrolling()
         self.prewarning_grid.HideRowLabels()
@@ -557,7 +615,9 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
 
         self.grid_panel.SetSizer(self.grid_panel_sizer)
 
-        self.main_panel_sizer.Add(self.grid_panel, proportion=1, flag=wx.EXPAND | wx.ALL, border=2)
+        self.main_panel_sizer.Add(
+            self.grid_panel, proportion=1, flag=wx.EXPAND | wx.ALL, border=2
+        )
 
         self.main_panel.SetSizer(self.main_panel_sizer)
 
@@ -567,7 +627,7 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
 
     # noinspection PyUnusedLocal
     def _on_timer(self, evt: wx.TimerEvent):
-        new_time = strftime('%H:%M:%S')
+        new_time = strftime("%H:%M:%S")
         self.time_label.SetLabel(new_time)
 
     def _on_context_menu(self, event: wx.ContextMenuEvent):
@@ -579,13 +639,17 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
         for hotkey_binding in self.hotkey_bindings:
             if hotkey_binding.hidden:
                 continue
-            menu_item = wx.MenuItem(id=hotkey_binding.window_id,
-                                    text=hotkey_binding.name,
-                                    helpString=hotkey_binding.description)
+            menu_item = wx.MenuItem(
+                id=hotkey_binding.window_id,
+                text=hotkey_binding.name,
+                helpString=hotkey_binding.description,
+            )
             if hotkey_binding.bitmap_name is not None:
-                menu_item.SetBitmap(wx.ArtProvider.GetBitmapBundle(hotkey_binding.bitmap_name,
-                                                             client=wx.ART_MENU,
-                                                             size=image_size))
+                menu_item.SetBitmap(
+                    wx.ArtProvider.GetBitmapBundle(
+                        hotkey_binding.bitmap_name, client=wx.ART_MENU, size=image_size
+                    )
+                )
             menu_item = menu.Append(menu_item)
             self.Bind(wx.EVT_MENU, self._on_event_menu, menu_item)
 
@@ -600,10 +664,10 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
                 item = hotkey_binding
                 break
         if item is None:
-            self.logger.error('_on_event_menu: Event window id not found.')
-            raise ValueError('_on_event_menu: Event window id not found.')
+            self.logger.error("_on_event_menu: Event window id not found.")
+            raise ValueError("_on_event_menu: Event window id not found.")
 
-        self.logger.debug('_on_event_menu: %s', item.name)
+        self.logger.debug("_on_event_menu: %s", item.name)
 
         item.handler()
 
@@ -626,39 +690,54 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
 
         self._remove_non_visible_rows()
 
-    def _add_pre_warning_with_refresh(self, passed_time: str, bib_number: str, relay_leg: str):
+    def _add_pre_warning_with_refresh(
+        self, passed_time: str, bib_number: str, relay_leg: str
+    ):
         self._add_pre_warning(passed_time, bib_number, relay_leg)
         self.prewarning_grid.Refresh()
         self.prewarning_grid.Update()
 
     def _add_filler_row(self):
         self.prewarning_grid.InsertRows()
-        self.prewarning_grid.SetCellValue(ROW_ZERO, COL_NR_TIME, '00:00:00')
-        self.prewarning_grid.SetCellValue(ROW_ZERO, COL_NR_TEAM, '00')
-        self.prewarning_grid.SetCellValue(ROW_ZERO, COL_NR_LEG, '0')
-        self.prewarning_grid.SetCellTextColour(ROW_ZERO, COL_NR_TIME,
-                                               self.prewarning_grid.GetCellBackgroundColour(ROW_ZERO, COL_NR_TIME))
-        self.prewarning_grid.SetCellTextColour(ROW_ZERO, COL_NR_TEAM,
-                                               self.prewarning_grid.GetCellBackgroundColour(ROW_ZERO, COL_NR_TEAM))
-        self.prewarning_grid.SetCellTextColour(ROW_ZERO, COL_NR_LEG,
-                                               self.prewarning_grid.GetCellBackgroundColour(ROW_ZERO, COL_NR_LEG))
+        self.prewarning_grid.SetCellValue(ROW_ZERO, COL_NR_TIME, "00:00:00")
+        self.prewarning_grid.SetCellValue(ROW_ZERO, COL_NR_TEAM, "00")
+        self.prewarning_grid.SetCellValue(ROW_ZERO, COL_NR_LEG, "0")
+        self.prewarning_grid.SetCellTextColour(
+            ROW_ZERO,
+            COL_NR_TIME,
+            self.prewarning_grid.GetCellBackgroundColour(ROW_ZERO, COL_NR_TIME),
+        )
+        self.prewarning_grid.SetCellTextColour(
+            ROW_ZERO,
+            COL_NR_TEAM,
+            self.prewarning_grid.GetCellBackgroundColour(ROW_ZERO, COL_NR_TEAM),
+        )
+        self.prewarning_grid.SetCellTextColour(
+            ROW_ZERO,
+            COL_NR_LEG,
+            self.prewarning_grid.GetCellBackgroundColour(ROW_ZERO, COL_NR_LEG),
+        )
 
     def _has_filler_row(self):
-        return self.prewarning_grid.GetNumberRows() == 1\
-               and self.prewarning_grid.GetCellTextColour(ROW_ZERO, COL_NR_TIME)\
-               == self.prewarning_grid.GetCellBackgroundColour(ROW_ZERO, COL_NR_TIME)
+        return (
+            self.prewarning_grid.GetNumberRows() == 1
+            and self.prewarning_grid.GetCellTextColour(ROW_ZERO, COL_NR_TIME)
+            == self.prewarning_grid.GetCellBackgroundColour(ROW_ZERO, COL_NR_TIME)
+        )
 
     def _remove_non_visible_rows(self):
         if not self._has_filler_row():
             last_row = self.prewarning_grid.GetNumberRows() - 1
-            while last_row >= 0 and not self.prewarning_grid.IsVisible(self.prewarning_grid.GetNumberRows() - 1,
-                                                                       COL_NR_TIME,
-                                                                       wholeCellVisible=True):
+            while last_row >= 0 and not self.prewarning_grid.IsVisible(
+                self.prewarning_grid.GetNumberRows() - 1,
+                COL_NR_TIME,
+                wholeCellVisible=True,
+            ):
                 if self.add_pre_warnings_to_bottom:
-                    self.logger.debug('DELETE 0')
+                    self.logger.debug("DELETE 0")
                     self.prewarning_grid.DeleteRows(ROW_ZERO)
                 else:
-                    self.logger.debug('DELETE LAST %d', last_row)
+                    self.logger.debug("DELETE LAST %d", last_row)
                     self.prewarning_grid.DeleteRows(last_row)
                 last_row = self.prewarning_grid.GetNumberRows() - 1
 
@@ -669,7 +748,9 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
 
     def _refresh(self):
         orig_size = self.GetSize()
-        new_size = wx.Size(width=orig_size.GetWidth() + 1, height=orig_size.GetHeight() + 1)
+        new_size = wx.Size(
+            width=orig_size.GetWidth() + 1, height=orig_size.GetHeight() + 1
+        )
         self.SetSize(new_size)
         self.SetSize(orig_size)
 
@@ -677,19 +758,21 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
 
     def _calculate_sizes(self):
         usable_size = wx.Window.GetClientSize(self)
-        self.logger.debug('calculate_sizes: %dx%d', usable_size.GetWidth(), usable_size.GetHeight())
+        self.logger.debug(
+            "calculate_sizes: %dx%d", usable_size.GetWidth(), usable_size.GetHeight()
+        )
 
         # font_factor = 28
         font_factor = 27
         if usable_size.GetWidth() <= usable_size.GetHeight():
             # font_factor = 15
             font_factor = 16
-        self.logger.debug('Font factor: %d', font_factor)
+        self.logger.debug("Font factor: %d", font_factor)
         font_factor += self.font_factor_offset
-        self.logger.debug('Font factor with offset: %d', font_factor)
+        self.logger.debug("Font factor with offset: %d", font_factor)
 
         default_font_size = int(usable_size.GetWidth() / font_factor)
-        self.logger.debug('Font size: %d', default_font_size)
+        self.logger.debug("Font size: %d", default_font_size)
 
         header_font = self.header_label.GetFont()
         header_font.SetPointSize(default_font_size)
@@ -729,40 +812,52 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
         new_col_size_team = col_size_team + int(col_size_team / 3)
         self.prewarning_grid.SetColSize(COL_NR_TEAM, new_col_size_team)
 
-        col_size_time = (grid_width - new_col_size_leg - new_col_size_team)
+        col_size_time = grid_width - new_col_size_leg - new_col_size_team
         col_size_time = max(10, col_size_time)
         self.prewarning_grid.SetColSize(COL_NR_TIME, col_size_time)
         self.prewarning_grid.Thaw()
 
     def _print_sizes(self):
-        self.logger.debug('PRINT SIZES')
+        self.logger.debug("PRINT SIZES")
         (header_panel_width, header_panel_height) = self.header_panel.GetSize()
-        self.logger.info('header_panel.GetSize(): %dx%d', header_panel_width, header_panel_height)
+        self.logger.info(
+            "header_panel.GetSize(): %dx%d", header_panel_width, header_panel_height
+        )
         (grid_panel_width, grid__panel_height) = self.grid_panel.GetSize()
-        self.logger.info('grid_panel.GetSize(): %dx%d', grid_panel_width, grid__panel_height)
+        self.logger.info(
+            "grid_panel.GetSize(): %dx%d", grid_panel_width, grid__panel_height
+        )
         (grid_width, grid_height) = self.prewarning_grid.GetSize()
-        self.logger.info('prewarning_grid.GetSize(): %dx%d', grid_width, grid_height)
+        self.logger.info("prewarning_grid.GetSize(): %dx%d", grid_width, grid_height)
 
     def _on_resize(self, event: wx.SizeEvent):
-        self.logger.debug('EventSize: %dx%d', event.GetSize().GetWidth(), event.GetSize().GetHeight())
+        self.logger.debug(
+            "EventSize: %dx%d", event.GetSize().GetWidth(), event.GetSize().GetHeight()
+        )
         self._calculate_sizes()
 
         event.Skip()
 
     def _on_resize_head(self, event: wx.SizeEvent):
-        self.logger.debug('HEAD EventSize: %dx%d', event.GetSize().GetWidth(), event.GetSize().GetHeight())
+        self.logger.debug(
+            "HEAD EventSize: %dx%d",
+            event.GetSize().GetWidth(),
+            event.GetSize().GetHeight(),
+        )
         self._calculate_sizes()
 
         event.Skip()
 
     def _about_dialog(self):
-        self.logger.debug('About Dialog')
+        self.logger.debug("About Dialog")
         about_dialog = AboutDialog(self, app_version=__version__)
         about_dialog.Show()
 
     def _help_dialog(self):
-        self.logger.debug('Help Dialog')
-        help_dialog = HelpDialog(self, app_version=__version__, hotkey_bindings=self.hotkey_bindings)
+        self.logger.debug("Help Dialog")
+        help_dialog = HelpDialog(
+            self, app_version=__version__, hotkey_bindings=self.hotkey_bindings
+        )
         help_dialog.Show()
 
     def _config_dialog(self, perform_validation: bool = False):
@@ -770,10 +865,11 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
         state_providers = {}
         if self.punch_source is not None:
             state_providers[self.punch_source.name] = self.punch_source
-        settings_dialog = ConfigDialog(self.config, self, title='Settings',
-                                       state_providers=state_providers)
+        settings_dialog = ConfigDialog(
+            self.config, self, title="Settings", state_providers=state_providers
+        )
         created = time()
-        self.logger.debug('Config Dialog created: %d seconds', created - start)
+        self.logger.debug("Config Dialog created: %d seconds", created - start)
         settings_dialog.Center()
 
         settings_dialog.TransferDataToWindow()
@@ -787,60 +883,64 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
         settings_dialog.Destroy()
 
     def _toggle_full_screen(self):
-        self.logger.debug('Toggle Full Screen')
+        self.logger.debug("Toggle Full Screen")
         if self.IsFullScreen():
             self.ShowFullScreen(False, style=wx.FULLSCREEN_ALL)
         else:
             self.ShowFullScreen(True, style=wx.FULLSCREEN_ALL)
 
     def _simulate_punch(self):
-        self.logger.debug('Simulate Punch')
+        self.logger.debug("Simulate Punch")
         self.test_bib_number += 10
         self.test_leg_number += 1
-        self._add_pre_warning(strftime('%H:%M:%S'), str(self.test_bib_number), str(self.test_leg_number))
-        self.announcement_queue.put({'language': None, 'sound': str(self.test_bib_number)})
+        self._add_pre_warning(
+            strftime("%H:%M:%S"), str(self.test_bib_number), str(self.test_leg_number)
+        )
+        self.announcement_queue.put(
+            {"language": None, "sound": str(self.test_bib_number)}
+        )
 
     def _play_test_sound(self):
-        self.logger.debug('Play Test Sound')
+        self.logger.debug("Play Test Sound")
         self.sound.play_sound(self.test_sound_file)
 
     def _notify_ip(self):
-        self.logger.debug('Notify IP')
+        self.logger.debug("Notify IP")
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(('8.8.8.8', 0))  # connecting to a UDP address doesn't send packets
+        s.connect(("8.8.8.8", 0))  # connecting to a UDP address doesn't send packets
         local_ip_address = s.getsockname()[0]
-        self.logger.debug('local_ip_address: %s', local_ip_address)
+        self.logger.debug("local_ip_address: %s", local_ip_address)
         for number in local_ip_address.split("."):
-            self.announcement_queue.put({'language': 'en', 'sound': number})
+            self.announcement_queue.put({"language": "en", "sound": number})
             pass
         s.close()
 
     def _close(self, event=None):
-        self.logger.debug('Close')
+        self.logger.debug("Close")
         self.stop()
         self.Unbind(wx.EVT_CLOSE, handler=self._close)
         self.Close(True)
 
     def _increase_font_size(self):
-        self.logger.debug('Increase Font Size')
+        self.logger.debug("Increase Font Size")
         self.font_factor_offset -= 1
         self._calculate_sizes()
         wx.CallAfter(self._refresh)
 
     def _decrease_font_size(self):
-        self.logger.debug('Decrease Font Size')
+        self.logger.debug("Decrease Font Size")
         self.font_factor_offset += 1
         self._calculate_sizes()
         wx.CallAfter(self._refresh)
 
     def _restore_font_size(self):
-        self.logger.debug('Restore Font Size')
+        self.logger.debug("Restore Font Size")
         self.font_factor_offset = 0
         self._calculate_sizes()
         wx.CallAfter(self._refresh)
 
     def _on_key_press(self, key_event: wx.KeyEvent):
-        self.logger.debug('_on_key_press: %s pushed!', key_event_to_str(key_event))
+        self.logger.debug("_on_key_press: %s pushed!", key_event_to_str(key_event))
 
         for key_binding in self.hotkey_bindings:
             if key_binding.matches(key_event):
@@ -858,10 +958,16 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
 
     def update_sources(self):
         if self.punch_source_name not in PUNCH_SOURCES:
-            self.logger.error('"%s" is not a valid Punch Source, valid values are: %s.',
-                              self.punch_source_name, ', '.join(PUNCH_SOURCES))
-            raise ValueError('"{}" is not a valid Punch Source, valid values are: {}.'.format(
-                self.punch_source_name, ', '.join(PUNCH_SOURCES)))
+            self.logger.error(
+                '"%s" is not a valid Punch Source, valid values are: %s.',
+                self.punch_source_name,
+                ", ".join(PUNCH_SOURCES),
+            )
+            raise ValueError(
+                '"{}" is not a valid Punch Source, valid values are: {}.'.format(
+                    self.punch_source_name, ", ".join(PUNCH_SOURCES)
+                )
+            )
 
         if self.punch_source is None:
             self.punch_source = PUNCH_SOURCES[self.punch_source_name]()
@@ -876,10 +982,16 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
                 self.punch_source.start()
 
         if self.start_list_source_name not in START_LIST_SOURCES:
-            self.logger.error('"%s" is not a valid Start List Source, valid values are: %s.',
-                              self.start_list_source_name, ', '.join(START_LIST_SOURCES))
-            raise ValueError('"{}" is not a valid Start List Source, valid values are: {}.'.format(
-                self.start_list_source_name, ', '.join(START_LIST_SOURCES)))
+            self.logger.error(
+                '"%s" is not a valid Start List Source, valid values are: %s.',
+                self.start_list_source_name,
+                ", ".join(START_LIST_SOURCES),
+            )
+            raise ValueError(
+                '"{}" is not a valid Start List Source, valid values are: {}.'.format(
+                    self.start_list_source_name, ", ".join(START_LIST_SOURCES)
+                )
+            )
 
         if self.start_list_source is None:
             self.start_list_source = START_LIST_SOURCES[self.start_list_source_name]()
@@ -893,25 +1005,37 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
 
     def _get_interactive_mode(self):
         config_section = Config().get_section(Config.SECTION_COMMON)
-        self.interactive_mode = self.CONFIG_OPTION_INTERACTIVE_MODE.get_value(config_section)
+        self.interactive_mode = self.CONFIG_OPTION_INTERACTIVE_MODE.get_value(
+            config_section
+        )
         if self.interactive_mode is None:
             self.interactive_mode = True
 
     def _parse_config(self):
         config_section = self.config.get_section(Config.SECTION_COMMON)
 
-        self.interactive_mode = self.CONFIG_OPTION_INTERACTIVE_MODE.get_value(config_section)
-        self.announce_ip_on_startup = self.CONFIG_OPTION_ANNOUNCE_IP_ON_STARTUP.get_value(config_section)
+        self.interactive_mode = self.CONFIG_OPTION_INTERACTIVE_MODE.get_value(
+            config_section
+        )
+        self.announce_ip_on_startup = (
+            self.CONFIG_OPTION_ANNOUNCE_IP_ON_STARTUP.get_value(config_section)
+        )
 
-        seconds = self.CONFIG_OPTION_INTRO_SOUND_TRIGGER_TIMEOUT_SECONDS.get_value(config_section)
+        seconds = self.CONFIG_OPTION_INTRO_SOUND_TRIGGER_TIMEOUT_SECONDS.get_value(
+            config_section
+        )
         sound_file = self.CONFIG_OPTION_INTRO_SOUND_FILE.get_value(config_section)
         with self._last_sound_time_lock:
             self.intro_sound_trigger_timeout_seconds = timedelta(seconds=seconds)
             self.intro_sound_file = sound_file
 
-        self.test_sound_file = self.CONFIG_OPTION_TEST_SOUND_FILE.get_value(config_section)
+        self.test_sound_file = self.CONFIG_OPTION_TEST_SOUND_FILE.get_value(
+            config_section
+        )
 
-        self.add_pre_warnings_to_bottom = self.CONFIG_OPTION_ADD_PRE_WARNINGS_TO_BOTTOM.get_value(config_section)
+        self.add_pre_warnings_to_bottom = (
+            self.CONFIG_OPTION_ADD_PRE_WARNINGS_TO_BOTTOM.get_value(config_section)
+        )
 
         self.punch_source_name = COMMON_PUNCH_SOURCE.get_value(config_section)
         self.start_list_source_name = COMMON_START_LIST_SOURCE.get_value(config_section)
@@ -925,62 +1049,74 @@ class PreWarning(wx.Frame, ConfigConsumer, PunchListener, LoggingEventHandler, m
         self.start_list_source.start()
 
     def punch_received(self, punch: Dict[str, str]):
-        self.logger.debug('punch_received: %s', punch)
+        self.logger.debug("punch_received: %s", punch)
         self.punch_queue.put(punch)
 
     def _process_punches(self):
         while True:
             punch = self.punch_queue.get()
-            self.logger.debug('Processing: %s from: %s', punch['cardNumber'], punch['controlCode'])
+            self.logger.debug(
+                "Processing: %s from: %s", punch["cardNumber"], punch["controlCode"]
+            )
 
             source = self.start_list_source
             source_name = self.start_list_source_name
             if source is None or source_name is None:
-                self.logger.warning('Start list source not yet initialized, deferring punch.')
+                self.logger.warning(
+                    "Start list source not yet initialized, deferring punch."
+                )
                 continue
-            if 'bibNumber' in punch:
+            if "bibNumber" in punch:
                 if source_name != StartListSourceOlaMySql.__qualname__:
-                    pre_warn_data = source.lookup_from_card_number(punch['cardNumber'])
+                    pre_warn_data = source.lookup_from_card_number(punch["cardNumber"])
                     if pre_warn_data is None:
-                        self.logger.debug('Could not find the team connected to the card number.'
-                                          ' Using already existing data.')
+                        self.logger.debug(
+                            "Could not find the team connected to the card number."
+                            " Using already existing data."
+                        )
                     else:
                         punch.update(pre_warn_data)
             else:
-                pre_warn_data = source.lookup_from_card_number(punch['cardNumber'])
+                pre_warn_data = source.lookup_from_card_number(punch["cardNumber"])
                 if pre_warn_data is None:
-                    self.logger.debug('Could not find the team connected to the card number. Skipping!')
+                    self.logger.debug(
+                        "Could not find the team connected to the card number. Skipping!"
+                    )
                     continue
                 else:
                     punch.update(pre_warn_data)
 
             language = None
-            passed_time = self._to_str(punch['passedTime']).rpartition(' ')[2]
-            bib_number = self._to_str(punch['bibNumber'])
-            relay_leg = self._to_str(punch['relayLeg'])
-            self.announcement_queue.put({'language': language, 'sound': bib_number})
-            wx.CallAfter(self._add_pre_warning_with_refresh, passed_time, bib_number, relay_leg)
+            passed_time = self._to_str(punch["passedTime"]).rpartition(" ")[2]
+            bib_number = self._to_str(punch["bibNumber"])
+            relay_leg = self._to_str(punch["relayLeg"])
+            self.announcement_queue.put({"language": language, "sound": bib_number})
+            wx.CallAfter(
+                self._add_pre_warning_with_refresh, passed_time, bib_number, relay_leg
+            )
 
     @staticmethod
     def _to_str(val: int | str | None) -> str:
         if val is None:
-            return '-'
+            return "-"
         return str(val)
 
     def _process_announcements(self):
         while True:
-            self.logger.debug('process_announcements')
+            self.logger.debug("process_announcements")
             sound = self.announcement_queue.get()
             with self._last_sound_time_lock:
-                self.logger.debug('last_sound_time: %s', self.last_sound_time)
-                if self.last_sound_time is None\
-                        or (datetime.now()-self.last_sound_time).total_seconds()\
-                        >= self.intro_sound_trigger_timeout_seconds.total_seconds():
-                    self.logger.debug('intro_sound_file: %s', self.intro_sound_file)
+                self.logger.debug("last_sound_time: %s", self.last_sound_time)
+                if (
+                    self.last_sound_time is None
+                    or (datetime.now() - self.last_sound_time).total_seconds()
+                    >= self.intro_sound_trigger_timeout_seconds.total_seconds()
+                ):
+                    self.logger.debug("intro_sound_file: %s", self.intro_sound_file)
                     self.sound.play_sound(self.intro_sound_file)
 
-                self.logger.debug('sound: %s', sound)
-                self.sound.play_lang('{}.mp3'.format(sound['sound']), sound['language'])
+                self.logger.debug("sound: %s", sound)
+                self.sound.play_lang("{}.mp3".format(sound["sound"]), sound["language"])
 
                 self.last_sound_time = datetime.now()
 
@@ -993,5 +1129,5 @@ def main():
     app.MainLoop()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -1,12 +1,16 @@
 # -*- coding: utf-8 -*-
 
-from validators.constants import HOSTNAME_PATTERN, HOSTNAME_FQDN_PATTERN, DOMAIN_NAME_PATTERN
+from validators.constants import (
+    HOSTNAME_PATTERN,
+    HOSTNAME_FQDN_PATTERN,
+    DOMAIN_NAME_PATTERN,
+)
 from validators.ip_address_validators import is_ip
 from validators.validator_decorator import validator
 from validators.validator_utils import to_unicode
 
 
-@validator(message='Not a valid hostname.')
+@validator(message="Not a valid hostname.")
 def is_hostname(value: str) -> bool:
     """
     Validate if the given value is a valid hostname.
@@ -30,8 +34,8 @@ def is_hostname(value: str) -> bool:
     """
     try:
         # To handle internationalized (IDN) hostnames
-        encoded_value = to_unicode(value).encode('idna').decode('ascii')
-    except (UnicodeError, AttributeError):
+        encoded_value = to_unicode(value).encode("idna").decode("ascii")
+    except UnicodeError, AttributeError:
         return False
 
     # A FQDN has a max length of 255 characters
@@ -47,7 +51,7 @@ def is_hostname(value: str) -> bool:
     return False
 
 
-@validator(message='Not a valid hostname or IP address.')
+@validator(message="Not a valid hostname or IP address.")
 def is_hostname_or_ip(value: str):
     """
     Validate if the given value is a valid hostname or IP address.
@@ -87,7 +91,7 @@ def is_hostname_or_ip(value: str):
     return False
 
 
-@validator(message='Not a valid domain name.')
+@validator(message="Not a valid domain name.")
 def is_domain_name(value: str) -> bool:
     """
     Validate if the given value is a valid domain name.
@@ -110,8 +114,8 @@ def is_domain_name(value: str) -> bool:
     """
     try:
         # To handle internationalized (IDN) hostnames
-        encoded_value = to_unicode(value).encode('idna').decode('ascii')
-    except (UnicodeError, AttributeError):
+        encoded_value = to_unicode(value).encode("idna").decode("ascii")
+    except UnicodeError, AttributeError:
         return False
 
     # A FQDN has a max length of 255 characters

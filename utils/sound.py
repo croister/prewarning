@@ -9,15 +9,30 @@ from natsort import natsorted
 from subprocess import run
 from typing import List
 
-from watchdog.events import LoggingEventHandler, DirMovedEvent, FileMovedEvent, DirCreatedEvent, FileCreatedEvent, DirDeletedEvent, FileDeletedEvent, DirModifiedEvent, FileModifiedEvent
+from watchdog.events import (
+    LoggingEventHandler,
+    DirMovedEvent,
+    FileMovedEvent,
+    DirCreatedEvent,
+    FileCreatedEvent,
+    DirDeletedEvent,
+    FileDeletedEvent,
+    DirModifiedEvent,
+    FileModifiedEvent,
+)
 from watchdog.observers import Observer
 
-from utils.config import ConfigConsumer, ConfigSectionDefinition, ConfigOptionDefinition, Config
+from utils.config import (
+    ConfigConsumer,
+    ConfigSectionDefinition,
+    ConfigOptionDefinition,
+    Config,
+)
 from utils.config_definitions import Path, VerificationResult
 from utils.singleton import Singleton
 
 
-SOUNDS_DIR = 'sounds'
+SOUNDS_DIR = "sounds"
 
 
 class SoundFolder(LoggingEventHandler, Singleton):
@@ -26,7 +41,7 @@ class SoundFolder(LoggingEventHandler, Singleton):
     """
 
     def __repr__(self) -> str:
-        return f'SoundFolder(sounds_dir_location={self._sounds_dir_location})'
+        return f"SoundFolder(sounds_dir_location={self._sounds_dir_location})"
 
     def __str__(self) -> str:
         return repr(self)
@@ -44,9 +59,11 @@ class SoundFolder(LoggingEventHandler, Singleton):
         self._lock = Lock()
 
         self.observer = Observer()
-        self.observer.name = 'SoundsDirObserverThread'
+        self.observer.name = "SoundsDirObserverThread"
         self.observer.start()
-        self.observer.schedule(event_handler=self, path=self.get_sounds_dir().as_posix())
+        self.observer.schedule(
+            event_handler=self, path=self.get_sounds_dir().as_posix()
+        )
 
         self.logger.debug(self)
 
@@ -76,7 +93,7 @@ class SoundFolder(LoggingEventHandler, Singleton):
         self._reset()
 
     def _reset(self):
-        self.logger.debug('Reset')
+        self.logger.debug("Reset")
 
         with self._lock:
             self._languages = None
@@ -84,7 +101,9 @@ class SoundFolder(LoggingEventHandler, Singleton):
 
     def get_sounds_dir(self) -> Path:
         if self._sounds_dir_location is None:
-            self._sounds_dir_location = Path(__file__).resolve().parent.parent.absolute() / SOUNDS_DIR
+            self._sounds_dir_location = (
+                Path(__file__).resolve().parent.parent.absolute() / SOUNDS_DIR
+            )
         return self._sounds_dir_location
 
     def get_languages(self) -> List[str]:
@@ -131,7 +150,7 @@ class SoundFolder(LoggingEventHandler, Singleton):
             return self._all_sounds
 
 
-LOGGER_NAME = 'Sound'
+LOGGER_NAME = "Sound"
 
 
 class _SoundMeta(type(ConfigConsumer), type(Singleton)):  # type: ignore[misc]
@@ -160,49 +179,53 @@ class Sound(ConfigConsumer, Singleton, metaclass=_SoundMeta):
         Sound().play_sound_default_foreign_lang(sound, override)"""
 
     def _run_cmd(self, cmd: List[str]) -> int:
-        self.logger.debug('_run_cmd(%s)', cmd)
+        self.logger.debug("_run_cmd(%s)", cmd)
         startupinfo = None
-        if os.name == 'nt':
+        if os.name == "nt":
             startupinfo = subprocess.STARTUPINFO()  # type: ignore[attr-defined]
             startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW  # type: ignore[attr-defined]
         result = run(cmd, capture_output=True, text=True, startupinfo=startupinfo)
-        self.logger.debug('_run_cmd(%s) -> %d', cmd, result.returncode)
+        self.logger.debug("_run_cmd(%s) -> %d", cmd, result.returncode)
         if result.stdout:
-            self.logger.debug('_run_cmd(%s) stdout: %s', cmd, result.stdout)
+            self.logger.debug("_run_cmd(%s) stdout: %s", cmd, result.stdout)
         if result.stderr:
-            self.logger.error('_run_cmd(%s) stderr: %s', cmd, result.stderr)
+            self.logger.error("_run_cmd(%s) stderr: %s", cmd, result.stderr)
         result.check_returncode()
         return result.returncode
 
     def _get_player_command(self) -> str:
         try:
-            self._run_cmd(['mpg123', '--version'])
-            return 'mpg123'
-        except (FileNotFoundError, subprocess.CalledProcessError):
+            self._run_cmd(["mpg123", "--version"])
+            return "mpg123"
+        except FileNotFoundError, subprocess.CalledProcessError:
             try:
-                self._run_cmd(['../mpg123/win/mpg123', '--version'])
-                return '../mpg123/win/mpg123'
-            except (FileNotFoundError, subprocess.CalledProcessError):
-                self.logger.error('Unable to locate the mpg123 binary, please install it and add it to the path.')
-                raise FileNotFoundError('Unable to locate the mpg123 binary, please install it and add it to the path.')
+                self._run_cmd(["../mpg123/win/mpg123", "--version"])
+                return "../mpg123/win/mpg123"
+            except FileNotFoundError, subprocess.CalledProcessError:
+                self.logger.error(
+                    "Unable to locate the mpg123 binary, please install it and add it to the path."
+                )
+                raise FileNotFoundError(
+                    "Unable to locate the mpg123 binary, please install it and add it to the path."
+                )
 
     name = __qualname__
 
     CONFIG_OPTION_SOUND_ENABLED = ConfigOptionDefinition(
-        name='SoundEnabled',
-        display_name='Enable Sound',
+        name="SoundEnabled",
+        display_name="Enable Sound",
         value_type=bool,
-        description='Enables or disables the playback of sounds.',
+        description="Enables or disables the playback of sounds.",
         default_value=True,
     )
 
     CONFIG_OPTION_DEFAULT_LANGUAGE = ConfigOptionDefinition(
-        name='DefaultLanguage',
-        display_name='Default Language',
+        name="DefaultLanguage",
+        display_name="Default Language",
         value_type=str,
-        description='Selects the default language to use for sounds.',
+        description="Selects the default language to use for sounds.",
         valid_values_gen=SoundFolder().get_languages,
-        default_value='sv',
+        default_value="sv",
         enabled_by=CONFIG_OPTION_SOUND_ENABLED,
     )
 
@@ -233,8 +256,10 @@ class Sound(ConfigConsumer, Singleton, metaclass=_SoundMeta):
         return cls.SOUND_CONFIG_SECTION_DEFINITION
 
     def __repr__(self) -> str:
-        return f'Sound(sound_enabled={self.sound_enabled},' \
-               f' default_language={self.default_language})'
+        return (
+            f"Sound(sound_enabled={self.sound_enabled},"
+            f" default_language={self.default_language})"
+        )
 
     def __str__(self) -> str:
         return repr(self)
@@ -243,7 +268,11 @@ class Sound(ConfigConsumer, Singleton, metaclass=_SoundMeta):
         super().__init__()
 
         if LOGGER_NAME != self.__class__.__name__:
-            raise ValueError('LOGGER_NAME not correct: {} vs {}'.format(LOGGER_NAME, self.__class__.__name__))
+            raise ValueError(
+                "LOGGER_NAME not correct: {} vs {}".format(
+                    LOGGER_NAME, self.__class__.__name__
+                )
+            )
 
         self.logger = logging.getLogger(self.__class__.__name__)
 
@@ -268,33 +297,39 @@ class Sound(ConfigConsumer, Singleton, metaclass=_SoundMeta):
         with self._sound_lock:
             config_section = Config().get_section(self.name)
 
-            self.sound_enabled = self.CONFIG_OPTION_SOUND_ENABLED.get_value(config_section)
+            self.sound_enabled = self.CONFIG_OPTION_SOUND_ENABLED.get_value(
+                config_section
+            )
 
-            self.default_language = self.CONFIG_OPTION_DEFAULT_LANGUAGE.get_value(config_section)
+            self.default_language = self.CONFIG_OPTION_DEFAULT_LANGUAGE.get_value(
+                config_section
+            )
 
             # self.default_foreign_language = self.CONFIG_OPTION_FOREIGN_DEFAULT_LANGUAGE.get_value(config_section)
 
     def play_sound(self, sound: str, override: bool = False):
-        self.logger.debug('Play requested: %s', sound)
+        self.logger.debug("Play requested: %s", sound)
         with self._sound_lock:
             if self.sound_enabled or override:
                 sound_file = self.sound_folder.get_sounds_dir() / sound
                 if not os.path.exists(sound_file):
-                    self.logger.error('The requested sound does not exist: %s', sound_file)
-                    sound_file = self.sound_folder.get_sounds_dir() / 'ding.mp3'
-                self._run_cmd([self.player_command, '-q', sound_file.as_posix()])
+                    self.logger.error(
+                        "The requested sound does not exist: %s", sound_file
+                    )
+                    sound_file = self.sound_folder.get_sounds_dir() / "ding.mp3"
+                self._run_cmd([self.player_command, "-q", sound_file.as_posix()])
             else:
-                self.logger.debug('Sound playback disabled, not playing.')
+                self.logger.debug("Sound playback disabled, not playing.")
 
     def play_sound_lang(self, sound: str, lang: str, override: bool = False):
-        self.logger.debug('Play lang requested: %s Lang: %s', sound, lang)
+        self.logger.debug("Play lang requested: %s Lang: %s", sound, lang)
         if lang is None:
             lang = self.default_language
         lang_sound = Path(lang) / sound
         self.play_sound(lang_sound.as_posix(), override)
 
     def play_sound_default_lang(self, sound: str, override: bool = False):
-        self.logger.debug('Play default lang requested: %s', sound)
+        self.logger.debug("Play default lang requested: %s", sound)
         self.play_sound_lang(sound, self.default_language, override)
 
     """def play_sound_default_foreign_lang(self, sound: str):
@@ -305,12 +340,14 @@ class Sound(ConfigConsumer, Singleton, metaclass=_SoundMeta):
 def verify_sound(sound: str):
     sound_file = SoundFolder().get_sounds_dir() / sound
     if not sound_file.is_file():
-        return VerificationResult(message=f'The sound file "{sound}" does not exist.', status=False)
+        return VerificationResult(
+            message=f'The sound file "{sound}" does not exist.', status=False
+        )
     try:
         Sound.play(sound, True)
         return True
     except Exception as e:
-        logging.getLogger(LOGGER_NAME).debug('verify_sound: %s', e)
+        logging.getLogger(LOGGER_NAME).debug("verify_sound: %s", e)
         return False
 
 

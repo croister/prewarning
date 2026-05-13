@@ -23,11 +23,11 @@ def _int(value: str, min_limit: int = MIN_SIZE, max_limit: int = MAX_SIZE) -> bo
         int_value = int(value)
         return min_limit <= int_value <= max_limit
     except (TypeError, ValueError) as e:
-        logging.getLogger(LOGGER_NAME).debug('_int: %s', e)
+        logging.getLogger(LOGGER_NAME).debug("_int: %s", e)
         return False
 
 
-@validator(message='Not an integer value.')
+@validator(message="Not an integer value.")
 def is_int(value: str) -> bool:
     """
     Validate if the given value is an integer.
@@ -38,7 +38,7 @@ def is_int(value: str) -> bool:
     return result
 
 
-@validator(message='Only positive integer values are allowed.')
+@validator(message="Only positive integer values are allowed.")
 def is_positive_int(value: str) -> bool:
     """
     Validate if the given value is a positive integer.
@@ -49,7 +49,7 @@ def is_positive_int(value: str) -> bool:
     return result
 
 
-@validator(message='Only negative integer values are allowed.')
+@validator(message="Only negative integer values are allowed.")
 def is_negative_int(value: str) -> bool:
     """
     Validate if the given value is a positive integer.
@@ -60,7 +60,7 @@ def is_negative_int(value: str) -> bool:
     return result
 
 
-@validator(message='Negative integer values are not allowed.')
+@validator(message="Negative integer values are not allowed.")
 def is_not_negative_int(value: str) -> bool:
     """
     Validate if the given value is not a negative integer.
@@ -71,7 +71,7 @@ def is_not_negative_int(value: str) -> bool:
     return result
 
 
-@validator(message='Positive integer values are not allowed.')
+@validator(message="Positive integer values are not allowed.")
 def is_not_positive_int(value: str) -> bool:
     """
     Validate if the given value is not a positive integer.

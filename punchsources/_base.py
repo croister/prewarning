@@ -11,9 +11,8 @@ from utils.config_definitions import ConfigOptionDefinition
 
 
 class PunchListener(ABC):
-
     def __repr__(self) -> str:
-        return 'PunchListener()'
+        return "PunchListener()"
 
     def __str__(self) -> str:
         return repr(self)
@@ -43,7 +42,7 @@ class _PunchSourceBase(ConfigConsumer):
     description = _NOT_OVERRIDDEN
 
     def __repr__(self) -> str:
-        return f'_PunchSourceBase(name={self.name})'
+        return f"_PunchSourceBase(name={self.name})"
 
     def __str__(self) -> str:
         return repr(self)
@@ -59,18 +58,15 @@ class _PunchSourceBase(ConfigConsumer):
 
     @abstractmethod
     def start(self):
-        """Starts the PunchSource.
-        """
+        """Starts the PunchSource."""
 
     @abstractmethod
     def stop(self):
-        """Stops the PunchSource.
-        """
+        """Stops the PunchSource."""
 
     @abstractmethod
     def is_running(self) -> bool:
-        """Returns if the PunchSource is running.
-        """
+        """Returns if the PunchSource is running."""
 
     def register_punch_listener(self, listener: PunchListener):
         """Registers a Punch Listener that will be notified when a Punch is received.

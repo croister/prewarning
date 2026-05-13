@@ -15,16 +15,17 @@ class TestStartListSourceBase:
         assert _StartListSourceBase.description is _NOT_OVERRIDDEN
 
     def test_str_repr(self):
-        assert '_StartListSourceBase' in repr(_StartListSourceBase)
-        assert '_StartListSourceBase' in str(_StartListSourceBase)
+        assert "_StartListSourceBase" in repr(_StartListSourceBase)
+        assert "_StartListSourceBase" in str(_StartListSourceBase)
 
-    @patch('utils.config.Config.register_config_section_listener')
+    @patch("utils.config.Config.register_config_section_listener")
     def test_concrete_subclass(self, _mock_register):
         class MySource(_StartListSourceBase):
             @classmethod
             def config_section_definition(cls):
                 from utils.config_definitions import ConfigSectionDefinition
-                return ConfigSectionDefinition('my_source', 'My Source')
+
+                return ConfigSectionDefinition("my_source", "My Source")
 
             def __init__(self):
                 super().__init__()
@@ -43,15 +44,16 @@ class TestStartListSourceBase:
 
         s = MySource()
         assert s.logger is not None
-        assert hasattr(s, 'logger')
+        assert hasattr(s, "logger")
 
-    @patch('utils.config.Config.register_config_section_listener')
+    @patch("utils.config.Config.register_config_section_listener")
     def test_lookup_from_card_number_default(self, _mock_register):
         class MySource(_StartListSourceBase):
             @classmethod
             def config_section_definition(cls):
                 from utils.config_definitions import ConfigSectionDefinition
-                return ConfigSectionDefinition('ms', 'MS')
+
+                return ConfigSectionDefinition("ms", "MS")
 
             def __init__(self):
                 super().__init__()
@@ -69,15 +71,16 @@ class TestStartListSourceBase:
                 return {}
 
         s = MySource()
-        assert s.lookup_from_card_number('12345') == {}
+        assert s.lookup_from_card_number("12345") == {}
 
-    @patch('utils.config.Config.register_config_section_listener')
+    @patch("utils.config.Config.register_config_section_listener")
     def test_is_running(self, _mock_register):
         class MySource(_StartListSourceBase):
             @classmethod
             def config_section_definition(cls):
                 from utils.config_definitions import ConfigSectionDefinition
-                return ConfigSectionDefinition('ms', 'MS')
+
+                return ConfigSectionDefinition("ms", "MS")
 
             def __init__(self):
                 super().__init__()
@@ -97,7 +100,7 @@ class TestStartListSourceBase:
         s = MySource()
         assert s.is_running() is True
 
-    @patch('utils.config.Config.register_config_section_listener')
+    @patch("utils.config.Config.register_config_section_listener")
     def test_start_stop(self, _mock_register):
         started = False
         stopped = False
@@ -106,7 +109,8 @@ class TestStartListSourceBase:
             @classmethod
             def config_section_definition(cls):
                 from utils.config_definitions import ConfigSectionDefinition
-                return ConfigSectionDefinition('ms', 'MS')
+
+                return ConfigSectionDefinition("ms", "MS")
 
             def __init__(self):
                 super().__init__()

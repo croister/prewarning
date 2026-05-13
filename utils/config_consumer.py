@@ -35,7 +35,7 @@ class ConfigConsumer(ABC):
         return definitions
 
     def __repr__(self) -> str:
-        return 'ConfigConsumer()'
+        return "ConfigConsumer()"
 
     def __str__(self) -> str:
         return repr(self)
@@ -47,10 +47,11 @@ class ConfigConsumer(ABC):
         self.logger = logging.getLogger(self.__class__.__name__)
 
         definitions = self.get_config_section_definitions()
-        self.logger.debug('config_section_definitions: %s', definitions)
+        self.logger.debug("config_section_definitions: %s", definitions)
         if definitions is not None:
             for definition in definitions:
                 from utils.config import Config
+
                 Config.register_config_section_listener(definition.name, self)
 
     def config_updated(self, section_names: List[str]):

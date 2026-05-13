@@ -5,7 +5,7 @@ import ipaddress
 from validators.validator_decorator import validator
 
 
-@validator(message='Not a valid IP version 4 address.')
+@validator(message="Not a valid IP version 4 address.")
 def is_ipv4(value: str) -> bool:
     """
     Validate if the given value is a valid IP version 4 address.
@@ -29,7 +29,7 @@ def is_ipv4(value: str) -> bool:
     return True
 
 
-@validator(message='Not a valid CIDR-notated IP version 4 address range.')
+@validator(message="Not a valid CIDR-notated IP version 4 address range.")
 def is_ipv4_cidr(value: str) -> bool:
     """
     Validate if the given value is a valid CIDR-notated IP version 4 address range.
@@ -44,7 +44,7 @@ def is_ipv4_cidr(value: str) -> bool:
     :param str value: The string to validate
     """
     try:
-        ipv4_address, cidr = value.split('/', 2)
+        ipv4_address, cidr = value.split("/", 2)
     except ValueError:
         return False
 
@@ -54,7 +54,7 @@ def is_ipv4_cidr(value: str) -> bool:
     return 0 <= int(cidr) <= 32
 
 
-@validator(message='Not a valid IP version 6 address.')
+@validator(message="Not a valid IP version 6 address.")
 def is_ipv6(value: str) -> bool:
     """
     Validate if the given value is a valid IP version 6 address.
@@ -82,7 +82,7 @@ def is_ipv6(value: str) -> bool:
     return True
 
 
-@validator(message='Not a valid CIDR-notated IP version 6 address range.')
+@validator(message="Not a valid CIDR-notated IP version 6 address range.")
 def is_ipv6_cidr(value: str) -> bool:
     """
     Validate if the given value is a valid CIDR-notated IP version 6 address range.
@@ -97,7 +97,7 @@ def is_ipv6_cidr(value: str) -> bool:
     :param str value: The string to validate
     """
     try:
-        ipv6_address, cidr = value.split('/', 2)
+        ipv6_address, cidr = value.split("/", 2)
     except ValueError:
         return False
 
@@ -107,7 +107,7 @@ def is_ipv6_cidr(value: str) -> bool:
     return 0 <= int(cidr) <= 128
 
 
-@validator(message='Not a valid IP address.')
+@validator(message="Not a valid IP address.")
 def is_ip(value: str) -> bool:
     """
     Validate if the given value is a valid IP address, both version 4 and 6 are accepted.
@@ -136,7 +136,7 @@ def is_ip(value: str) -> bool:
     return True
 
 
-@validator(message='Not a valid CIDR-notated IP address range.')
+@validator(message="Not a valid CIDR-notated IP address range.")
 def is_ip_cidr(value: str) -> bool:
     """
     Validate if the given value is a valid CIDR-notated IP address range, both version 4 and 6 are accepted.

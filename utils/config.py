@@ -11,8 +11,13 @@ from watchdog.events import LoggingEventHandler, DirModifiedEvent, FileModifiedE
 from watchdog.observers import Observer
 
 from utils.config_consumer import ConfigConsumer
-from utils.config_definitions import ConfigSectionDefinition, ConfigOptionDefinition, ConfigSectionOptionDefinition, \
-    config_section_definitions_sort_key, RuntimeStateOptionDefinition
+from utils.config_definitions import (
+    ConfigSectionDefinition,
+    ConfigOptionDefinition,
+    ConfigSectionOptionDefinition,
+    config_section_definitions_sort_key,
+    RuntimeStateOptionDefinition,
+)
 from utils.singleton import Singleton
 
 
@@ -21,81 +26,127 @@ class Config(LoggingEventHandler, Singleton):
     Handles the application's configuration.
     """
 
-    DEFAULT_CONFIG_FILE_NAME = 'config.ini'
+    DEFAULT_CONFIG_FILE_NAME = "config.ini"
 
-    DEFAULT_CONFIG_FILE_LOCATION = Path(__file__).resolve().parent.parent.absolute() / DEFAULT_CONFIG_FILE_NAME
+    DEFAULT_CONFIG_FILE_LOCATION = (
+        Path(__file__).resolve().parent.parent.absolute() / DEFAULT_CONFIG_FILE_NAME
+    )
 
-    SECTION_COMMON = 'Common'
+    SECTION_COMMON = "Common"
 
     CONFIG_SECTION_DEFINITIONS: dict[str, ConfigSectionDefinition] = dict()
 
     @classmethod
-    def register_config_section_definition(cls, config_section_definition: ConfigSectionDefinition):
+    def register_config_section_definition(
+        cls, config_section_definition: ConfigSectionDefinition
+    ):
         if config_section_definition.name in cls.CONFIG_SECTION_DEFINITIONS:
-            raise ValueError('Duplicate config section definition "{}".'.format(config_section_definition.name))
+            raise ValueError(
+                'Duplicate config section definition "{}".'.format(
+                    config_section_definition.name
+                )
+            )
 
-        temp_config_section_name = '_{}'.format(config_section_definition.name)
+        temp_config_section_name = "_{}".format(config_section_definition.name)
         if temp_config_section_name in cls.CONFIG_SECTION_DEFINITIONS:
-            config_section_definition.copy_from(cls.CONFIG_SECTION_DEFINITIONS[temp_config_section_name])
+            config_section_definition.copy_from(
+                cls.CONFIG_SECTION_DEFINITIONS[temp_config_section_name]
+            )
             del cls.CONFIG_SECTION_DEFINITIONS[temp_config_section_name]
 
-        cls.CONFIG_SECTION_DEFINITIONS[config_section_definition.name] = config_section_definition
+        cls.CONFIG_SECTION_DEFINITIONS[config_section_definition.name] = (
+            config_section_definition
+        )
 
         for required in config_section_definition.requires:
             required.add_required_by(config_section_definition)
 
-        for config_option_definition_name in config_section_definition.option_definitions:
-            config_option_definition = config_section_definition.option_definitions[config_option_definition_name]
+        for (
+            config_option_definition_name
+        ) in config_section_definition.option_definitions:
+            config_option_definition = config_section_definition.option_definitions[
+                config_option_definition_name
+            ]
             for section_enabled_by in config_option_definition.enables:
                 if isinstance(section_enabled_by, ConfigSectionDefinition):
-                    section_enabled_by.set_enabled_by(ConfigSectionOptionDefinition(
-                        section_name=config_section_definition.name,
-                        option_definition=config_option_definition))
+                    section_enabled_by.set_enabled_by(
+                        ConfigSectionOptionDefinition(
+                            section_name=config_section_definition.name,
+                            option_definition=config_option_definition,
+                        )
+                    )
 
-        cls.CONFIG_SECTION_DEFINITIONS = {value.name: value
-                                          for value in natsorted(cls.CONFIG_SECTION_DEFINITIONS.values(),
-                                                                 key=config_section_definitions_sort_key)}
+        cls.CONFIG_SECTION_DEFINITIONS = {
+            value.name: value
+            for value in natsorted(
+                cls.CONFIG_SECTION_DEFINITIONS.values(),
+                key=config_section_definitions_sort_key,
+            )
+        }
 
         if cls.has_instance():
-            cls.get_instance().config_section_definition_changed(config_section_definition.name)
+            cls.get_instance().config_section_definition_changed(
+                config_section_definition.name
+            )
 
     @classmethod
-    def register_config_option_definition(cls,
-                                          config_section_name: str,
-                                          config_option_definition: ConfigOptionDefinition,
-                                          notify_provider: bool = True):
-        config_section_name = cls._create_temporary_config_section_definition_if_needed(config_section_name)
+    def register_config_option_definition(
+        cls,
+        config_section_name: str,
+        config_option_definition: ConfigOptionDefinition,
+        notify_provider: bool = True,
+    ):
+        config_section_name = cls._create_temporary_config_section_definition_if_needed(
+            config_section_name
+        )
 
-        cls.CONFIG_SECTION_DEFINITIONS[config_section_name].add_option_definition(config_option_definition)
+        cls.CONFIG_SECTION_DEFINITIONS[config_section_name].add_option_definition(
+            config_option_definition
+        )
 
         if cls.has_instance() and notify_provider:
-            cls.get_instance().config_option_definition_added(config_section_name, config_option_definition.name)
+            cls.get_instance().config_option_definition_added(
+                config_section_name, config_option_definition.name
+            )
 
     @classmethod
-    def _create_temporary_config_section_definition_if_needed(cls, config_section_name: str) -> str:
+    def _create_temporary_config_section_definition_if_needed(
+        cls, config_section_name: str
+    ) -> str:
         # Add it to a temporary config section definition if the config section definition is not already defined
         if config_section_name not in cls.CONFIG_SECTION_DEFINITIONS:
-            config_section_name = '_{}'.format(config_section_name)
+            config_section_name = "_{}".format(config_section_name)
             if config_section_name not in cls.CONFIG_SECTION_DEFINITIONS:
-                cls.CONFIG_SECTION_DEFINITIONS[config_section_name] = ConfigSectionDefinition(config_section_name,
-                                                                                              config_section_name)
+                cls.CONFIG_SECTION_DEFINITIONS[config_section_name] = (
+                    ConfigSectionDefinition(config_section_name, config_section_name)
+                )
         return config_section_name
 
     CONFIG_SECTION_LISTENERS: dict[str, list[ConfigConsumer]] = dict()
 
     @classmethod
-    def register_config_section_listener(cls, config_section_name: str, config_section_listener: ConfigConsumer):
+    def register_config_section_listener(
+        cls, config_section_name: str, config_section_listener: ConfigConsumer
+    ):
         if config_section_name not in cls.CONFIG_SECTION_DEFINITIONS.keys():
-            raise ValueError('The Config Section Definition "{}" is not registered.'
-                             .format(config_section_name))
+            raise ValueError(
+                'The Config Section Definition "{}" is not registered.'.format(
+                    config_section_name
+                )
+            )
 
         if config_section_name not in cls.CONFIG_SECTION_LISTENERS:
             cls.CONFIG_SECTION_LISTENERS[config_section_name] = []
-        if config_section_listener not in cls.CONFIG_SECTION_LISTENERS[config_section_name]:
-            cls.CONFIG_SECTION_LISTENERS[config_section_name].append(config_section_listener)
+        if (
+            config_section_listener
+            not in cls.CONFIG_SECTION_LISTENERS[config_section_name]
+        ):
+            cls.CONFIG_SECTION_LISTENERS[config_section_name].append(
+                config_section_listener
+            )
 
     def __repr__(self) -> str:
-        return f'Config(config_file_location={self.config_file_location})'
+        return f"Config(config_file_location={self.config_file_location})"
 
     def __str__(self) -> str:
         return repr(self)
@@ -118,10 +169,16 @@ class Config(LoggingEventHandler, Singleton):
                 self.config_file_location = Path(config_file_location)
 
         if not self.config_file_location.is_absolute():
-            self.config_file_location = Path(__file__).resolve().parent.parent.absolute() / self.config_file_location
+            self.config_file_location = (
+                Path(__file__).resolve().parent.parent.absolute()
+                / self.config_file_location
+            )
 
         if not self.config_file_location.is_file():
-            self.logger.warning('The config file "%s" was not found, creating it.', self.config_file_location)
+            self.logger.warning(
+                'The config file "%s" was not found, creating it.',
+                self.config_file_location,
+            )
 
         self.config = ConfigParser()
 
@@ -129,10 +186,10 @@ class Config(LoggingEventHandler, Singleton):
         self.prev_config_sections: dict[str, SectionProxy] = dict()
 
         self.observer = Observer()
-        self.observer.name = 'ConfigFileObserverThread'
+        self.observer.name = "ConfigFileObserverThread"
         self.observer.start()
 
-        self.logger.debug('Config: %s', self)
+        self.logger.debug("Config: %s", self)
 
     def __del__(self):
         self.stop()
@@ -144,18 +201,23 @@ class Config(LoggingEventHandler, Singleton):
 
     def on_modified(self, event: DirModifiedEvent | FileModifiedEvent):
         super().on_modified(event)
-        what = 'directory' if event.is_directory else 'file'
+        what = "directory" if event.is_directory else "file"
         self.logger.debug("Modified %s: %s", what, event.src_path)
 
         src_path = event.src_path
         try:
             if Path(str(src_path)).resolve() == self.config_file_location:
-                self.logger.debug('Configuration file modification detected, reloading.')
+                self.logger.debug(
+                    "Configuration file modification detected, reloading."
+                )
                 self.read_config()
                 validation_errors = self.validate()
                 if len(validation_errors):
-                    raise ValueError('The configuration contains the following errors: {}.'
-                                     .format(str(validation_errors)))
+                    raise ValueError(
+                        "The configuration contains the following errors: {}.".format(
+                            str(validation_errors)
+                        )
+                    )
         except PermissionError as e:
             logging.error('PermissionError in accessing the file: "%s" %s', src_path, e)
         except OSError as e:
@@ -170,39 +232,69 @@ class Config(LoggingEventHandler, Singleton):
         with self._config_lock:
             if name not in self.config:
                 self.logger.error('The config section "%s" is not available.', name)
-                raise ValueError('The config section "{}" is not available.'.format(name))
+                raise ValueError(
+                    'The config section "{}" is not available.'.format(name)
+                )
             return self.config[name]
 
-    def update_live_section_option(self, name: str, option_definition: ConfigOptionDefinition, value: Any):
+    def update_live_section_option(
+        self, name: str, option_definition: ConfigOptionDefinition, value: Any
+    ):
         with self._config_lock:
             if name not in self.config:
-                self.logger.error('The config section "%s" is not available in active config.', name)
-                raise ValueError('The config section "{}" is not available in active config.'.format(name))
+                self.logger.error(
+                    'The config section "%s" is not available in active config.', name
+                )
+                raise ValueError(
+                    'The config section "{}" is not available in active config.'.format(
+                        name
+                    )
+                )
             if name not in self.prev_config_sections:
-                self.logger.error('The config section "%s" is not available in prev config.', name)
-                raise ValueError('The config section "{}" is not available in prev config.'.format(name))
+                self.logger.error(
+                    'The config section "%s" is not available in prev config.', name
+                )
+                raise ValueError(
+                    'The config section "{}" is not available in prev config.'.format(
+                        name
+                    )
+                )
             option_definition.set_value(self.config[name], value)
             option_definition.set_value(self.prev_config_sections[name], value)
 
-    def config_option_definition_added(self, config_section_name: str, config_option_definition_name: str):
+    def config_option_definition_added(
+        self, config_section_name: str, config_option_definition_name: str
+    ):
         with self._config_lock:
-            if config_section_name not in self.config or config_section_name not in self.config_sections:
+            if (
+                config_section_name not in self.config
+                or config_section_name not in self.config_sections
+            ):
                 return
             config_section = self.config[config_section_name]
             section_definition = self.CONFIG_SECTION_DEFINITIONS[config_section_name]
-            option_definition = section_definition.option_definitions[config_option_definition_name]
-            self._validate_config_option(config_section, section_definition, option_definition)
+            option_definition = section_definition.option_definitions[
+                config_option_definition_name
+            ]
+            self._validate_config_option(
+                config_section, section_definition, option_definition
+            )
 
     def config_section_definition_changed(self, config_section_name: str):
         with self._config_lock:
-            if config_section_name not in self.config or config_section_name not in self.config_sections:
+            if (
+                config_section_name not in self.config
+                or config_section_name not in self.config_sections
+            ):
                 return
             config_section = self.config[config_section_name]
-            config_section_definition = self.CONFIG_SECTION_DEFINITIONS[config_section_name]
+            config_section_definition = self.CONFIG_SECTION_DEFINITIONS[
+                config_section_name
+            ]
             self._validate_config_section(config_section, config_section_definition)
 
     def read_config(self):
-        self.logger.debug('read_config')
+        self.logger.debug("read_config")
 
         with self._config_lock:
             self.observer.unschedule_all()
@@ -215,50 +307,77 @@ class Config(LoggingEventHandler, Singleton):
                 config_section = self._read_config_section(config_section_definition)
                 section_name = config_section_definition.name
 
-                if section_name not in self.prev_config_sections \
-                        or self.prev_config_sections[section_name] != config_section:
+                if (
+                    section_name not in self.prev_config_sections
+                    or self.prev_config_sections[section_name] != config_section
+                ):
                     self.config_sections[section_name] = config_section
                     self.prev_config_sections[section_name] = dict(config_section)
                     updated_sections.append(section_name)
 
-            self.observer.schedule(event_handler=self, path=self.config_file_location.parent.as_posix())
+            self.observer.schedule(
+                event_handler=self, path=self.config_file_location.parent.as_posix()
+            )
 
             self._notify_updates(updated_sections)
 
-    def _read_config_section(self, config_section_definition: ConfigSectionDefinition) -> SectionProxy:
+    def _read_config_section(
+        self, config_section_definition: ConfigSectionDefinition
+    ) -> SectionProxy:
         config_section_name = config_section_definition.name
         if not self.config.has_section(config_section_name):
-            self.logger.warning('The configuration file is missing the "%s" section, creating with default values.',
-                                config_section_name)
+            self.logger.warning(
+                'The configuration file is missing the "%s" section, creating with default values.',
+                config_section_name,
+            )
             self._create_initial_config_section(config_section_definition)
 
         for option_definition in config_section_definition.option_definitions.values():
             if isinstance(option_definition, RuntimeStateOptionDefinition):
                 continue
             if option_definition.name not in self.config[config_section_name]:
-                self.logger.warning('The configuration file is missing the "%s" option in the "%s" section,'
-                                    ' creating with default value.',
-                                    option_definition.name, config_section_name)
-                self._create_initial_config_option(self.config[config_section_name], option_definition)
+                self.logger.warning(
+                    'The configuration file is missing the "%s" option in the "%s" section,'
+                    " creating with default value.",
+                    option_definition.name,
+                    config_section_name,
+                )
+                self._create_initial_config_option(
+                    self.config[config_section_name], option_definition
+                )
 
             value = option_definition.get_value(self.config[config_section_name])
             if value is None and option_definition.default_value is not None:
-                self.logger.debug('The configuration file is missing a value for the "%s" option in the "%s" section,'
-                                  ' using the default value.',
-                                  option_definition.name, config_section_name)
-                self._create_initial_config_option(self.config[config_section_name], option_definition)
+                self.logger.debug(
+                    'The configuration file is missing a value for the "%s" option in the "%s" section,'
+                    " using the default value.",
+                    option_definition.name,
+                    config_section_name,
+                )
+                self._create_initial_config_option(
+                    self.config[config_section_name], option_definition
+                )
 
         config_section = self.config[config_section_name]
 
         return config_section
 
-    def _create_initial_config_section(self, config_section_definition: ConfigSectionDefinition):
-        self.config[config_section_definition.name] = config_section_definition.get_initial_config_section()
+    def _create_initial_config_section(
+        self, config_section_definition: ConfigSectionDefinition
+    ):
+        self.config[config_section_definition.name] = (
+            config_section_definition.get_initial_config_section()
+        )
         self.write()
 
-    def _create_initial_config_option(self, config_section: SectionProxy,
-                                      config_option_definition: ConfigOptionDefinition):
-        config_section[config_option_definition.name] = config_option_definition.get_initial_option_value()
+    def _create_initial_config_option(
+        self,
+        config_section: SectionProxy,
+        config_option_definition: ConfigOptionDefinition,
+    ):
+        config_section[config_option_definition.name] = (
+            config_option_definition.get_initial_option_value()
+        )
         self.write()
 
     def _notify_updates(self, updated_sections: List[str]):
@@ -271,10 +390,12 @@ class Config(LoggingEventHandler, Singleton):
                         notifications[listener] = []
                     notifications[listener].append(updated_section)
 
-        for (listener, updated) in notifications.items():
+        for listener, updated in notifications.items():
             listener.config_updated(updated)
 
-    def validate(self) -> Dict[ConfigSectionDefinition, Dict[ConfigOptionDefinition, List[str]]]:
+    def validate(
+        self,
+    ) -> Dict[ConfigSectionDefinition, Dict[ConfigOptionDefinition, List[str]]]:
         """Validate the configuration
 
         :return: The validation errors detected for this configuration
@@ -285,17 +406,19 @@ class Config(LoggingEventHandler, Singleton):
             section_name = config_section_definition.name
             config_section = self.config_sections[section_name]
 
-            section_validation_errors = self._validate_config_section(config_section,
-                                                                      config_section_definition)
+            section_validation_errors = self._validate_config_section(
+                config_section, config_section_definition
+            )
             if len(section_validation_errors):
                 validation_errors[config_section_definition] = section_validation_errors
 
         return validation_errors
 
-    def _validate_config_section(self,
-                                 config_section: SectionProxy,
-                                 config_section_definition: ConfigSectionDefinition) -> Dict[ConfigOptionDefinition,
-                                                                                              List[str]]:
+    def _validate_config_section(
+        self,
+        config_section: SectionProxy,
+        config_section_definition: ConfigSectionDefinition,
+    ) -> Dict[ConfigOptionDefinition, List[str]]:
         """Validate a configuration section
 
         :param SectionProxy config_section: The config section to validate
@@ -305,23 +428,34 @@ class Config(LoggingEventHandler, Singleton):
         """
         validation_errors: dict[ConfigOptionDefinition, list[str]] = dict()
         if self._is_config_section_enabled(config_section_definition):
-            for option_definition in config_section_definition.option_definitions.values():
-                validation_errors |= self._validate_config_option(config_section, config_section_definition, option_definition)
+            for (
+                option_definition
+            ) in config_section_definition.option_definitions.values():
+                validation_errors |= self._validate_config_option(
+                    config_section, config_section_definition, option_definition
+                )
         return validation_errors
 
-    def _validate_config_option(self, config_section: SectionProxy,
-                                config_section_definition: ConfigSectionDefinition,
-                                option_definition: ConfigOptionDefinition) -> dict[ConfigOptionDefinition, list[str]]:
+    def _validate_config_option(
+        self,
+        config_section: SectionProxy,
+        config_section_definition: ConfigSectionDefinition,
+        option_definition: ConfigOptionDefinition,
+    ) -> dict[ConfigOptionDefinition, list[str]]:
         validation_errors: dict[ConfigOptionDefinition, list[str]] = dict()
         if not isinstance(option_definition, RuntimeStateOptionDefinition):
-            if self._is_config_option_enabled(config_section_definition, option_definition):
+            if self._is_config_option_enabled(
+                config_section_definition, option_definition
+            ):
                 value = option_definition.get_value(config_section)
                 option_validation_errors = option_definition.validate(value)
                 if len(option_validation_errors):
                     validation_errors[option_definition] = option_validation_errors
         return validation_errors
 
-    def _is_config_section_enabled(self, config_section_definition: ConfigSectionDefinition) -> bool:
+    def _is_config_section_enabled(
+        self, config_section_definition: ConfigSectionDefinition
+    ) -> bool:
         """Determines if a config section is enabled
 
         :param ConfigSectionDefinition config_section_definition: The config section definition
@@ -330,9 +464,11 @@ class Config(LoggingEventHandler, Singleton):
         """
         return config_section_definition.is_enabled(self.config_sections)
 
-    def _is_config_option_enabled(self,
-                                  config_section_definition: ConfigSectionDefinition,
-                                  config_option_definition: ConfigOptionDefinition) -> bool:
+    def _is_config_option_enabled(
+        self,
+        config_section_definition: ConfigSectionDefinition,
+        config_option_definition: ConfigOptionDefinition,
+    ) -> bool:
         """Determines if a config option is enabled
 
         :param ConfigSectionDefinition config_section_definition: The config section definition
@@ -340,7 +476,9 @@ class Config(LoggingEventHandler, Singleton):
         :return: True if it is enabled otherwise False
         :rtype: bool
         """
-        return config_option_definition.is_enabled(self.config_sections[config_section_definition.name])
+        return config_option_definition.is_enabled(
+            self.config_sections[config_section_definition.name]
+        )
 
     def write(self):
         """Write the configuration to file"""
@@ -352,16 +490,25 @@ class Config(LoggingEventHandler, Singleton):
                     continue
                 removed = []
                 for option_def in section_def.option_definitions.values():
-                    if isinstance(option_def, RuntimeStateOptionDefinition) and option_def.name in self.config[section_name]:
+                    if (
+                        isinstance(option_def, RuntimeStateOptionDefinition)
+                        and option_def.name in self.config[section_name]
+                    ):
                         removed.append(option_def.name)
                         del self.config[section_name][option_def.name]
                 if removed:
                     runtime_snapshots[section_name] = removed
 
-            with open(self.config_file_location, 'w') as configfile:
+            with open(self.config_file_location, "w") as configfile:
                 self.config.write(configfile)
 
             for section_name, option_names in runtime_snapshots.items():
                 for option_name in option_names:
-                    default = self.CONFIG_SECTION_DEFINITIONS[section_name].option_definitions[option_name].default_value
-                    self.config[section_name][option_name] = str(default) if default is not None else ''
+                    default = (
+                        self.CONFIG_SECTION_DEFINITIONS[section_name]
+                        .option_definitions[option_name]
+                        .default_value
+                    )
+                    self.config[section_name][option_name] = (
+                        str(default) if default is not None else ""
+                    )

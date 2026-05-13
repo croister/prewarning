@@ -14,7 +14,7 @@ def reset_singleton_instances():
 _APP = None
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def wx_app():
     global _APP
     if _APP is None:

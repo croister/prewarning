@@ -1,1 +1,1 @@
-LOGGER_NAME = 'Utils'
+LOGGER_NAME = "Utils"

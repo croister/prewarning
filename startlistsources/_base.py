@@ -22,7 +22,7 @@ class _StartListSourceBase(ConfigConsumer):
     description = _NOT_OVERRIDDEN
 
     def __repr__(self) -> str:
-        return '_StartListSourceBase()'
+        return "_StartListSourceBase()"
 
     def __str__(self) -> str:
         return repr(self)
@@ -35,18 +35,15 @@ class _StartListSourceBase(ConfigConsumer):
 
     @abstractmethod
     def start(self):
-        """Starts the StartListSource.
-        """
+        """Starts the StartListSource."""
 
     @abstractmethod
     def stop(self):
-        """Stops the StartListSource.
-        """
+        """Stops the StartListSource."""
 
     @abstractmethod
     def is_running(self) -> bool:
-        """Returns if the StartListSource is running.
-        """
+        """Returns if the StartListSource is running."""
 
     @abstractmethod
     def lookup_from_card_number(self, card_number: str) -> Dict[str, str] | None:

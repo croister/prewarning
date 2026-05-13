@@ -6,11 +6,10 @@ import wx
 import wx.html
 
 
-APP_ICON_PATH = str(Path(__file__).resolve().parent.parent / 'favicon.ico')
+APP_ICON_PATH = str(Path(__file__).resolve().parent.parent / "favicon.ico")
 
 
 class AboutDialog(wx.Frame):
-
     def __init__(self, parent, app_version: str):
         wx.Frame.__init__(self, parent, wx.ID_ANY, title="About")
 
@@ -26,7 +25,9 @@ class AboutDialog(wx.Frame):
         app_bmp = wx.Bitmap(app_img)
         app_static_bmp = wx.StaticBitmap(self, bitmap=app_bmp)
         title_sizer.Add(app_static_bmp, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 8)
-        title_text = wx.StaticText(self, label="PreWarning {app_version}".format(app_version=app_version))
+        title_text = wx.StaticText(
+            self, label="PreWarning {app_version}".format(app_version=app_version)
+        )
         title_font = title_text.GetFont()
         title_font.SetPointSize(title_font.GetPointSize() + 4)
         title_font.SetWeight(wx.FONTWEIGHT_BOLD)
@@ -39,32 +40,42 @@ class AboutDialog(wx.Frame):
 
         self.SetSizer(main_sizer)
 
-        contents = '<p><b>Author:</b> Christian Lindblom<br>' \
-                    '<a href="mailto:croister@croister.se">croister@croister.se</a></p>'
-        contents += '<p>PreWarning is intended to be used to perform pre-warning for an Orienteering Relay event.</p>'
+        contents = (
+            "<p><b>Author:</b> Christian Lindblom<br>"
+            '<a href="mailto:croister@croister.se">croister@croister.se</a></p>'
+        )
+        contents += "<p>PreWarning is intended to be used to perform pre-warning for an Orienteering Relay event.</p>"
 
-        contents += '<h3>System</h3>'
-        contents += '<p>Python {python_version}<br>{platform}</p>'.format(
+        contents += "<h3>System</h3>"
+        contents += "<p>Python {python_version}<br>{platform}</p>".format(
             python_version=platform.python_version(),
             platform=platform.platform(),
         )
 
-        contents += '<h3>Dependencies</h3><table>'
+        contents += "<h3>Dependencies</h3><table>"
         try:
-            requirements = importlib.metadata.requires('prewarning')
+            requirements = importlib.metadata.requires("prewarning")
             if requirements:
                 for req in requirements:
-                    parts = req.split(';')
-                    dist_name = parts[0].split('==')[0].split('>=')[0].split('~=')[0].split('!=')[0].strip()
+                    parts = req.split(";")
+                    dist_name = (
+                        parts[0]
+                        .split("==")[0]
+                        .split(">=")[0]
+                        .split("~=")[0]
+                        .split("!=")[0]
+                        .strip()
+                    )
                     try:
                         ver = importlib.metadata.version(dist_name)
                     except importlib.metadata.PackageNotFoundError:
-                        ver = 'unknown'
-                    contents += '<tr><td>{name}</td><td>{version}</td></tr>'.format(
-                        name=dist_name, version=ver)
+                        ver = "unknown"
+                    contents += "<tr><td>{name}</td><td>{version}</td></tr>".format(
+                        name=dist_name, version=ver
+                    )
         except importlib.metadata.PackageNotFoundError:
             pass
-        contents += '</table>'
+        contents += "</table>"
 
         self._html.SetPage(contents)
         wx.CallAfter(self._fit_to_dialog)
@@ -78,7 +89,7 @@ class AboutDialog(wx.Frame):
 
 
 class WxHTML(wx.html.HtmlWindow):
-
     def OnLinkClicked(self, link):
         import webbrowser
+
         webbrowser.open(link.GetHref())
