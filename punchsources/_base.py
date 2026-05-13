@@ -13,7 +13,7 @@ from utils.config_definitions import ConfigOptionDefinition
 class PunchListener(ABC):
 
     def __repr__(self) -> str:
-        return f'PunchListener()'
+        return 'PunchListener()'
 
     def __str__(self) -> str:
         return repr(self)

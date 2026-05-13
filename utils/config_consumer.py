@@ -35,7 +35,7 @@ class ConfigConsumer(ABC):
         return definitions
 
     def __repr__(self) -> str:
-        return f'ConfigConsumer()'
+        return 'ConfigConsumer()'
 
     def __str__(self) -> str:
         return repr(self)

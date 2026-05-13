@@ -3,7 +3,7 @@
 import logging
 from configparser import SectionProxy
 from pathlib import Path
-from typing import Any, Dict, List, cast
+from typing import Any, Dict, List
 
 import wx
 import wx.lib.scrolledpanel
@@ -37,18 +37,18 @@ def _has_default_value(option_definition: ConfigOptionDefinition, config_section
 
 
 def _set_value(control: wx.TextEntry | wx.CheckBox | wx.ListBox, value: Any):
-    if type(control) == wx.TextCtrl:
+    if isinstance(control, wx.TextCtrl):
         control.ChangeValue(str(value))
-    elif type(control) == wx.ComboBox:
+    elif isinstance(control, wx.ComboBox):
         control.SetValue(value)
-    elif type(control) == wx.ListBox:
+    elif isinstance(control, wx.ListBox):
         control.SetStringSelection(value)
     else:
         control.SetValue(value)
 
 
 def _get_value(control: wx.TextEntry | wx.CheckBox | wx.ListBox) -> str | None:
-    if type(control) == wx.ListBox:
+    if isinstance(control, wx.ListBox):
         selection = control.GetSelection()
         if selection != wx.NOT_FOUND:
             return control.GetString(selection)
@@ -548,13 +548,13 @@ class ConfigSectionPanel(wx.Panel):
                     raise ValueError('Unknown select method.')
 
                 if select_result is not None:
-                    if type(select_result) == SelectionError:
+                    if isinstance(select_result, SelectionError):
                         button.SetBackgroundColour(wx.Colour('pink'))
                         button.SetToolTip(select_result.message)
                         button.SetFocus()
                         button.Refresh()
 
-                    elif type(select_result) == SelectionResult:
+                    elif isinstance(select_result, SelectionResult):
                         option_input = wx.FindWindowByName(name, parent=self)
                         if option_input is None:
                             self.logger.error('Unable to find the %s input.', name)

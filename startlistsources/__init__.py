@@ -1,7 +1,5 @@
 import inspect
-import logging
 
-from startlistsources import start_list_source_file, start_list_source_ola_mysql
 from startlistsources._base import _StartListSourceBase, _NOT_OVERRIDDEN
 from startlistsources.start_list_source_ola_mysql import StartListSourceOlaMySql
 from utils.config import Config

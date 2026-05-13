@@ -105,7 +105,7 @@ class EventForm(Enum):
         return [str(self)]
 
     def __eq__(self, other):
-        if type(other) == str:
+        if isinstance(other, str):
             return self.value == other
         return super(Enum).__eq__(other)
 
@@ -140,7 +140,7 @@ class EventFormType(Enum):
         return [str(v) for v in self.value]
 
     def __eq__(self, other):
-        if type(other) == str or type(other) == EventForm:
+        if isinstance(other, str) or isinstance(other, EventForm):
             return other in self.value
         return super(Enum).__eq__(other)
 

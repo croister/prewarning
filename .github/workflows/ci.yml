@@ -11,13 +11,23 @@ on:
 
 jobs:
   yamllint:
-    name: YAML lint (workflow definition)
+    name: Lint (YAML)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
       - uses: astral-sh/setup-uv@v8.1.0
-      - name: YAML lint (workflow definition)
+      - name: Lint (YAML) - workflow definition
         run: uv run --with yamllint yamllint .github/workflows/ && echo "No YAML issues found."
+
+  ruff:
+    name: Lint (Python)
+    needs: [yamllint]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v8.1.0
+      - name: Lint (Python)
+        run: uv run --with ruff ruff check .
 
   test:
     name: Tests
@@ -58,7 +68,7 @@ jobs:
 
   build:
     name: Build (${{ matrix.target }})
-    needs: [test, typecheck]
+    needs: [ruff, test, typecheck]
     strategy:
       fail-fast: false
       matrix:

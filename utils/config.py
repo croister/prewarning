@@ -4,7 +4,7 @@ from configparser import ConfigParser, SectionProxy
 import logging
 from pathlib import Path
 from threading import RLock
-from typing import Callable, List, Dict, Any
+from typing import List, Dict, Any
 
 from natsort import natsorted
 from watchdog.events import LoggingEventHandler, DirModifiedEvent, FileModifiedEvent
@@ -47,7 +47,7 @@ class Config(LoggingEventHandler, Singleton):
         for config_option_definition_name in config_section_definition.option_definitions:
             config_option_definition = config_section_definition.option_definitions[config_option_definition_name]
             for section_enabled_by in config_option_definition.enables:
-                if type(section_enabled_by) == ConfigSectionDefinition:
+                if isinstance(section_enabled_by, ConfigSectionDefinition):
                     section_enabled_by.set_enabled_by(ConfigSectionOptionDefinition(
                         section_name=config_section_definition.name,
                         option_definition=config_option_definition))
@@ -112,7 +112,7 @@ class Config(LoggingEventHandler, Singleton):
         if config_file_location is None:
             self.config_file_location = self.DEFAULT_CONFIG_FILE_LOCATION
         else:
-            if type(config_file_location) == Path:
+            if isinstance(config_file_location, Path):
                 self.config_file_location = config_file_location
             else:
                 self.config_file_location = Path(config_file_location)

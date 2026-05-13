@@ -6,31 +6,12 @@ PreWarning main file.
 
 __author__ = 'Christian Lindblom croister@croister.se'
 
-import re
-from importlib.metadata import version as _metadata_version
-from pathlib import Path
-
-__version__ = re.sub(r'\.dev\d+', '-dev', _metadata_version('prewarning'))
-
-_commit_sha = None
-try:
-    _git_dir = Path(__file__).resolve().parent / '.git'
-    _head = _git_dir.joinpath('HEAD').read_text('utf-8').strip()
-    if _head.startswith('ref: '):
-        _commit_sha = _git_dir.joinpath(_head[5:]).read_text('utf-8').strip()[:7]
-    else:
-        _commit_sha = _head[:7]
-except Exception:
-    pass
-
-if _commit_sha and '-dev' in __version__ and '+' not in __version__:
-    __version__ = f"{__version__}+{_commit_sha}"
-
 import logging
 import logging.config
 import socket
 import sys
 from datetime import timedelta, datetime
+from pathlib import Path
 from queue import Queue
 from threading import Thread, Lock
 from time import strftime, time
@@ -56,7 +37,8 @@ from utils.constants import CONFIGURATION_DIR, APPLICATION_DIR
 from utils.about_dialog import AboutDialog
 from utils.help_dialog import HelpDialog
 from utils.hotkey_bindings import HotKeyBindingDefinition, HotKeyDefinition, key_event_to_str
-from utils.sound import Sound, SoundFolder, verify_sound, get_all_sounds
+from utils.sound import Sound, verify_sound, get_all_sounds
+from utils.version import __version__
 
 # Column index names
 COL_NR_TIME = 0

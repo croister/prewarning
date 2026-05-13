@@ -74,7 +74,7 @@ class TestStateSaverMixin:
 
     def test_data_read_true_after_file_exists(self, tmp_path):
         rsg = RuntimeStateGroup('test.ini')
-        opt = RuntimeStateOptionDefinition(rsg, 'val', 'Val', str, 'desc', default_value='x')
+        RuntimeStateOptionDefinition(rsg, 'val', 'Val', str, 'desc', default_value='x')
         opt_defs = list(rsg.option_definitions.values())
         saver1 = FakeStateSaver('Section', [rsg], tmp_path)
         assert not saver1._data_read(opt_defs[0])
@@ -85,9 +85,9 @@ class TestStateSaverMixin:
 
     def test_multiple_groups(self, tmp_path):
         rsg1 = RuntimeStateGroup('group1.ini')
-        opt1 = RuntimeStateOptionDefinition(rsg1, 'a', 'A', str, 'desc', default_value='x')
+        RuntimeStateOptionDefinition(rsg1, 'a', 'A', str, 'desc', default_value='x')
         rsg2 = RuntimeStateGroup('group2.ini')
-        opt2 = RuntimeStateOptionDefinition(rsg2, 'b', 'B', str, 'desc', default_value='y')
+        RuntimeStateOptionDefinition(rsg2, 'b', 'B', str, 'desc', default_value='y')
         saver = FakeStateSaver('Section', [rsg1, rsg2], tmp_path)
         assert (tmp_path / 'group1.ini').exists()
         assert (tmp_path / 'group2.ini').exists()
@@ -108,7 +108,7 @@ class TestStateSaverMixin:
 
     def test_validation_error_resets_to_default(self, tmp_path):
         rsg = RuntimeStateGroup('test.ini')
-        opt = RuntimeStateOptionDefinition(
+        RuntimeStateOptionDefinition(
             rsg, 'val', 'Val', str, 'desc',
             default_value='valid', valid_values=['valid', 'ok'])
         opt_defs = list(rsg.option_definitions.values())
@@ -134,7 +134,7 @@ class TestStateSaverMixin:
 
     def test_state_saver_group_cleanup(self, tmp_path):
         rsg = RuntimeStateGroup('test.ini')
-        opt = RuntimeStateOptionDefinition(rsg, 'val', 'Val', str, 'desc', default_value='x')
+        RuntimeStateOptionDefinition(rsg, 'val', 'Val', str, 'desc', default_value='x')
         group = _StateSaverGroup('Section', rsg, tmp_path)
         state_file = tmp_path / 'test.ini'
         assert state_file.exists()

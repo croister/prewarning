@@ -18,16 +18,16 @@ class TestPunchListener:
             def __init__(self):
                 super().__init__()
 
-        l = MyListener()
-        assert l.logger is not None
+        listener = MyListener()
+        assert listener.logger is not None
 
     def test_punch_received_default_noop(self):
         class MyListener(PunchListener):
             def __init__(self):
                 super().__init__()
 
-        l = MyListener()
-        result = l.punch_received({'card_number': '123'})
+        listener = MyListener()
+        result = listener.punch_received({'card_number': '123'})
         assert result is None
 
 

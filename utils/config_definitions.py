@@ -5,7 +5,7 @@ import logging
 from configparser import SectionProxy
 from enum import Enum, unique
 from pathlib import Path
-from typing import Any, Dict, List, Callable, Iterable, Tuple
+from typing import Any, Dict, List, Callable
 
 import wx
 
@@ -60,7 +60,7 @@ class ConfigOptionDefinition:
         self.selector: ConfigSelectorDefinition | None = None
 
         if enabled_by is not None:
-            if enabled_by.value_type != bool:
+            if enabled_by.value_type is not bool:
                 self.logger.error(
                     'Only bool option values are allows for "enabled_by" for the configuration option %s.', self.name)
                 raise ValueError(
@@ -121,7 +121,7 @@ class ConfigOptionDefinition:
     def _validate_type(self):
         """Validates the value type
         """
-        if self.value_type == bool:
+        if self.value_type is bool:
             if self.default_value is None:
                 self.logger.error(
                     'A configuration option (%s) with the type bool must have a default value.', self.name)
@@ -187,7 +187,7 @@ class ConfigOptionDefinition:
         if value is None:
             return None
 
-        if type(value) == str and not value:
+        if isinstance(value, str) and not value:
             return None
 
         try:
@@ -370,7 +370,7 @@ class ConfigOptionDefinition:
         option_definition = self.enabled_by
         value = option_definition.get_value(config_section)
         value_type = type(value)
-        if value_type == bool:
+        if value_type is bool:
             return value
         else:
             self.logger.error(
@@ -565,9 +565,9 @@ class ConfigSectionDefinition:
             return False
 
         value_type = type(value)
-        if value_type == bool:
+        if value_type is bool:
             return value
-        elif value_type == str:
+        elif value_type is str:
             return value == self.name
         else:
             self.logger.error(
@@ -680,7 +680,7 @@ class ConfigVerifierDefinition:
     def verify(self) -> bool | VerificationError:
         from utils.config import Config
         args = [p.option_definition.get_value(Config().get_section(p.section_name))
-                if type(p) == ConfigSectionOptionDefinition
+                if isinstance(p, ConfigSectionOptionDefinition)
                 else p
                 for p in self.parameters]
 
@@ -813,7 +813,7 @@ class ConfigSelectorDefinition:
         from utils.config import Config
         arg_names = inspect.getfullargspec(self.function)[0]
         args = [p.option_definition.get_value(Config().get_section(p.section_name))
-                if type(p) == ConfigSectionOptionDefinition
+                if isinstance(p, ConfigSectionOptionDefinition)
                 else p for p in self.parameters]
 
         if 'parent' in arg_names:

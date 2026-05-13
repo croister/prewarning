@@ -22,7 +22,7 @@ class _StartListSourceBase(ConfigConsumer):
     description = _NOT_OVERRIDDEN
 
     def __repr__(self) -> str:
-        return f'_StartListSourceBase()'
+        return '_StartListSourceBase()'
 
     def __str__(self) -> str:
         return repr(self)

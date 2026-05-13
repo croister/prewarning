@@ -1129,7 +1129,8 @@ class TestVerificationError:
 
 class TestConfigVerifierDefinition:
     def test_init(self):
-        func = lambda a, b: True
+        def func(a, b):
+            return True
         v = ConfigVerifierDefinition(func, [], 'Custom message')
         assert v.function is func
         assert v.parameters == []
@@ -1307,7 +1308,8 @@ class TestSelectionError:
 
 class TestConfigSelectorDefinition:
     def test_init(self):
-        func = lambda: SelectionResult('Cap', 'Msg')
+        def func():
+            return SelectionResult('Cap', 'Msg')
         sel = ConfigSelectorDefinition(func, [], 'Custom msg')
         assert sel.function is func
         assert sel.parameters == []

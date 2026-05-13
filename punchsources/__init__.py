@@ -1,8 +1,5 @@
 import inspect
-import logging
-from typing import Dict, Type
 
-from punchsources import punch_source_olresultat_se, punch_source_ola_mysql
 from punchsources._base import _PunchSourceBase, _NOT_OVERRIDDEN
 from punchsources.punch_source_olresultat_se import PunchSourceOlresultatSe
 from utils.config import Config
@@ -79,8 +76,6 @@ def _validate_sources():
 
 def _register_common_source():
     global COMMON_PUNCH_SOURCE, __all__
-
-    logger = logging.getLogger(LOGGER_NAME)
 
     COMMON_PUNCH_SOURCE = ConfigOptionDefinition(
         name='PunchSource',

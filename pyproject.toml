@@ -18,6 +18,7 @@ dev = [
     "mypy>=2.1.0",
     "pyinstaller>=6",
     "pytest>=9.0.3",
+    "ruff>=0.11.0",
     "types-decorator>=5.2.0.20260508",
     "types-pymysql>=1.1.0.20260508",
 ]
@@ -38,6 +39,10 @@ show_error_codes = true
 [[tool.mypy.overrides]]
 module = ["wx.*", "consolemenu", "consolemenu.*", "wx", "consolemenu"]
 ignore_missing_imports = true
+
+[tool.ruff]
+target-version = "py314"
+exclude = ["dist", "build"]
 
 [build-system]
 requires = ["hatchling"]
