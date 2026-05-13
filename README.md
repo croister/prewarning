@@ -74,6 +74,7 @@ This project uses [uv](https://docs.astral.sh/uv/) for dependency management and
 | Build Python package (sdist/wheel) | `uv build` |
 | Build executable (PyInstaller) | `uv run scripts/package.py` |
 | Clean build artifacts | `uv run scripts/clean.py` |
+| Run all CI checks locally | `uv run scripts/precommit.py` |
 
 ### Test structure
 
@@ -82,6 +83,17 @@ Tests live in `tests/` and use [pytest](https://docs.pytest.org/). Run them with
 ```
 uv run pytest
 ```
+
+### CI checks
+
+Before pushing, run all CI checks locally:
+
+```
+uv run scripts/precommit.py
+```
+
+This runs: YAML lint, spelling, Ruff lint, Ruff format, dependency audit,
+mypy type checking, and pytest. The same checks run in CI on every push.
 
 ### Upgrading
 
