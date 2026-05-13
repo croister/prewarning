@@ -19,6 +19,15 @@ jobs:
       - name: Lint (YAML) - workflow definition
         run: uvx yamllint .github/workflows/ && echo "No YAML issues found."
 
+  audit:
+    name: Audit (Dependencies)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v8.1.0
+      - name: Audit (Dependencies)
+        run: uv audit --preview-features audit
+
   codespell:
     name: Lint (Spelling)
     runs-on: ubuntu-latest
@@ -76,7 +85,7 @@ jobs:
 
   build:
     name: Build (${{ matrix.target }})
-    needs: [yamllint, codespell, ruff, test, typecheck]
+    needs: [yamllint, audit, codespell, ruff, test, typecheck]
     strategy:
       fail-fast: false
       matrix:
