@@ -10,17 +10,18 @@ on:
 
 
 jobs:
-  lint:
-    name: Lint
+  yamllint:
+    name: YAML lint (workflow definition)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
       - uses: astral-sh/setup-uv@v8.1.0
-      - name: YAML lint
-        run: uv run --with yamllint yamllint .github/workflows/
+      - name: YAML lint (workflow definition)
+        run: uv run --with yamllint yamllint .github/workflows/ && echo "No YAML issues found."
 
   test:
     name: Tests
+    needs: [yamllint]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
