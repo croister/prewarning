@@ -955,6 +955,14 @@ class PreWarning(
     def _apply_config_update(self):
         self._parse_config()
         self.update_sources()
+        if self.punch_source is not None and not self.punch_source.is_running():
+            self.punch_source.start()
+        start_not_running = (
+            self.start_list_source is not None
+            and not self.start_list_source.is_running()
+        )
+        if start_not_running:
+            self.start_list_source.start()
 
     def update_sources(self):
         if self.punch_source_name not in PUNCH_SOURCES:
