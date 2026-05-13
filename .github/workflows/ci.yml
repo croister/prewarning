@@ -10,6 +10,15 @@ on:
 
 
 jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v8.1.0
+      - name: YAML lint
+        run: uv run --with yamllint yamllint .github/workflows/
+
   test:
     name: Tests
     runs-on: ubuntu-latest
