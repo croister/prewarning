@@ -131,6 +131,7 @@ class _StateSaverGroup:
 
     def __validate(self):
         """Validate the state file"""
+        assert self._config_section is not None
         for option_definition in self.runtime_state_group.option_definitions.values():
             value = option_definition.get_value(self._config_section)
             option_validation_errors = option_definition.validate(value)

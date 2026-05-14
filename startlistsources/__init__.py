@@ -1,10 +1,19 @@
 import inspect
 
+from typing import TYPE_CHECKING
 from startlistsources._base import _StartListSourceBase, _NOT_OVERRIDDEN
 from startlistsources.start_list_source_ola_mysql import StartListSourceOlaMySql
 from utils.config import Config
 from utils.config_definitions import ConfigOptionDefinition
 
+if TYPE_CHECKING:
+    _StartListSourceClass = type[_StartListSourceBase]
+else:
+    _StartListSourceClass = type
+
+__all__: list[str] = []
+START_LIST_SOURCES: dict[str, _StartListSourceClass]
+COMMON_START_LIST_SOURCE: ConfigOptionDefinition
 
 LOGGER_NAME = "StartListSources"
 
@@ -28,8 +37,6 @@ def _import_all_modules():
     import os
     import traceback
 
-    global __all__
-    __all__ = []
     globals_, locals_ = globals(), locals()
 
     os.chdir(os.path.dirname(__file__))
@@ -54,7 +61,7 @@ def _import_all_modules():
 
 
 def _populate_start_list_sources():
-    global START_LIST_SOURCES, __all__
+    global START_LIST_SOURCES
     START_LIST_SOURCES = dict()
     __all__.append("START_LIST_SOURCES")
 
@@ -87,8 +94,7 @@ def _validate_sources():
 
 
 def _register_common_source():
-    global COMMON_START_LIST_SOURCE, __all__
-
+    global COMMON_START_LIST_SOURCE
     COMMON_START_LIST_SOURCE = ConfigOptionDefinition(
         name="StartListSource",
         display_name="Start List Source",

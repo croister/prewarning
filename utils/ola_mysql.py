@@ -116,7 +116,7 @@ class EventForm(Enum):
     def __eq__(self, other):
         if isinstance(other, str):
             return self.value == other
-        return super(Enum).__eq__(other)
+        return super().__eq__(other)
 
 
 @unique
@@ -148,7 +148,7 @@ class EventFormType(Enum):
     def __eq__(self, other):
         if isinstance(other, str) or isinstance(other, EventForm):
             return other in self.value
-        return super(Enum).__eq__(other)
+        return super().__eq__(other)
 
 
 def _generate_in_format_str(no_of_values: int):
@@ -1011,6 +1011,9 @@ class OlaMySql(ConfigConsumer, Singleton, metaclass=_OlaMySqlMeta):
     def get_database_names(self) -> List[str]:
         self.logger.debug("get_database_names")
 
+        assert self.host is not None
+        assert self.user is not None
+        assert self.password is not None
         connection = connect(self.host, self.user, self.password)
         with connection:
             database_names = get_database_names(connection)
@@ -1030,6 +1033,9 @@ class OlaMySql(ConfigConsumer, Singleton, metaclass=_OlaMySqlMeta):
                 )
             )
 
+        assert self.host is not None
+        assert self.user is not None
+        assert self.password is not None
         connection = connect(self.host, self.user, self.password, self.database)
 
         if self.ola_db_version is None:
@@ -1054,6 +1060,7 @@ class OlaMySql(ConfigConsumer, Singleton, metaclass=_OlaMySqlMeta):
         if self.ola_db_version is None:
             connection = self._connect()
             connection.close()
+        assert self.ola_db_version is not None
         return self.ola_db_version
 
     def get_events(
@@ -1207,6 +1214,8 @@ class OlaMySql(ConfigConsumer, Singleton, metaclass=_OlaMySqlMeta):
             raise ValueError("A Event Race needs to be selected first")
 
         connection = self._connect()
+        assert self.ola_db_version is not None
+        assert self.is_relay is not None
         with connection:
             split_time_controls = get_event_race_split_time_controls(
                 connection,
@@ -1229,6 +1238,7 @@ class OlaMySql(ConfigConsumer, Singleton, metaclass=_OlaMySqlMeta):
             last_modify_time = "0000-00-00 00:00:00.000"
 
         connection = self._connect()
+        assert self.ola_db_version is not None
         with connection:
             event_split_times = get_event_race_split_times(
                 connection,

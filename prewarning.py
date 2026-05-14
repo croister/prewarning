@@ -448,8 +448,8 @@ class PreWarning(
         self.sound = Sound()
 
         # Set up the queues used for punches and announcements
-        self.punch_queue = Queue()
-        self.announcement_queue = Queue()
+        self.punch_queue: Queue = Queue()
+        self.announcement_queue: Queue = Queue()
 
         # Init the thread used to process punches from the punch queue
         self.punch_processor = Thread(
@@ -902,6 +902,7 @@ class PreWarning(
 
     def _play_test_sound(self):
         self.logger.debug("Play Test Sound")
+        assert self.test_sound_file is not None
         self.sound.play_sound(self.test_sound_file)
 
     def _notify_ip(self):
@@ -961,7 +962,7 @@ class PreWarning(
             self.start_list_source is not None
             and not self.start_list_source.is_running()
         )
-        if start_not_running:
+        if start_not_running and self.start_list_source is not None:
             self.start_list_source.start()
 
     def update_sources(self):
@@ -1053,8 +1054,10 @@ class PreWarning(
             self._notify_ip()
         self.punch_processor.start()
         self.announcement_processor.start()
-        self.punch_source.start()
-        self.start_list_source.start()
+        if self.punch_source is not None:
+            self.punch_source.start()
+        if self.start_list_source is not None:
+            self.start_list_source.start()
 
     def punch_received(self, punch: Dict[str, str]):
         self.logger.debug("punch_received: %s", punch)
@@ -1115,6 +1118,8 @@ class PreWarning(
             sound = self.announcement_queue.get()
             with self._last_sound_time_lock:
                 self.logger.debug("last_sound_time: %s", self.last_sound_time)
+                assert self.intro_sound_trigger_timeout_seconds is not None
+                assert self.intro_sound_file is not None
                 if (
                     self.last_sound_time is None
                     or (datetime.now() - self.last_sound_time).total_seconds()

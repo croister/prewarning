@@ -275,7 +275,7 @@ class ConfigSectionPanel(wx.Panel):
                             )
                         )
 
-    def _create_widgets(self):
+    def _create_widgets(self) -> None:
         main_sizer = wx.BoxSizer(wx.VERTICAL)
         self.options_sizer = wx.FlexGridSizer(
             rows=len(self.config_section_definition.option_definitions),
@@ -283,6 +283,7 @@ class ConfigSectionPanel(wx.Panel):
             hgap=5,
             vgap=5,
         )
+        assert self.options_sizer is not None
 
         self.section_label = wx.StaticText(
             self, label=self.config_section_definition.display_name
@@ -471,14 +472,14 @@ class ConfigSectionPanel(wx.Panel):
         return len(valid_values) > 20
 
     @staticmethod
-    def _use_combo_box_for(valid_values: List[Any]) -> bool:
+    def _use_combo_box_for(valid_values: List[Any] | None) -> bool:
         return (
             valid_values is not None
             and not ConfigSectionPanel._too_large_for_combo_box(valid_values)
         )
 
     @staticmethod
-    def _use_selector_for(valid_values: List[Any]) -> bool:
+    def _use_selector_for(valid_values: List[Any] | None) -> bool:
         return valid_values is not None and ConfigSectionPanel._too_large_for_combo_box(
             valid_values
         )
@@ -490,7 +491,7 @@ class ConfigSectionPanel(wx.Panel):
             if validate:
                 self._dialog.Validate()
 
-    def update_visibility(self):
+    def update_visibility(self) -> None:
         self.TransferDataFromWindow()
 
         for (
@@ -812,11 +813,12 @@ class ConfigDialog(wx.Dialog):
 
         self.logger.debug(self)
 
-    def _create_widgets(self):
+    def _create_widgets(self) -> None:
         scroll_panel = wx.lib.scrolledpanel.ScrolledPanel(self)
 
         button_sizer = wx.StdDialogButtonSizer()
         self.sections_sizer = wx.BoxSizer(wx.VERTICAL)
+        assert self.sections_sizer is not None
         main_sizer = wx.BoxSizer(wx.VERTICAL)
 
         for config_section_definition_name in self.config.CONFIG_SECTION_DEFINITIONS:
@@ -870,7 +872,8 @@ class ConfigDialog(wx.Dialog):
         self.SetSizer(main_sizer)
         self.Fit()
 
-    def update_visibility(self):
+    def update_visibility(self) -> None:
+        assert self.sections_sizer is not None
         self.TransferDataFromWindow()
 
         for config_section_definition_name in self.config.CONFIG_SECTION_DEFINITIONS:

@@ -297,7 +297,8 @@ class Config(LoggingEventHandler, Singleton):
         self.logger.debug("read_config")
 
         with self._config_lock:
-            self.observer.unschedule_all()
+            if self.observer is not None:
+                self.observer.unschedule_all()
 
             self.config.read(self.config_file_location)
 
@@ -312,12 +313,13 @@ class Config(LoggingEventHandler, Singleton):
                     or self.prev_config_sections[section_name] != config_section
                 ):
                     self.config_sections[section_name] = config_section
-                    self.prev_config_sections[section_name] = dict(config_section)
+                    self.prev_config_sections[section_name] = config_section
                     updated_sections.append(section_name)
 
-            self.observer.schedule(
-                event_handler=self, path=self.config_file_location.parent.as_posix()
-            )
+            if self.observer is not None:
+                self.observer.schedule(
+                    event_handler=self, path=self.config_file_location.parent.as_posix()
+                )
 
             self._notify_updates(updated_sections)
 

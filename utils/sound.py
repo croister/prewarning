@@ -321,10 +321,11 @@ class Sound(ConfigConsumer, Singleton, metaclass=_SoundMeta):
             else:
                 self.logger.debug("Sound playback disabled, not playing.")
 
-    def play_sound_lang(self, sound: str, lang: str, override: bool = False):
+    def play_sound_lang(self, sound: str, lang: str | None, override: bool = False):
         self.logger.debug("Play lang requested: %s Lang: %s", sound, lang)
         if lang is None:
             lang = self.default_language
+        assert lang is not None
         lang_sound = Path(lang) / sound
         self.play_sound(lang_sound.as_posix(), override)
 

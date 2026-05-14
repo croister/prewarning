@@ -601,6 +601,7 @@ class PunchSourceOlaMySql(StateSaverMixin, _PunchSourceBase):
         self.logger.debug("Started")
         while not self._stop_event.is_set():
             try:
+                assert self.control_ids is not None
                 split_times = self.ola_mysql.get_event_race_split_times(
                     self.control_ids, self.last_modify_time
                 )

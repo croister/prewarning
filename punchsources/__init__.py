@@ -1,10 +1,19 @@
 import inspect
 
+from typing import TYPE_CHECKING
 from punchsources._base import _PunchSourceBase, _NOT_OVERRIDDEN
 from punchsources.punch_source_olresultat_se import PunchSourceOlresultatSe
 from utils.config import Config
 from utils.config_definitions import ConfigOptionDefinition
 
+if TYPE_CHECKING:
+    _PunchSourceClass = type[_PunchSourceBase]
+else:
+    _PunchSourceClass = type
+
+__all__: list[str] = []
+PUNCH_SOURCES: dict[str, _PunchSourceClass]
+COMMON_PUNCH_SOURCE: ConfigOptionDefinition
 
 LOGGER_NAME = "PunchSources"
 
@@ -28,8 +37,6 @@ def _import_all_modules():
     import os
     import traceback
 
-    global __all__
-    __all__ = []
     globals_, locals_ = globals(), locals()
 
     os.chdir(os.path.dirname(__file__))
@@ -54,7 +61,7 @@ def _import_all_modules():
 
 
 def _populate_punch_sources():
-    global PUNCH_SOURCES, __all__
+    global PUNCH_SOURCES
     PUNCH_SOURCES = dict()
     __all__.append("PUNCH_SOURCES")
 
@@ -87,8 +94,7 @@ def _validate_sources():
 
 
 def _register_common_source():
-    global COMMON_PUNCH_SOURCE, __all__
-
+    global COMMON_PUNCH_SOURCE
     COMMON_PUNCH_SOURCE = ConfigOptionDefinition(
         name="PunchSource",
         display_name="Punch Source",

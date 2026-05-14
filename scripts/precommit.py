@@ -54,6 +54,7 @@ def main():
             "uv",
             "run",
             "mypy",
+            "--check-untyped-defs",
             "prewarning.py",
             "utils",
             "validators",

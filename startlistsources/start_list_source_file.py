@@ -341,9 +341,10 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
 
     def stop(self):
         self._running = False
-        if self.observer.is_alive():
-            self.observer.stop()
-            self.observer.join()
+        if self.observer is not None:
+            if self.observer.is_alive():
+                self.observer.stop()
+                self.observer.join()
 
     def is_running(self) -> bool:
         return self._running
@@ -403,15 +404,17 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
         )
 
         with self._observer_lock:
-            self.observer.unschedule_all()
-            self.observer.schedule(
-                event_handler=self, path=self.start_list_file.parent.as_posix()
-            )
-            if self._running and not self.observer.is_alive():
-                self.observer.start()
+            if self.observer is not None:
+                self.observer.unschedule_all()
+                self.observer.schedule(
+                    event_handler=self, path=self.start_list_file.parent.as_posix()
+                )
+                if self._running and not self.observer.is_alive():
+                    self.observer.start()
 
     def _read_start_list(self):
         with self._data_lock:
+            assert self.start_list_file is not None
             if self.start_list_file.as_posix().lower().endswith(".zip"):
                 with ZipFile(self.start_list_file, "r") as archive:
                     data = archive.read("SOFTSTRT.XML")
@@ -463,7 +466,7 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
                 team_bib_number = int(_get_data(xml_team, "ns:BibNumber", ns))
                 self.team_names[team_bib_number] = team_name
 
-                team = dict()
+                team: dict[int, dict[str, dict[str, str | bool]]] = dict()
                 last_leg = 0
                 team_members = xml_team.findall("ns:TeamMemberStart", ns)
                 for team_member in team_members:
@@ -507,8 +510,8 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
                 if team and last_leg in team:
                     leg = team[last_leg]
                     if leg:
-                        for team_member in leg.values():
-                            team_member["is_last_leg"] = True
+                        for member in leg.values():
+                            member["is_last_leg"] = True
 
                 team = dict(natsorted(team.items()))
 
@@ -524,6 +527,7 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
             self.logger.debug("Teams: %s", str(self.team_names))
             self.logger.debug("Runners: %s", str(self.runners))
 
+            assert self.start_list_update_sound_file is not None
             Sound.play(self.start_list_update_sound_file)
 
     def lookup_from_card_number(self, card_number: str) -> Dict[str, str] | None:
