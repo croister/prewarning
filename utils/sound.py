@@ -29,10 +29,24 @@ from utils.config import (
     Config,
 )
 from utils.config_definitions import Path, VerificationResult
+from utils.constants import AUDIO_EXTENSION, DING_FILENAME
 from utils.singleton import Singleton
 
-
 SOUNDS_DIR = "sounds"
+
+MPG123_BINARY = "mpg123"
+MPG123_RELATIVE_PATH = f"mpg123/win/{MPG123_BINARY}"
+MPG123_VERSION_ARGUMENT = "--version"
+MPG123_QUIET_ARGUMENT = "-q"
+MPG123_NOT_FOUND_MSG = (
+    "Unable to locate the mpg123 binary, please install it and add it to the path."
+)
+
+
+_VM_KEY_DEFAULT_COUNTRY = "defaultcountry"
+_VM_KEY_DEFAULT_VOICE = "defaultvoice"
+_VM_KEY_FALLBACK_VOICE = "fallbackvoice"
+_VM_SECTION_NAME = "VoiceManager"
 
 
 class SoundFolder(LoggingEventHandler, Singleton):
@@ -53,7 +67,6 @@ class SoundFolder(LoggingEventHandler, Singleton):
 
         self._sounds_dir_location = None
 
-        self._languages = None
         self._all_sounds = None
 
         self._lock = Lock()
@@ -96,7 +109,6 @@ class SoundFolder(LoggingEventHandler, Singleton):
         self.logger.debug("Reset")
 
         with self._lock:
-            self._languages = None
             self._all_sounds = None
 
     def get_sounds_dir(self) -> Path:
@@ -105,18 +117,6 @@ class SoundFolder(LoggingEventHandler, Singleton):
                 Path(__file__).resolve().parent.parent.absolute() / SOUNDS_DIR
             )
         return self._sounds_dir_location
-
-    def get_languages(self) -> List[str]:
-        with self._lock:
-            if self._languages is None:
-                sounds_dir_location = self.get_sounds_dir()
-                self._languages = []
-                for child in sounds_dir_location.iterdir():
-                    if child.is_dir():
-                        self._languages.append(child.name)
-                self._languages = natsorted(self._languages)
-
-            return self._languages
 
     @staticmethod
     def _path_sort_key(path: Path) -> str:
@@ -131,11 +131,15 @@ class SoundFolder(LoggingEventHandler, Singleton):
             for child in current_dir.iterdir():
                 if child.is_dir():
                     directories.append(child)
-                else:
+                elif child.suffix.lower() == AUDIO_EXTENSION:
                     files.append(child.relative_to(sounds_dir_location))
 
             files = natsorted(files, key=SoundFolder._path_sort_key)
             all_sounds.extend(files)
+            for f in files:
+                bare = Path(f.name)
+                if bare not in all_sounds:
+                    all_sounds.append(bare)
 
             directories = natsorted(directories, key=SoundFolder._path_sort_key)
             for directory in directories:
@@ -167,16 +171,12 @@ class Sound(ConfigConsumer, Singleton, metaclass=_SoundMeta):
         Sound().play_sound(sound, override)
 
     @classmethod
-    def play_lang(cls, sound: str, lang: str, override: bool = False):
-        Sound().play_sound_lang(sound, lang, override)
+    def play_voice(cls, sound: str, voice: str | None, override: bool = False):
+        Sound().play_voice_sound(sound, voice, override)
 
     @classmethod
-    def play_default_lang(cls, sound: str, override: bool = False):
-        Sound().play_sound_default_lang(sound, override)
-
-    """@classmethod
-    def play_default_foreign_lang(cls, sound: str, override: bool = False):
-        Sound().play_sound_default_foreign_lang(sound, override)"""
+    def play_file(cls, path: str | Path, override: bool = False):
+        Sound().play_file_path(path, override)
 
     def _run_cmd(self, cmd: List[str]) -> int:
         self.logger.debug("_run_cmd(%s)", cmd)
@@ -195,19 +195,18 @@ class Sound(ConfigConsumer, Singleton, metaclass=_SoundMeta):
 
     def _get_player_command(self) -> str:
         try:
-            self._run_cmd(["mpg123", "--version"])
-            return "mpg123"
+            self._run_cmd([MPG123_BINARY, MPG123_VERSION_ARGUMENT])
+            return MPG123_BINARY
         except FileNotFoundError, subprocess.CalledProcessError:
             try:
-                self._run_cmd(["../mpg123/win/mpg123", "--version"])
-                return "../mpg123/win/mpg123"
+                mpg123_path = (
+                    Path(__file__).resolve().parent.parent / MPG123_RELATIVE_PATH
+                )
+                self._run_cmd([str(mpg123_path), MPG123_VERSION_ARGUMENT])
+                return str(mpg123_path)
             except FileNotFoundError, subprocess.CalledProcessError:
-                self.logger.error(
-                    "Unable to locate the mpg123 binary, please install it and add it to the path."
-                )
-                raise FileNotFoundError(
-                    "Unable to locate the mpg123 binary, please install it and add it to the path."
-                )
+                self.logger.error(MPG123_NOT_FOUND_MSG)
+                raise FileNotFoundError(MPG123_NOT_FOUND_MSG)
 
     name = __qualname__
 
@@ -219,32 +218,11 @@ class Sound(ConfigConsumer, Singleton, metaclass=_SoundMeta):
         default_value=True,
     )
 
-    CONFIG_OPTION_DEFAULT_LANGUAGE = ConfigOptionDefinition(
-        name="DefaultLanguage",
-        display_name="Default Language",
-        value_type=str,
-        description="Selects the default language to use for sounds.",
-        valid_values_gen=SoundFolder().get_languages,
-        default_value="sv",
-        enabled_by=CONFIG_OPTION_SOUND_ENABLED,
-    )
-
-    """CONFIG_OPTION_FOREIGN_DEFAULT_LANGUAGE = ConfigOptionDefinition(
-        name='DefaultForeignLanguage',
-        display_name='Default Foreign Language',
-        value_type=str,
-        description='Selects the default language to use for foreign runners for sounds.',
-        valid_values=get_languages(),
-        default_value='en'
-    )"""
-
     SOUND_CONFIG_SECTION_DEFINITION = ConfigSectionDefinition(
         name=name,
         display_name=name,
         option_definitions=[
             CONFIG_OPTION_SOUND_ENABLED,
-            CONFIG_OPTION_DEFAULT_LANGUAGE,
-            # CONFIG_OPTION_FOREIGN_DEFAULT_LANGUAGE,
         ],
         sort_key_prefix=10,
     )
@@ -256,15 +234,14 @@ class Sound(ConfigConsumer, Singleton, metaclass=_SoundMeta):
         return cls.SOUND_CONFIG_SECTION_DEFINITION
 
     def __repr__(self) -> str:
-        return (
-            f"Sound(sound_enabled={self.sound_enabled},"
-            f" default_language={self.default_language})"
-        )
+        return f"Sound(sound_enabled={self.sound_enabled})"
 
     def __str__(self) -> str:
         return repr(self)
 
     def __init__(self):
+        if hasattr(self, "_initialized"):
+            return
         super().__init__()
 
         if LOGGER_NAME != self.__class__.__name__:
@@ -279,8 +256,6 @@ class Sound(ConfigConsumer, Singleton, metaclass=_SoundMeta):
         self._sound_lock = Lock()
 
         self.sound_enabled = None
-        self.default_language = None
-        # self.default_foreign_language = None
 
         self.player_command = self._get_player_command()
 
@@ -289,6 +264,8 @@ class Sound(ConfigConsumer, Singleton, metaclass=_SoundMeta):
         self._parse_config()
 
         self.logger.debug(self)
+
+        self._initialized = True
 
     def config_updated(self, section_names: List[str]):
         self._parse_config()
@@ -301,11 +278,10 @@ class Sound(ConfigConsumer, Singleton, metaclass=_SoundMeta):
                 config_section
             )
 
-            self.default_language = self.CONFIG_OPTION_DEFAULT_LANGUAGE.get_value(
-                config_section
-            )
-
-            # self.default_foreign_language = self.CONFIG_OPTION_FOREIGN_DEFAULT_LANGUAGE.get_value(config_section)
+            voice_section = Config().get_section(_VM_SECTION_NAME)
+            self.default_country = voice_section.get(_VM_KEY_DEFAULT_COUNTRY, "SWE")
+            self.default_voice = voice_section.get(_VM_KEY_DEFAULT_VOICE, "")
+            self.fallback_voice = voice_section.get(_VM_KEY_FALLBACK_VOICE, "")
 
     def play_sound(self, sound: str, override: bool = False):
         self.logger.debug("Play requested: %s", sound)
@@ -316,36 +292,81 @@ class Sound(ConfigConsumer, Singleton, metaclass=_SoundMeta):
                     self.logger.error(
                         "The requested sound does not exist: %s", sound_file
                     )
-                    sound_file = self.sound_folder.get_sounds_dir() / "ding.mp3"
-                self._run_cmd([self.player_command, "-q", sound_file.as_posix()])
+                    sound_file = self.sound_folder.get_sounds_dir() / DING_FILENAME
+                self._run_cmd(
+                    [self.player_command, MPG123_QUIET_ARGUMENT, sound_file.as_posix()]
+                )
             else:
                 self.logger.debug("Sound playback disabled, not playing.")
 
-    def play_sound_lang(self, sound: str, lang: str | None, override: bool = False):
-        self.logger.debug("Play lang requested: %s Lang: %s", sound, lang)
-        if lang is None:
-            lang = self.default_language
-        assert lang is not None
-        lang_sound = Path(lang) / sound
-        self.play_sound(lang_sound.as_posix(), override)
+    def play_voice_sound(self, sound: str, voice: str | None, override: bool = False):
+        self.logger.debug("Play voice requested: %s Voice: %s", sound, voice)
+        if voice is None:
+            voice = self.default_voice or None
+        if voice is None:
+            self.play_sound(sound, override)
+        else:
+            voice_sound = Path(voice) / sound
+            self.play_sound(voice_sound.as_posix(), override)
 
-    def play_sound_default_lang(self, sound: str, override: bool = False):
-        self.logger.debug("Play default lang requested: %s", sound)
-        self.play_sound_lang(sound, self.default_language, override)
+    def play_file_path(self, path: str | Path, override: bool = False):
+        self.logger.debug("Play file requested: %s", path)
+        with self._sound_lock:
+            if self.sound_enabled or override:
+                sound_file = Path(path)
+                if not os.path.exists(sound_file):
+                    self.logger.error(
+                        "The requested file does not exist: %s", sound_file
+                    )
+                    sound_file = self.sound_folder.get_sounds_dir() / DING_FILENAME
+                self._run_cmd(
+                    [self.player_command, MPG123_QUIET_ARGUMENT, str(sound_file)]
+                )
+            else:
+                self.logger.debug("Sound playback disabled, not playing.")
 
-    """def play_sound_default_foreign_lang(self, sound: str):
-        self.logger.debug('Play default foreign lang requested: %s', sound)
-        self.play_sound_lang(sound, self.default_foreign_language)"""
+    def resolve_voice(self, runner_country: str | None) -> str | None:
+        if not runner_country:
+            return self.default_voice or None
+        elif runner_country.upper() == self.default_country.upper():
+            return self.default_voice or None
+        return self.fallback_voice or None
+
+
+def resolve_sound_for_voice(sound: str, voice: str | None) -> str:
+    """Resolve a bare filename for voice playback.
+
+    For bare filenames (no directory component), checks root sounds/ first.
+    Falls back to {voice}/{sound} if available.
+    For paths with a directory component, returns as-is.
+    """
+    sound_path = Path(sound)
+    if sound_path.parent == Path("."):
+        folder = SoundFolder()
+        if (folder.get_sounds_dir() / sound).is_file():
+            return sound
+    if voice:
+        return (Path(voice) / sound).as_posix()
+    return sound
 
 
 def verify_sound(sound: str):
-    sound_file = SoundFolder().get_sounds_dir() / sound
-    if not sound_file.is_file():
+    voice = None
+    try:
+        from utils.config import Config
+
+        section = Config().get_section(_VM_SECTION_NAME)
+        voice = section.get(_VM_KEY_DEFAULT_VOICE, None)
+    except Exception:
+        pass
+    resolved = resolve_sound_for_voice(sound, voice)
+    folder = SoundFolder()
+    if not (folder.get_sounds_dir() / resolved).is_file():
         return VerificationResult(
-            message=f'The sound file "{sound}" does not exist.', status=False
+            message=f'The sound file "{resolved}" does not exist.', status=False
         )
     try:
-        Sound.play(sound, True)
+        Sound.play(resolved, True)
         return True
     except Exception as e:
         logging.getLogger(LOGGER_NAME).debug("verify_sound: %s", e)

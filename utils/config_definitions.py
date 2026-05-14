@@ -361,18 +361,20 @@ class ConfigOptionDefinition:
 
         if valid_values is not None:
             if value not in valid_values:
-                self.logger.error(
-                    "The %s (%s) for the configuration option %s is not in the valid values list (%s).",
-                    value_name,
-                    value,
-                    self.name,
-                    str(valid_values),
-                )
-                validation_errors.append(
-                    "The {} ({}) is not in the valid values list ({}).".format(
-                        value_name, self.name, str(valid_values)
+                is_bare_filename = isinstance(value, Path) and value.parent == Path(".")
+                if not is_bare_filename:
+                    self.logger.error(
+                        "The %s (%s) for the configuration option %s is not in the valid values list (%s).",
+                        value_name,
+                        value,
+                        self.name,
+                        str(valid_values),
                     )
-                )
+                    validation_errors.append(
+                        "The {} ({}) is not in the valid values list ({}).".format(
+                            value_name, self.name, str(valid_values)
+                        )
+                    )
         elif self.validator is not None:
             result = self.validator(value)
             if not result:

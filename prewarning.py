@@ -37,7 +37,13 @@ from utils.config_definitions import (
     ConfigSectionOptionDefinition,
 )
 from utils.config_dialog import ConfigDialog
-from utils.constants import CONFIGURATION_DIR, APPLICATION_DIR
+from utils.constants import (
+    CONFIGURATION_DIR,
+    APPLICATION_DIR,
+    AUDIO_EXTENSION,
+    DING_FILENAME,
+    TESTING_FILENAME,
+)
 from utils.about_dialog import AboutDialog
 from utils.help_dialog import HelpDialog
 from utils.hotkey_bindings import (
@@ -175,7 +181,7 @@ class PreWarning(
         display_name="Intro Sound",
         value_type=Path,
         description="The path to the sound file to use as the intro sound before announcements.",
-        default_value=Path("ding.mp3"),
+        default_value=Path(DING_FILENAME),
         valid_values_gen=get_all_sounds,
         enabled_by=CONFIG_OPTION_ENABLE_INTRO_SOUND,
     )
@@ -190,7 +196,7 @@ class PreWarning(
         display_name="Test Sound",
         value_type=Path,
         description="The path to the sound file to use as the test sound.",
-        default_value=Path("en/Testing.mp3"),
+        default_value=Path(TESTING_FILENAME),
         valid_values_gen=get_all_sounds,
     )
 
@@ -290,6 +296,13 @@ class PreWarning(
                 handler=self._config_dialog,
                 description="Opens the Settings Dialog",
                 bitmap_name=wx.ART_EXECUTABLE_FILE,
+            ),
+            HotKeyBindingDefinition(
+                name="Voice Manager",
+                hotkey=HotKeyDefinition(key_code=ord("M")).with_ctrl().with_shift(),
+                handler=self._open_voice_manager,
+                description="Opens the Voice Manager dialog",
+                bitmap_name=wx.ART_CDROM,
             ),
             HotKeyBindingDefinition(
                 name="Help",
@@ -438,9 +451,7 @@ class PreWarning(
                 validation_errors = self.config.validate()
             else:
                 raise ValueError(
-                    "The configuration contains the following errors: {}.".format(
-                        str(validation_errors)
-                    )
+                    f"The configuration contains the following errors: {str(validation_errors)}."
                 )
         self._parse_config()
 
@@ -897,13 +908,35 @@ class PreWarning(
             strftime("%H:%M:%S"), str(self.test_bib_number), str(self.test_leg_number)
         )
         self.announcement_queue.put(
-            {"language": None, "sound": str(self.test_bib_number)}
+            {
+                "voice": self.sound.resolve_voice(None),
+                "sound": str(self.test_bib_number),
+            }
         )
 
     def _play_test_sound(self):
         self.logger.debug("Play Test Sound")
-        assert self.test_sound_file is not None
-        self.sound.play_sound(self.test_sound_file)
+        voice = self.sound.resolve_voice(None)
+        test_file = (
+            self.test_sound_file.as_posix()
+            if self.test_sound_file
+            else TESTING_FILENAME
+        )
+        self.sound.play_voice_sound(test_file, voice)
+
+    def _open_voice_manager(self):
+        import time as _time
+
+        _t0 = _time.time()
+        self.logger.debug("Open Voice Manager")
+        from utils.voice_manager_dialog import VoiceManagerDialog
+
+        self.logger.debug("Import VoiceManagerDialog took %.3fs", _time.time() - _t0)
+        dlg = VoiceManagerDialog(self)
+        self.logger.debug("Dialog construction took %.3fs", _time.time() - _t0)
+        dlg.ShowModal()
+        self.logger.debug("Dialog closed after %.3fs", _time.time() - _t0)
+        dlg.Destroy()
 
     def _notify_ip(self):
         self.logger.debug("Notify IP")
@@ -912,7 +945,7 @@ class PreWarning(
         local_ip_address = s.getsockname()[0]
         self.logger.debug("local_ip_address: %s", local_ip_address)
         for number in local_ip_address.split("."):
-            self.announcement_queue.put({"language": "en", "sound": number})
+            self.announcement_queue.put({"voice": None, "sound": number})
             pass
         s.close()
 
@@ -1097,11 +1130,12 @@ class PreWarning(
                 else:
                     punch.update(pre_warn_data)
 
-            language = None
             passed_time = self._to_str(punch["passedTime"]).rpartition(" ")[2]
             bib_number = self._to_str(punch["bibNumber"])
             relay_leg = self._to_str(punch["relayLeg"])
-            self.announcement_queue.put({"language": language, "sound": bib_number})
+            country = punch.get("country")
+            voice = self.sound.resolve_voice(country)
+            self.announcement_queue.put({"voice": voice, "sound": bib_number})
             wx.CallAfter(
                 self._add_pre_warning_with_refresh, passed_time, bib_number, relay_leg
             )
@@ -1132,8 +1166,8 @@ class PreWarning(
                 if sound["sound"] == "-":
                     self.sound.play_sound(self.intro_sound_file)
                 else:
-                    self.sound.play_lang(
-                        "{}.mp3".format(sound["sound"]), sound["language"]
+                    self.sound.play_voice_sound(
+                        f"{sound['sound']}{AUDIO_EXTENSION}", sound.get("voice")
                     )
 
                 self.last_sound_time = datetime.now()

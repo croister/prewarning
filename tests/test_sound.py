@@ -3,7 +3,12 @@ from unittest.mock import patch, MagicMock
 import subprocess
 import pytest
 
-from utils.sound import Sound, SoundFolder, verify_sound, get_all_sounds
+from utils.sound import (
+    Sound,
+    SoundFolder,
+    verify_sound,
+    get_all_sounds,
+)
 from utils.config_definitions import VerificationResult
 
 
@@ -83,24 +88,30 @@ class TestGetPlayerCommand:
 
     def test_falls_back_to_relative_path(self):
         sound = _make_sound()
+        from pathlib import Path
+
+        expected = str(Path(__file__).resolve().parent.parent / "mpg123/win/mpg123")
         with patch.object(sound, "_run_cmd") as mock_run:
             mock_run.side_effect = [
                 FileNotFoundError("mpg123 not found"),
                 None,
             ]
             cmd = sound._get_player_command()
-            assert cmd == "../mpg123/win/mpg123"
+            assert cmd == expected
             assert mock_run.call_count == 2
 
     def test_falls_back_on_called_process_error(self):
         sound = _make_sound()
+        from pathlib import Path
+
+        expected = str(Path(__file__).resolve().parent.parent / "mpg123/win/mpg123")
         with patch.object(sound, "_run_cmd") as mock_run:
             mock_run.side_effect = [
                 subprocess.CalledProcessError(1, ["mpg123", "--version"]),
                 None,
             ]
             cmd = sound._get_player_command()
-            assert cmd == "../mpg123/win/mpg123"
+            assert cmd == expected
             assert mock_run.call_count == 2
 
     def test_raises_when_not_found_anywhere(self):
@@ -164,43 +175,97 @@ class TestPlaySound:
             assert "-q" in args
 
 
-class TestPlaySoundLang:
-    def test_plays_with_lang_prefix(self, sound):
+class TestPlayVoice:
+    def test_plays_with_voice_prefix(self, sound):
         with (
             patch("utils.sound.os.path.exists", return_value=True),
             patch.object(sound, "_run_cmd") as mock_run,
         ):
             with patch.object(sound, "sound_enabled", True):
-                sound.play_sound_lang("hello.mp3", "en")
+                sound.play_voice_sound("hello.mp3", "en-voice")
 
             args = mock_run.call_args[0][0]
-            assert any("en" in a and "hello.mp3" in a for a in args)
+            assert any("en-voice" in a and "hello.mp3" in a for a in args)
 
-    def test_falls_back_to_default_language_when_none(self, sound):
+    def test_plays_without_prefix_when_voice_none(self, sound):
+        sound.default_voice = ""
         with (
             patch("utils.sound.os.path.exists", return_value=True),
             patch.object(sound, "_run_cmd") as mock_run,
         ):
             with patch.object(sound, "sound_enabled", True):
-                with patch.object(sound, "default_language", "sv"):
-                    sound.play_sound_lang("hello.mp3", None)
+                sound.play_voice_sound("hello.mp3", None)
 
             args = mock_run.call_args[0][0]
-            assert any("sv" in a and "hello.mp3" in a for a in args)
+            assert any("hello.mp3" in a for a in args)
+            assert not any("\\" in a or "//" in a for a in args)
 
-
-class TestPlaySoundDefaultLang:
-    def test_plays_with_default_language(self, sound):
+    def test_voice_none_falls_back_to_default_voice(self, sound):
+        sound.default_voice = "sv-SE-ExampleVoice"
         with (
             patch("utils.sound.os.path.exists", return_value=True),
             patch.object(sound, "_run_cmd") as mock_run,
         ):
             with patch.object(sound, "sound_enabled", True):
-                with patch.object(sound, "default_language", "de"):
-                    sound.play_sound_default_lang("hello.mp3")
+                sound.play_voice_sound("hello.mp3", None)
 
             args = mock_run.call_args[0][0]
-            assert any("de" in a and "hello.mp3" in a for a in args)
+            assert any("sv-SE-ExampleVoice" in a and "hello.mp3" in a for a in args)
+
+
+class TestPlayFile:
+    def test_plays_file_when_enabled(self, sound):
+        with (
+            patch("utils.sound.os.path.exists", return_value=True),
+            patch.object(sound, "_run_cmd") as mock_run,
+        ):
+            with patch.object(sound, "sound_enabled", True):
+                sound.play_file_path("some/path/test.mp3")
+
+            mock_run.assert_called_once()
+            args = mock_run.call_args[0][0]
+            assert any("test.mp3" in a for a in args)
+            assert "-q" in args
+
+    def test_does_not_play_when_disabled(self, sound):
+        with patch.object(sound, "_run_cmd") as mock_run:
+            with patch.object(sound, "sound_enabled", False):
+                sound.play_file_path("some/path/test.mp3", override=False)
+            mock_run.assert_not_called()
+
+    def test_plays_when_disabled_but_override(self, sound):
+        with (
+            patch("utils.sound.os.path.exists", return_value=True),
+            patch.object(sound, "_run_cmd") as mock_run,
+        ):
+            with patch.object(sound, "sound_enabled", False):
+                sound.play_file_path("some/path/test.mp3", override=True)
+            mock_run.assert_called_once()
+
+    def test_falls_back_to_ding_when_file_missing(self, sound):
+        with (
+            patch(
+                "utils.sound.os.path.exists",
+                side_effect=lambda p: "ding.mp3" in str(p),
+            ),
+            patch.object(sound, "_run_cmd") as mock_run,
+        ):
+            with patch.object(sound, "sound_enabled", True):
+                sound.play_file_path("missing.mp3")
+            args = mock_run.call_args[0][0]
+            assert any("ding.mp3" in a for a in args)
+
+    def test_classmethod_delegates_to_instance(self):
+        with (
+            patch("utils.sound.os.path.exists", return_value=True),
+            patch.object(Sound, "_get_player_command", return_value="mpg123"),
+            patch.object(Sound, "_run_cmd") as mock_run,
+        ):
+            Sound.play_file("some/path/test.mp3", override=True)
+
+            mock_run.assert_called_once()
+            args = mock_run.call_args[0][0]
+            assert any("test.mp3" in a for a in args)
 
 
 class TestVerifySound:
@@ -237,3 +302,53 @@ class TestGetAllSounds:
         ):
             result = get_all_sounds()
             assert result == ["a.mp3", "b.mp3"]
+
+
+class TestResolveVoice:
+    """Tests for Sound.resolve_voice()"""
+
+    def _make_sound_with_voices(
+        self, default_country="SWE", default_voice="sv-voice", fallback_voice="en-voice"
+    ):
+        s = _make_sound()
+        s.default_country = default_country
+        s.default_voice = default_voice
+        s.fallback_voice = fallback_voice
+        return s
+
+    def test_matching_country_returns_default_voice(self):
+        s = self._make_sound_with_voices()
+        assert s.resolve_voice("SWE") == "sv-voice"
+
+    def test_case_insensitive_match(self):
+        s = self._make_sound_with_voices()
+        assert s.resolve_voice("swe") == "sv-voice"
+
+    def test_mixed_case_match(self):
+        s = self._make_sound_with_voices()
+        assert s.resolve_voice("Swe") == "sv-voice"
+
+    def test_non_matching_country_returns_fallback_voice(self):
+        s = self._make_sound_with_voices()
+        assert s.resolve_voice("NOR") == "en-voice"
+
+    def test_none_country_returns_default_voice(self):
+        s = self._make_sound_with_voices()
+        assert s.resolve_voice(None) == "sv-voice"
+
+    def test_empty_country_returns_default_voice(self):
+        s = self._make_sound_with_voices()
+        assert s.resolve_voice("") == "sv-voice"
+
+    def test_returns_none_when_default_voice_empty_and_matching(self):
+        s = self._make_sound_with_voices(default_voice="")
+        assert s.resolve_voice("SWE") is None
+
+    def test_returns_none_when_fallback_voice_empty_and_non_matching(self):
+        s = self._make_sound_with_voices(fallback_voice="")
+        assert s.resolve_voice("NOR") is None
+
+    def test_matching_with_different_default_country(self):
+        s = self._make_sound_with_voices(default_country="NOR")
+        assert s.resolve_voice("NOR") == "sv-voice"
+        assert s.resolve_voice("SWE") == "en-voice"

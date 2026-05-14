@@ -85,3 +85,10 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+# PyCharm project settings
+.idea/
+
+# Test and execution artifacts
+data/
+test_data/

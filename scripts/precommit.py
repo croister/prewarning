@@ -37,7 +37,7 @@ def main():
         cmd=[
             "uvx",
             "codespell",
-            "--skip=.git,uv.lock,dist,__pycache__,logs,startlists,test_data",
+            "--skip=.git,uv.lock,dist,__pycache__,logs,startlists,test_data,**country_dict_by_ioc*",
             "--ignore-words-list=datas",
         ],
     )

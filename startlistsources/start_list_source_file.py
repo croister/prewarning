@@ -75,6 +75,26 @@ def _get_data(element, selector, ns):
         return None
 
 
+def _get_attr(element, selector, attr_name, ns):
+    data = element.find(selector, ns)
+    if data is not None:
+        return data.get(attr_name)
+    return None
+
+
+def _get_country(xml_team, team_member, ns):
+    country = _get_data(team_member, "ns:Person/ns:Nationality", ns)
+    if country:
+        return country
+    country = _get_attr(xml_team, "ns:Organisation/ns:Country", "code", ns)
+    if country:
+        return country
+    country = _get_attr(xml_team, "ns:Country", "code", ns)
+    if country:
+        return country
+    return None
+
+
 def _read_start_list(start_list_file: str):
     if start_list_file.lower().endswith(".zip"):
         archive = ZipFile(start_list_file, "r")
@@ -133,6 +153,7 @@ def _read_start_list(start_list_file: str):
                 team_member, "ns:Start/ns:ControlCard", ns
             )
             if team_member_control_card is not None:
+                country = _get_country(xml_team, team_member, ns)
                 runners[team_member_control_card] = {
                     "id": team_member_id,
                     "family": team_member_name_family,
@@ -142,6 +163,7 @@ def _read_start_list(start_list_file: str):
                     "team_bib_number": team_bib_number,
                     "bib_number": team_member_bib_number,
                     "control_card": team_member_control_card,
+                    "country": country,
                 }
                 if team_member_leg not in team:
                     team[team_member_leg] = dict()
@@ -489,6 +511,7 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
                         team_member, "ns:Start/ns:ControlCard", ns
                     )
                     if team_member_control_card is not None:
+                        country = _get_country(xml_team, team_member, ns)
                         self.runners[team_member_control_card] = {
                             "id": team_member_id,
                             "family": team_member_name_family,
@@ -498,6 +521,7 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
                             "team_bib_number": team_bib_number,
                             "bib_number": team_member_bib_number,
                             "control_card": team_member_control_card,
+                            "country": country,
                             "is_last_leg": False,
                         }
                         if team_member_leg not in team:
@@ -543,10 +567,20 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
                 team_bib_number = runner["team_bib_number"]
                 leg = runner["leg"]
                 is_last_leg = runner["is_last_leg"]
+                next_country = None
+                if not is_last_leg:
+                    next_leg = leg + 1
+                    team = self.teams.get(team_bib_number)
+                    if team and next_leg in team:
+                        next_runners = team[next_leg]
+                        if next_runners:
+                            first_next = next(iter(next_runners.values()))
+                            next_country = first_next.get("country")
                 return {
                     "bibNumber": team_bib_number,
                     "relayLeg": leg,
                     "isLastLeg": is_last_leg,
+                    "country": next_country,
                 }
             else:
                 self.logger.warning("Not found: %s", card_number)

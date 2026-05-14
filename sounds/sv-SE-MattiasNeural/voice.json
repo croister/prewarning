@@ -1,0 +1,18 @@
+{
+  "Name": "Microsoft Server Speech Text to Speech Voice (sv-SE, MattiasNeural)",
+  "ShortName": "sv-SE-MattiasNeural",
+  "Gender": "Male",
+  "Locale": "sv-SE",
+  "SuggestedCodec": "audio-24khz-48kbitrate-mono-mp3",
+  "FriendlyName": "Microsoft Mattias Online (Natural) - Swedish (Sweden)",
+  "Status": "GA",
+  "VoiceTag": {
+    "ContentCategories": [
+      "General"
+    ],
+    "VoicePersonalities": [
+      "Friendly",
+      "Positive"
+    ]
+  }
+}

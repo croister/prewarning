@@ -31,6 +31,32 @@ def _default_value(option_definition: ConfigOptionDefinition):
     return value
 
 
+UI_BORDER = 5
+OPTIONS_GRID_COLS = 3
+OPTIONS_GRID_GAP = 5
+DEFAULT_ICON_SIZE = 16
+
+LABEL_NAME_FMT = "{}_label_name"
+DEFAULT_BUTTON_NAME_FMT = "{}_default_button_name"
+VERIFY_BUTTON_NAME_FMT = "{}_verify_button_name"
+SELECT_BUTTON_NAME_FMT = "{}_select_button_name"
+ERR_UNKNOWN_VALUE_TYPE = 'Unknown value type "{}" for the configuration option {}.'
+ERR_LABEL_NOT_FOUND = "Unable to find the {} label."
+ERR_INPUT_NOT_FOUND = "Unable to find the {} input."
+ERR_PANEL_NOT_FOUND = "Unable to find the {} panel."
+MSG_VERIFY_FAILED = "Verification failed."
+MSG_SUCCESS = "Success"
+MSG_SUCCESS_FMT = "Success: {}"
+DLG_VALID_VALUES_CAPTION = "Valid Values"
+DLG_SELECT_VALUE = "Select a value"
+DLG_SELECT_VALUE_LABEL = "Select a Value:"
+DLG_VALUES = "Values"
+DLG_SELECT_VALUES = "Select value(s)"
+ERR_UNKNOWN_SELECT_METHOD = "Unknown select method."
+MSG_NO_OPTIONS_AVAILABLE = "No options available."
+TOOLTIP_DEPENDS_ON = "Depends on: {}"
+
+
 def _value(option_definition: ConfigOptionDefinition, config_section: SectionProxy):
     if option_definition.value_type is bool:
         value = option_definition.get_value(config_section)
@@ -68,16 +94,22 @@ def _get_value(control: wx.TextEntry | wx.CheckBox | wx.ListBox) -> str | None:
         return control.GetValue()
 
 
+TOOLTIP_DEFAULT = "Reset to the default value."
+TOOLTIP_VERIFY = "Test the value(s)."
+TOOLTIP_SELECT = "Select a value."
+TOOLTIP_ERR_INVALID_FUNCTION = '_default_tooltip: Invalid function "{}".'
+
+
 def _default_tooltip(function: str) -> str:
     if function == "default":
-        return "Reset to the default value."
+        return TOOLTIP_DEFAULT
     elif function == "verify":
-        return "Test the value(s)."
+        return TOOLTIP_VERIFY
     elif function == "select":
-        return "Select a value."
+        return TOOLTIP_SELECT
     else:
         logging.error('_default_tooltip: Invalid function "%s".', function)
-        raise ValueError('_default_tooltip: Invalid function "{}".'.format(function))
+        raise ValueError(TOOLTIP_ERR_INVALID_FUNCTION.format(function))
 
 
 class ConfigOptionValidator(wx.Validator):
@@ -279,9 +311,9 @@ class ConfigSectionPanel(wx.Panel):
         main_sizer = wx.BoxSizer(wx.VERTICAL)
         self.options_sizer = wx.FlexGridSizer(
             rows=len(self.config_section_definition.option_definitions),
-            cols=3,
-            hgap=5,
-            vgap=5,
+            cols=OPTIONS_GRID_COLS,
+            hgap=OPTIONS_GRID_GAP,
+            vgap=OPTIONS_GRID_GAP,
         )
         assert self.options_sizer is not None
 
@@ -291,7 +323,7 @@ class ConfigSectionPanel(wx.Panel):
         self.section_label.SetFont(self.section_label.GetFont().Bold())
         if len(self.config_section_definition.requires) != 0:
             self.section_label.SetToolTip(
-                "Depends on: {}".format(
+                TOOLTIP_DEPENDS_ON.format(
                     ", ".join(
                         [
                             req.display_name
@@ -301,7 +333,7 @@ class ConfigSectionPanel(wx.Panel):
                 )
             )
 
-        image_size = wx.Size(16, 16)
+        image_size = wx.Size(DEFAULT_ICON_SIZE, DEFAULT_ICON_SIZE)
         image_reset_to_default = wx.ArtProvider.GetBitmapBundle(
             wx.ART_UNDO, client=wx.ART_TOOLBAR, size=image_size
         )
@@ -374,7 +406,7 @@ class ConfigSectionPanel(wx.Panel):
                         option_definition_name,
                     )
                     raise ValueError(
-                        'Unknown value type "{}" for the configuration option {}.'.format(
+                        ERR_UNKNOWN_VALUE_TYPE.format(
                             str(option_definition.value_type), option_definition_name
                         )
                     )
@@ -441,7 +473,7 @@ class ConfigSectionPanel(wx.Panel):
         self.options_sizer.AddGrowableCol(1, 2)
 
         if len(self.GetChildren()) == 1:
-            option_label = wx.StaticText(self, label="No options available.")
+            option_label = wx.StaticText(self, label=MSG_NO_OPTIONS_AVAILABLE)
 
             main_sizer.Add(option_label, 0, wx.ALL, 5)
         else:
@@ -453,19 +485,19 @@ class ConfigSectionPanel(wx.Panel):
 
     @staticmethod
     def _label_name(option_name: str) -> str:
-        return "{}_label_name".format(option_name)
+        return LABEL_NAME_FMT.format(option_name)
 
     @staticmethod
     def _default_button_name(option_name: str) -> str:
-        return "{}_default_button_name".format(option_name)
+        return DEFAULT_BUTTON_NAME_FMT.format(option_name)
 
     @staticmethod
     def _verify_button_name(option_name: str) -> str:
-        return "{}_verify_button_name".format(option_name)
+        return VERIFY_BUTTON_NAME_FMT.format(option_name)
 
     @staticmethod
     def _select_button_name(option_name: str) -> str:
-        return "{}_select_button_name".format(option_name)
+        return SELECT_BUTTON_NAME_FMT.format(option_name)
 
     @staticmethod
     def _too_large_for_combo_box(valid_values: List[Any]) -> bool:
@@ -511,7 +543,7 @@ class ConfigSectionPanel(wx.Panel):
                     "Unable to find the %s label.", config_option_definition_name
                 )
                 raise ValueError(
-                    "Unable to find the {} label.".format(config_option_definition_name)
+                    ERR_LABEL_NOT_FOUND.format(config_option_definition_name)
                 )
 
             option_input = wx.FindWindowByName(
@@ -522,7 +554,7 @@ class ConfigSectionPanel(wx.Panel):
                     "Unable to find the %s input.", config_option_definition_name
                 )
                 raise ValueError(
-                    "Unable to find the {} input.".format(config_option_definition_name)
+                    ERR_INPUT_NOT_FOUND.format(config_option_definition_name)
                 )
 
             option_default_button = wx.FindWindowByName(
@@ -604,7 +636,7 @@ class ConfigSectionPanel(wx.Panel):
                 option_input = wx.FindWindowByName(name, parent=self)
                 if option_input is None:
                     self.logger.error("Unable to find the %s input.", name)
-                    raise ValueError("Unable to find the {} input.".format(name))
+                    raise ValueError(ERR_INPUT_NOT_FOUND.format(name))
 
                 _set_value(option_input, default_value)
                 if name in self._tracking_controls:
@@ -633,14 +665,14 @@ class ConfigSectionPanel(wx.Panel):
                     if isinstance(result, VerificationError):
                         button.SetToolTip(result.message)
                     else:
-                        button.SetToolTip("Verification failed.")
+                        button.SetToolTip(MSG_VERIFY_FAILED)
                     button.SetFocus()
                     button.Refresh()
                 else:
-                    message = "Success"
+                    message = MSG_SUCCESS
                     if isinstance(result, VerificationResult):
                         if result.message is not None:
-                            message = f"Success: {result.message}"
+                            message = MSG_SUCCESS_FMT.format(result.message)
                     button.SetBackgroundColour(wx.GREEN)
                     button.SetToolTip(message)
                     button.Refresh()
@@ -655,13 +687,13 @@ class ConfigSectionPanel(wx.Panel):
                     )
                 elif ConfigSectionPanel._use_selector_for(valid_values):
                     select_result = SelectionResult(
-                        caption="Valid Values", message="Select a Value:"
+                        caption=DLG_VALID_VALUES_CAPTION, message=DLG_SELECT_VALUE_LABEL
                     )
                     for value in valid_values:
                         select_result.add_value(SelectionData(value, value))
                 else:
-                    self.logger.error("Unknown select method.")
-                    raise ValueError("Unknown select method.")
+                    self.logger.error(ERR_UNKNOWN_SELECT_METHOD)
+                    raise ValueError(ERR_UNKNOWN_SELECT_METHOD)
 
                 if select_result is not None:
                     if isinstance(select_result, SelectionError):
@@ -674,9 +706,7 @@ class ConfigSectionPanel(wx.Panel):
                         option_input = wx.FindWindowByName(name, parent=self)
                         if option_input is None:
                             self.logger.error("Unable to find the %s input.", name)
-                            raise ValueError(
-                                "Unable to find the {} input.".format(name)
-                            )
+                            raise ValueError(ERR_INPUT_NOT_FOUND.format(name))
 
                         selected = None
 
@@ -702,8 +732,8 @@ class ConfigSectionPanel(wx.Panel):
 
                                 with wx.SingleChoiceDialog(
                                     self.GetParent(),
-                                    "Select a value",
-                                    "Values",
+                                    DLG_SELECT_VALUE,
+                                    DLG_VALUES,
                                     value_list,
                                 ) as dialog:
                                     dialog.SetSelection(old_selected)
@@ -729,8 +759,8 @@ class ConfigSectionPanel(wx.Panel):
 
                                 with wx.MultiChoiceDialog(
                                     self.GetParent(),
-                                    "Select value(s)",
-                                    "Values",
+                                    DLG_SELECT_VALUES,
+                                    DLG_VALUES,
                                     value_list,
                                 ) as dialog:
                                     dialog.SetSelections(multi_old_selected)
@@ -758,7 +788,7 @@ class ConfigSectionPanel(wx.Panel):
                             self.update()
 
                             button.SetBackgroundColour(wx.GREEN)
-                            button.SetToolTip("Success")
+                            button.SetToolTip(MSG_SUCCESS)
                             button.Refresh()
                         else:
                             self.update()
@@ -804,7 +834,9 @@ class ConfigDialog(wx.Dialog):
         icon = wx.Icon()
         icon.CopyFromBitmap(
             wx.ArtProvider.GetBitmap(
-                wx.ART_EXECUTABLE_FILE, client=wx.ART_FRAME_ICON, size=wx.Size(16, 16)
+                wx.ART_EXECUTABLE_FILE,
+                client=wx.ART_FRAME_ICON,
+                size=wx.Size(DEFAULT_ICON_SIZE, DEFAULT_ICON_SIZE),
             )
         )
         self.SetIcon(icon)
@@ -837,7 +869,10 @@ class ConfigDialog(wx.Dialog):
             )
 
             self.sections_sizer.Add(
-                config_section_panel, proportion=0, flag=wx.EXPAND | wx.ALL, border=5
+                config_section_panel,
+                proportion=0,
+                flag=wx.EXPAND | wx.ALL,
+                border=UI_BORDER,
             )
             self._panels.append(config_section_panel)
 
@@ -866,7 +901,7 @@ class ConfigDialog(wx.Dialog):
         main_sizer.Add(scroll_panel, proportion=1, flag=wx.EXPAND)
 
         main_sizer.Add(
-            button_sizer, proportion=0, flag=wx.ALL | wx.ALIGN_RIGHT, border=5
+            button_sizer, proportion=0, flag=wx.ALL | wx.ALIGN_RIGHT, border=UI_BORDER
         )
 
         self.SetSizer(main_sizer)
@@ -889,9 +924,7 @@ class ConfigDialog(wx.Dialog):
                     "Unable to find the %s panel.", config_section_definition_name
                 )
                 raise ValueError(
-                    "Unable to find the {} panel.".format(
-                        config_section_definition_name
-                    )
+                    ERR_PANEL_NOT_FOUND.format(config_section_definition_name)
                 )
 
             if (

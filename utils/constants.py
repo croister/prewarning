@@ -15,3 +15,12 @@ DATA_DIR_NAME = "data"
 
 # The directory where the configuration files are located
 DATA_DIR = APPLICATION_DIR / DATA_DIR_NAME
+
+# The file extension used for audio files
+AUDIO_EXTENSION = ".mp3"
+
+# The default ding sound file name
+DING_FILENAME = f"ding{AUDIO_EXTENSION}"
+
+# The file name for the Testing onem two, three sound
+TESTING_FILENAME = f"Testing{AUDIO_EXTENSION}"

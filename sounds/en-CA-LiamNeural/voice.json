@@ -1,0 +1,18 @@
+{
+  "Name": "Microsoft Server Speech Text to Speech Voice (en-CA, LiamNeural)",
+  "ShortName": "en-CA-LiamNeural",
+  "Gender": "Male",
+  "Locale": "en-CA",
+  "SuggestedCodec": "audio-24khz-48kbitrate-mono-mp3",
+  "FriendlyName": "Microsoft Liam Online (Natural) - English (Canada)",
+  "Status": "GA",
+  "VoiceTag": {
+    "ContentCategories": [
+      "General"
+    ],
+    "VoicePersonalities": [
+      "Friendly",
+      "Positive"
+    ]
+  }
+}

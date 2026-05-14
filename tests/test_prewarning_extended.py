@@ -83,10 +83,15 @@ class TestFontSize:
 class TestPlayTestSound:
     def test_plays_sound(self):
         pw = MagicMock()
-        pw.test_sound_file = "test.mp3"
         pw.sound = MagicMock()
+        from pathlib import Path as _Path
+
+        pw.test_sound_file = _Path("Testing.mp3")
         PreWarning._play_test_sound(pw)
-        pw.sound.play_sound.assert_called_once_with("test.mp3")
+        pw.sound.resolve_voice.assert_called_once_with(None)
+        pw.sound.play_voice_sound.assert_called_once()
+        call_args = pw.sound.play_voice_sound.call_args[0]
+        assert call_args[0] == "Testing.mp3"
 
 
 class TestSimulatePunch:
@@ -107,9 +112,10 @@ class TestSimulatePunch:
 
     def test_queues_announcement(self, pw):
         PreWarning._simulate_punch(pw)
-        pw.announcement_queue.put.assert_called_once_with(
-            {"language": None, "sound": "10"}
-        )
+        pw.sound.resolve_voice.assert_called_once_with(None)
+        pw.announcement_queue.put.assert_called_once()
+        call_args = pw.announcement_queue.put.call_args[0][0]
+        assert call_args["sound"] == "10"
 
 
 class TestPunchReceived:
@@ -182,10 +188,10 @@ class TestNotifyIp:
             assert pw.announcement_queue.put.call_count == 4
             pw.announcement_queue.put.assert_has_calls(
                 [
-                    call({"language": "en", "sound": "192"}),
-                    call({"language": "en", "sound": "168"}),
-                    call({"language": "en", "sound": "1"}),
-                    call({"language": "en", "sound": "42"}),
+                    call({"voice": None, "sound": "192"}),
+                    call({"voice": None, "sound": "168"}),
+                    call({"voice": None, "sound": "1"}),
+                    call({"voice": None, "sound": "42"}),
                 ]
             )
             sock.close.assert_called_once()

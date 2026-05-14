@@ -45,6 +45,10 @@ def connect(
 BUILT_IN_DATABASES = ["information_schema", "mysql", "performance_schema", "sys"]
 DATABASE_KEY_NAME = "Database"
 
+OLA_6_3_0_0_DB_VERSION = 564
+OLA_6_3_9_DB_VERSION = 565
+NULL_TIMESTAMP = "0000-00-00 00:00:00.000"
+
 
 def get_database_names(connection: Connection) -> List[str]:
     logging.getLogger(LOGGER_NAME).debug("get_database_names")
@@ -291,7 +295,7 @@ def get_event_race_split_time_controls(
 
     event_split_time_controls: list[dict[str, Any]] = []
     with connection.cursor(DictCursor) as cursor:
-        if ola_db_version >= 565:  # OLA 6.3.9
+        if ola_db_version >= OLA_6_3_9_DB_VERSION:
             sql = (
                 "SELECT DISTINCT"
                 "       `RaceClassSplitTimeControls`.`name` AS `raceClassSplitTimeControlName`,"
@@ -331,7 +335,7 @@ def get_event_race_split_time_controls(
                 "       `RaceClasses`.`raceClassName` ASC"
                 ";".format(class_names_query=class_names_query)
             )
-        elif ola_db_version >= 564:  # OLA 6.3.0.0
+        elif ola_db_version >= OLA_6_3_0_0_DB_VERSION:
             sql = (
                 "SELECT DISTINCT"
                 "       `RaceClassSplitTimeControls`.`name` AS `raceClassSplitTimeControlName`,"
@@ -597,12 +601,12 @@ def get_event_race_split_times(
     logging.getLogger(LOGGER_NAME).debug("get_event_race_split_times")
 
     if last_modify_time is None:
-        last_modify_time = "0000-00-00 00:00:00.000"
+        last_modify_time = NULL_TIMESTAMP
 
     event_split_times: list[dict[str, Any]] = []
     with connection.cursor(DictCursor) as cursor:
         control_ids_format_str = _generate_in_format_str(len(control_ids))
-        if ola_db_version >= 564:
+        if ola_db_version >= OLA_6_3_0_0_DB_VERSION:
             sql = (
                 "SELECT"
                 "  CONCAT(`SplitTimes`.`resultRaceIndividualNumber`,"
@@ -1235,7 +1239,7 @@ class OlaMySql(ConfigConsumer, Singleton, metaclass=_OlaMySqlMeta):
             raise ValueError("A Event Race needs to be selected first")
 
         if last_modify_time is None:
-            last_modify_time = "0000-00-00 00:00:00.000"
+            last_modify_time = NULL_TIMESTAMP
 
         connection = self._connect()
         assert self.ola_db_version is not None
@@ -1265,8 +1269,23 @@ class OlaMySql(ConfigConsumer, Singleton, metaclass=_OlaMySqlMeta):
                     "SELECT"
                     "  `Results`.`bibNumber`,"
                     "  `RaceClasses`.`relayLeg`,"
-                    "  (SELECT MAX(`RaceClasses`.`relayLeg`) FROM `RaceClasses` WHERE `RaceClasses`.`eventClassId`"
-                    "    = `RaceClasses`.`eventClassId`) = `RaceClasses`.`relayLeg` AS isLastLeg"
+                    "  (SELECT MAX(`rc2`.`relayLeg`) FROM `RaceClasses` `rc2`"
+                    "   WHERE `rc2`.`eventClassId` = `RaceClasses`.`eventClassId`)"
+                    "    = `RaceClasses`.`relayLeg` AS isLastLeg,"
+                    "  COALESCE("
+                    "    (SELECT `c_next`.`alpha3`"
+                    "     FROM `Results` `r_next`"
+                    "     LEFT JOIN `RaceClasses` `rc_next`"
+                    "       ON `r_next`.`raceClassId` = `rc_next`.`raceClassId`"
+                    "     LEFT JOIN `Persons` `p_next`"
+                    "       ON `r_next`.`relayPersonId` = `p_next`.`personId`"
+                    "     LEFT JOIN `Countries` `c_next`"
+                    "       ON `p_next`.`nationalityId` = `c_next`.`countryId`"
+                    "     WHERE `r_next`.`entryId` = `Results`.`entryId`"
+                    "       AND `rc_next`.`relayLeg` = `RaceClasses`.`relayLeg` + 1"
+                    "     LIMIT 1),"
+                    "    `c_curr`.`alpha3`"
+                    "  ) AS country"
                     " FROM `Results`"
                     "  LEFT JOIN `RaceClasses`"
                     "         ON `Results`.`raceClassId` = `RaceClasses`.`raceClassId`"
@@ -1274,6 +1293,10 @@ class OlaMySql(ConfigConsumer, Singleton, metaclass=_OlaMySqlMeta):
                     "         ON `RaceClasses`.`eventRaceId` = `EventRaces`.`eventRaceId`"
                     "  LEFT JOIN `ElectronicPunchingCards`"
                     "         ON `Results`.`electronicPunchingCardId` = `ElectronicPunchingCards`.`cardId`"
+                    "  LEFT JOIN `Persons` `p_curr`"
+                    "         ON `Results`.`relayPersonId` = `p_curr`.`personId`"
+                    "  LEFT JOIN `Countries` `c_curr`"
+                    "         ON `p_curr`.`nationalityId` = `c_curr`.`countryId`"
                     " WHERE `EventRaces`.`eventId` = %s"
                     "   AND `EventRaces`.`eventRaceId` = %s"
                     "   AND `ElectronicPunchingCards`.`cardNumber` = %s"
