@@ -1124,7 +1124,12 @@ class PreWarning(
                     self.sound.play_sound(self.intro_sound_file)
 
                 self.logger.debug("sound: %s", sound)
-                self.sound.play_lang("{}.mp3".format(sound["sound"]), sound["language"])
+                if sound["sound"] == "-":
+                    self.sound.play_sound(self.intro_sound_file)
+                else:
+                    self.sound.play_lang(
+                        "{}.mp3".format(sound["sound"]), sound["language"]
+                    )
 
                 self.last_sound_time = datetime.now()
 
