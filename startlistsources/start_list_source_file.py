@@ -361,9 +361,12 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
         if src_path.endswith("~"):
             src_path = src_path[0:-1]
         with self._data_lock:
-            start_list_file = self.start_list_file
-        if Path(src_path).resolve() == start_list_file:
-            self._read_start_list()
+            is_current_file = (
+                self.start_list_file is not None
+                and Path(src_path).resolve() == self.start_list_file
+            )
+            if is_current_file:
+                self._read_start_list()
 
     def config_updated(self, section_names: List[str]):
         self.update()
