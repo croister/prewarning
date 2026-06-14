@@ -209,6 +209,31 @@ class PreWarning(
         default_value=False,
     )
 
+    CONFIG_OPTION_DEDUP_CARD_CONTROL = ConfigOptionDefinition(
+        name="DedupCardControl",
+        display_name="Deduplicate by Card + Control",
+        value_type=bool,
+        description="Skip re-announcement when the same SI card punches the same control code again.",
+        default_value=False,
+    )
+
+    CONFIG_OPTION_DEDUP_BIB_LEG = ConfigOptionDefinition(
+        name="DedupBibLeg",
+        display_name="Deduplicate by Bib + Leg",
+        value_type=bool,
+        description="Skip re-announcement when the same team bib number appears on the same relay leg again.",
+        default_value=False,
+    )
+
+    CONFIG_OPTION_DEDUP_TIMEOUT_SECONDS = ConfigOptionDefinition(
+        name="DedupTimeoutSeconds",
+        display_name="Dedup Timeout (seconds)",
+        value_type=int,
+        description="How long a dedup key remains active. 0 = forever (session).",
+        default_value=0,
+        valid_values=list(range(0, 3601)),
+    )
+
     COMMON_CONFIG_SECTION_DEFINITION = ConfigSectionDefinition(
         name=Config.SECTION_COMMON,
         display_name=Config.SECTION_COMMON,
@@ -220,6 +245,9 @@ class PreWarning(
             CONFIG_OPTION_INTRO_SOUND_FILE,
             CONFIG_OPTION_TEST_SOUND_FILE,
             CONFIG_OPTION_ADD_PRE_WARNINGS_TO_BOTTOM,
+            CONFIG_OPTION_DEDUP_CARD_CONTROL,
+            CONFIG_OPTION_DEDUP_BIB_LEG,
+            CONFIG_OPTION_DEDUP_TIMEOUT_SECONDS,
         ],
         sort_key_prefix=0,
     )
@@ -272,6 +300,14 @@ class PreWarning(
 
         # Lock for thread-safe last_sound_time access
         self._last_sound_time_lock = Lock()
+
+        # Deduplication state
+        self._dedup_lock = Lock()
+        self._dedup_card_control: dict = {}
+        self._dedup_bib_leg: dict = {}
+        self._dedup_card_control_enabled: bool = False
+        self._dedup_bib_leg_enabled: bool = False
+        self._dedup_timeout: int = 0
 
         # Config variables
         self.interactive_mode = None
@@ -1072,6 +1108,16 @@ class PreWarning(
             self.CONFIG_OPTION_ADD_PRE_WARNINGS_TO_BOTTOM.get_value(config_section)
         )
 
+        self._dedup_card_control_enabled = (
+            self.CONFIG_OPTION_DEDUP_CARD_CONTROL.get_value(config_section)
+        )
+        self._dedup_bib_leg_enabled = self.CONFIG_OPTION_DEDUP_BIB_LEG.get_value(
+            config_section
+        )
+        self._dedup_timeout = self.CONFIG_OPTION_DEDUP_TIMEOUT_SECONDS.get_value(
+            config_section
+        )
+
         self.punch_source_name = COMMON_PUNCH_SOURCE.get_value(config_section)
         self.start_list_source_name = COMMON_START_LIST_SOURCE.get_value(config_section)
 
@@ -1089,12 +1135,45 @@ class PreWarning(
         self.logger.debug("punch_received: %s", punch)
         self.punch_queue.put(punch)
 
+    def _is_deduped(
+        self,
+        cache: dict[tuple[str, str], float],
+        key: tuple[str, str],
+        current_passed_time: float,
+    ) -> bool:
+        timestamp = cache.get(key)
+        if timestamp is None:
+            return False
+        if self._dedup_timeout == 0:
+            return True
+        if current_passed_time - timestamp >= self._dedup_timeout:
+            del cache[key]
+            return False
+        return True
+
+    @staticmethod
+    def _parse_passed_time(passed_time: datetime | None) -> float:
+        if passed_time is None:
+            return time()
+        return passed_time.timestamp()
+
     def _process_punches(self):
         while True:
             punch = self.punch_queue.get()
             self.logger.debug(
                 "Processing: %s from: %s", punch["cardNumber"], punch["controlCode"]
             )
+
+            punch_passed_time = self._parse_passed_time(punch["passedTime"])
+
+            if self._dedup_card_control_enabled:
+                key = (str(punch["cardNumber"]), str(punch["controlCode"]))
+                with self._dedup_lock:
+                    if self._is_deduped(
+                        self._dedup_card_control, key, punch_passed_time
+                    ):
+                        self.logger.debug("Skipping duplicate card+control: %s", key)
+                        continue
 
             source = self.start_list_source
             source_name = self.start_list_source_name
@@ -1126,12 +1205,32 @@ class PreWarning(
             passed_time = self._to_str(punch["passedTime"]).rpartition(" ")[2]
             bib_number = self._to_str(punch["bibNumber"])
             relay_leg = self._to_str(punch["relayLeg"])
+
+            if self._dedup_bib_leg_enabled:
+                key = (bib_number, relay_leg)
+                with self._dedup_lock:
+                    if self._is_deduped(self._dedup_bib_leg, key, punch_passed_time):
+                        self.logger.debug("Skipping duplicate bib+leg: %s", key)
+                        continue
+
             country = punch.get("country")
             voice = self.sound.resolve_voice(country)
             self.announcement_queue.put({"voice": voice, "sound": bib_number})
             wx.CallAfter(
                 self._add_pre_warning_with_refresh, passed_time, bib_number, relay_leg
             )
+
+            if self._dedup_card_control_enabled:
+                key = (punch["cardNumber"], punch["controlCode"])
+                with self._dedup_lock:
+                    if key not in self._dedup_card_control:
+                        self._dedup_card_control[key] = punch_passed_time
+
+            if self._dedup_bib_leg_enabled:
+                key = (bib_number, relay_leg)
+                with self._dedup_lock:
+                    if key not in self._dedup_bib_leg:
+                        self._dedup_bib_leg[key] = punch_passed_time
 
     @staticmethod
     def _to_str(val: int | str | None) -> str:

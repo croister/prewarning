@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
-from datetime import date
+from datetime import date, datetime
 from threading import Event, Thread
 from typing import List, Dict
 from urllib.error import HTTPError, URLError
@@ -31,6 +31,17 @@ _MODULE_LOGGER_NAME = "PunchSourceOlresultatSe"
 PUNCH_SOURCE_OL_RESULTAT_SE_RUNTIME_STATE = RuntimeStateGroup("ps_olresultatse.dat")
 
 DEFAULT_RESPONSE_ENCODING = "utf-8"
+
+
+PUNCH_KEYS = ("id", "controlCode", "cardNumber", "passedTime")
+
+
+def _normalize_passed_time(raw: str) -> datetime:
+    try:
+        return datetime.fromisoformat(raw)
+    except ValueError, TypeError:
+        pass
+    return datetime.now()
 
 
 def _fetch_punches(
@@ -71,11 +82,9 @@ def _fetch_punches(
                 '_fetch_punches data: "%s"', data
             )
             for line in splitlines:
-                punch_dict = dict(
-                    zip(
-                        ("id", "controlCode", "cardNumber", "passedTime"),
-                        line.split(";"),
-                    )
+                punch_dict = dict(zip(PUNCH_KEYS, line.split(";")))
+                punch_dict["passedTime"] = _normalize_passed_time(
+                    punch_dict["passedTime"]
                 )
                 if control_codes is None or punch_dict["controlCode"] in control_codes:
                     punches.append(punch_dict)
@@ -547,11 +556,9 @@ class PunchSourceOlresultatSe(StateSaverMixin, _PunchSourceBase):
                 if splitlines:
                     self.logger.debug(data)
                     for line in splitlines:
-                        punch_dict = dict(
-                            zip(
-                                ("id", "controlCode", "cardNumber", "passedTime"),
-                                line.split(";"),
-                            )
+                        punch_dict = dict(zip(PUNCH_KEYS, line.split(";")))
+                        punch_dict["passedTime"] = _normalize_passed_time(
+                            punch_dict["passedTime"]
                         )
                         self.logger.debug(punch_dict)
                         if punch_dict["controlCode"] in self.control_codes:

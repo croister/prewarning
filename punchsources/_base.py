@@ -24,6 +24,11 @@ class PunchListener(ABC):
         self.logger = logging.getLogger(self.__class__.__name__)
 
     def punch_received(self, punch: Dict[str, str]):
+        """Called when a punch is received.
+
+        The punch dict follows the contract documented in
+        ``_PunchSourceBase._notify_punch_listeners``.
+        """
         pass
 
 
@@ -77,6 +82,17 @@ class _PunchSourceBase(ConfigConsumer):
 
     def _notify_punch_listeners(self, punch: Dict[str, str]):
         """Notifies all Punch Listeners that a punch has been received.
+
+        The punch dict must contain these keys:
+          - id (str): unique punch identifier
+          - controlCode (str): the control code
+          - cardNumber (str): the SI card number
+          - passedTime (datetime | None): time the runner passed the control
+
+        The ``passedTime`` value **must** be a ``datetime`` object
+        (or ``None`` as a last resort). New punch sources must convert
+        their native timestamp to ``datetime`` before inserting into
+        the dict.
 
         :param Dict[str, str] punch: The punch to notify about
         """
