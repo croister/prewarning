@@ -14,6 +14,7 @@ from utils.config_dialog import (
     ConfigOptionValidator,
     ConfigSectionPanel,
     ConfigDialog,
+    FilterableChoiceDialog,
 )
 
 
@@ -425,3 +426,76 @@ class TestConfigDialog:
         assert dialog._panels[0].config_section_definition is sec
         parent.Destroy()
         dialog.Destroy()
+
+
+class TestFilterableChoiceDialog:
+    def test_create_and_get_string_selection(self, wx_app):
+        parent = wx.Frame(None)
+        choices = ["SWE", "NOR", "FIN", "DEN"]
+        dialog = FilterableChoiceDialog(
+            parent,
+            caption="Select Country",
+            message="Choose a country code:",
+            choices=choices,
+            initial_selection=1,
+        )
+        assert dialog.GetStringSelection() == "NOR"
+        dialog.Destroy()
+        parent.Destroy()
+
+    def test_set_selection(self, wx_app):
+        parent = wx.Frame(None)
+        choices = ["SWE", "NOR", "FIN", "DEN"]
+        dialog = FilterableChoiceDialog(
+            parent,
+            caption="Select",
+            message="Choose:",
+            choices=choices,
+            initial_selection=0,
+        )
+        dialog.SetSelection(3)
+        assert dialog.GetStringSelection() == "DEN"
+        dialog.Destroy()
+        parent.Destroy()
+
+    def test_set_selection_out_of_range_no_error(self, wx_app):
+        parent = wx.Frame(None)
+        choices = ["SWE", "NOR"]
+        dialog = FilterableChoiceDialog(
+            parent,
+            caption="Select",
+            message="Choose:",
+            choices=choices,
+            initial_selection=0,
+        )
+        dialog.SetSelection(99)
+        assert dialog.GetStringSelection() == "SWE"
+        dialog.Destroy()
+        parent.Destroy()
+
+    def test_initial_selection_out_of_range_defaults_to_first(self, wx_app):
+        parent = wx.Frame(None)
+        choices = ["SWE", "NOR"]
+        dialog = FilterableChoiceDialog(
+            parent,
+            caption="Select",
+            message="Choose:",
+            choices=choices,
+            initial_selection=99,
+        )
+        assert dialog.GetStringSelection() == "SWE"
+        dialog.Destroy()
+        parent.Destroy()
+
+    def test_empty_choices(self, wx_app):
+        parent = wx.Frame(None)
+        dialog = FilterableChoiceDialog(
+            parent,
+            caption="Select",
+            message="Choose:",
+            choices=[],
+            initial_selection=0,
+        )
+        assert dialog.GetStringSelection() == ""
+        dialog.Destroy()
+        parent.Destroy()

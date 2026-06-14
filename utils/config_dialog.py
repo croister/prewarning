@@ -55,6 +55,11 @@ DLG_SELECT_VALUES = "Select value(s)"
 ERR_UNKNOWN_SELECT_METHOD = "Unknown select method."
 MSG_NO_OPTIONS_AVAILABLE = "No options available."
 TOOLTIP_DEPENDS_ON = "Depends on: {}"
+FILTER_HINT = "Type to filter..."
+DLG_INITIAL_WIDTH = 400
+DLG_INITIAL_HEIGHT = 500
+DLG_MIN_WIDTH = 300
+DLG_MIN_HEIGHT = 300
 
 
 def _value(option_definition: ConfigOptionDefinition, config_section: SectionProxy):
@@ -175,6 +180,76 @@ class ConfigOptionValidator(wx.Validator):
         value = _get_value(control)
         self.config_section[self.config_option_definition.name] = str(value)
         return True
+
+
+class FilterableChoiceDialog(wx.Dialog):
+    """A dialog with a filter text field and a listbox for single selection."""
+
+    def __init__(
+        self,
+        parent: wx.Window,
+        caption: str,
+        message: str,
+        choices: list[str],
+        initial_selection: int = 0,
+    ):
+        wx.Dialog.__init__(
+            self,
+            parent,
+            title=caption,
+            style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER,
+        )
+        self._all_choices = list(choices)
+        self._filtered_choices = list(choices)
+
+        sizer = wx.BoxSizer(wx.VERTICAL)
+
+        label = wx.StaticText(self, label=message)
+        sizer.Add(label, 0, wx.ALL, UI_BORDER)
+
+        self._filter_ctrl = wx.TextCtrl(self)
+        self._filter_ctrl.SetHint(FILTER_HINT)
+        self._filter_ctrl.Bind(wx.EVT_TEXT, self._on_filter)
+        sizer.Add(self._filter_ctrl, 0, wx.ALL | wx.EXPAND, UI_BORDER)
+
+        self._listbox = wx.ListBox(
+            self, choices=self._filtered_choices, style=wx.LB_SINGLE
+        )
+        if self._filtered_choices:
+            if 0 <= initial_selection < len(self._filtered_choices):
+                self._listbox.SetSelection(initial_selection)
+            else:
+                self._listbox.SetSelection(0)
+        self._listbox.Bind(wx.EVT_LISTBOX_DCLICK, self._on_dclick)
+        sizer.Add(self._listbox, 1, wx.ALL | wx.EXPAND, UI_BORDER)
+
+        btn_sizer = self.CreateButtonSizer(wx.OK | wx.CANCEL)
+        sizer.Add(btn_sizer, 0, wx.ALL | wx.ALIGN_RIGHT, UI_BORDER)
+
+        self.SetSizer(sizer)
+        self.SetInitialSize(wx.Size(DLG_INITIAL_WIDTH, DLG_INITIAL_HEIGHT))
+        self.SetMinSize(wx.Size(DLG_MIN_WIDTH, DLG_MIN_HEIGHT))
+
+    def _on_filter(self, event) -> None:
+        text = self._filter_ctrl.GetValue().lower()
+        if not text:
+            self._filtered_choices = list(self._all_choices)
+        else:
+            self._filtered_choices = [c for c in self._all_choices if text in c.lower()]
+        self._listbox.Clear()
+        self._listbox.AppendItems(self._filtered_choices)
+        if self._filtered_choices:
+            self._listbox.SetSelection(0)
+
+    def _on_dclick(self, event) -> None:
+        self.EndModal(wx.ID_OK)
+
+    def GetStringSelection(self) -> str:
+        return self._listbox.GetStringSelection()
+
+    def SetSelection(self, index: int) -> None:
+        if 0 <= index < self._listbox.GetCount():
+            self._listbox.SetSelection(index)
 
 
 class ConfigSectionPanel(wx.Panel):
@@ -342,7 +417,7 @@ class ConfigSectionPanel(wx.Panel):
             wx.ART_FILE_OPEN, client=wx.ART_MENU, size=image_size
         )
 
-        main_sizer.Add(self.section_label, 0, wx.ALL, 5)
+        main_sizer.Add(self.section_label, 0, wx.ALL, UI_BORDER)
 
         for option_definition_name in self.config_section_definition.option_definitions:
             option_definition = self.config_section_definition.option_definitions[
@@ -356,7 +431,7 @@ class ConfigSectionPanel(wx.Panel):
             )
             option_label.SetToolTip(option_definition.description)
 
-            self.options_sizer.Add(option_label, 0, wx.ALL, 5)
+            self.options_sizer.Add(option_label, 0, wx.ALL, UI_BORDER)
 
             validator = ConfigOptionValidator(
                 option_definition, self.config_section_definition, self.config
@@ -374,19 +449,34 @@ class ConfigSectionPanel(wx.Panel):
                 )
                 option_input.Bind(wx.EVT_COMBOBOX, self.on_combo_box_changed)
             else:
+                text_ctrl_style = 0
+                if (
+                    option_definition.selector is not None
+                    or ConfigSectionPanel._use_selector_for(valid_values)
+                ):
+                    text_ctrl_style |= wx.TE_READONLY
                 if option_definition.value_type is str:
                     option_input = wx.TextCtrl(
-                        self, validator=validator, name=option_definition_name
+                        self,
+                        validator=validator,
+                        name=option_definition_name,
+                        style=text_ctrl_style,
                     )
                     option_input.Bind(wx.EVT_TEXT, self.on_text_ctrl_changed)
                 elif option_definition.value_type is int:
                     option_input = wx.TextCtrl(
-                        self, validator=validator, name=option_definition_name
+                        self,
+                        validator=validator,
+                        name=option_definition_name,
+                        style=text_ctrl_style,
                     )
                     option_input.Bind(wx.EVT_TEXT, self.on_text_ctrl_changed)
                 elif option_definition.value_type is float:
                     option_input = wx.TextCtrl(
-                        self, validator=validator, name=option_definition_name
+                        self,
+                        validator=validator,
+                        name=option_definition_name,
+                        style=text_ctrl_style,
                     )
                     option_input.Bind(wx.EVT_TEXT, self.on_text_ctrl_changed)
                 elif option_definition.value_type is bool:
@@ -396,7 +486,10 @@ class ConfigSectionPanel(wx.Panel):
                     option_input.Bind(wx.EVT_CHECKBOX, self.on_check_box_changed)
                 elif option_definition.value_type is Path:
                     option_input = wx.TextCtrl(
-                        self, validator=validator, name=option_definition_name
+                        self,
+                        validator=validator,
+                        name=option_definition_name,
+                        style=text_ctrl_style,
                     )
                     option_input.Bind(wx.EVT_TEXT, self.on_text_ctrl_changed)
                 else:
@@ -411,7 +504,7 @@ class ConfigSectionPanel(wx.Panel):
                         )
                     )
 
-            self.options_sizer.Add(option_input, 1, wx.ALL | wx.EXPAND, 5)
+            self.options_sizer.Add(option_input, 1, wx.ALL | wx.EXPAND, UI_BORDER)
 
             if isinstance(option_definition, RuntimeStateOptionDefinition):
                 self._tracking_controls[option_definition_name] = option_input
@@ -467,7 +560,9 @@ class ConfigSectionPanel(wx.Panel):
                 if not option_definition.is_enabled(self.config_section):
                     option_verify_button.Disable()
 
-            self.options_sizer.Add(option_buttons_sizer, 0, wx.TOP | wx.BOTTOM, 5)
+            self.options_sizer.Add(
+                option_buttons_sizer, 0, wx.TOP | wx.BOTTOM, UI_BORDER
+            )
 
         self.options_sizer.AddGrowableCol(0, 1)
         self.options_sizer.AddGrowableCol(1, 2)
@@ -475,7 +570,7 @@ class ConfigSectionPanel(wx.Panel):
         if len(self.GetChildren()) == 1:
             option_label = wx.StaticText(self, label=MSG_NO_OPTIONS_AVAILABLE)
 
-            main_sizer.Add(option_label, 0, wx.ALL, 5)
+            main_sizer.Add(option_label, 0, wx.ALL, UI_BORDER)
         else:
             main_sizer.Add(self.options_sizer, 0, wx.EXPAND)
 
@@ -730,14 +825,13 @@ class ConfigSectionPanel(wx.Panel):
                                 if old_value is not None and old_value in new_values:
                                     old_selected = new_values.index(old_value)
 
-                                with wx.SingleChoiceDialog(
+                                with FilterableChoiceDialog(
                                     self.GetParent(),
-                                    DLG_SELECT_VALUE,
-                                    DLG_VALUES,
-                                    value_list,
+                                    caption=DLG_VALUES,
+                                    message=DLG_SELECT_VALUE_LABEL,
+                                    choices=value_list,
+                                    initial_selection=old_selected,
                                 ) as dialog:
-                                    dialog.SetSelection(old_selected)
-
                                     if dialog.ShowModal() == wx.ID_OK:
                                         self.logger.debug(
                                             'You selected: "%s"',

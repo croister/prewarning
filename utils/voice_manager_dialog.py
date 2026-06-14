@@ -15,7 +15,18 @@ from edge_tts.typing import Voice
 from gpytranslate import Translator as GpyTranslator
 
 from utils.config import Config, ConfigSectionDefinition, ConfigOptionDefinition
+from utils.config_definitions import (
+    ConfigVerifierDefinition,
+    ConfigSectionOptionDefinition,
+    ConfigSelectorDefinition,
+    SelectionData,
+    SelectionResult,
+    SelectionType,
+    VerificationResult,
+)
 from utils.constants import AUDIO_EXTENSION, TESTING_FILENAME
+from utils.country_dict_by_ioc import COUNTRIES
+from validators.validation_error import ValidationError
 from utils.edge_tts import (
     EdgeTTSError,
     VoiceFile,
@@ -86,6 +97,87 @@ def parse_extra_ranges(value: str | None) -> list[tuple[int, int]]:
     return ranges
 
 
+DEFAULT_RANGE_START = 0
+DEFAULT_RANGE_END = 999
+DEFAULT_EXTRA_RANGE = "1000-9999"
+
+DLG_DEFAULT_COUNTRY_CAPTION = "Select Default Country"
+DLG_DEFAULT_COUNTRY_MESSAGE = "Select a country:"
+MSG_SELECT_COUNTRY = "Select a country code."
+ERR_COUNTRY_VERIFY = "The selected country code is not a valid IOC code."
+ERR_DEFAULT_VOICE_VERIFY = "The default voice is not installed."
+ERR_FALLBACK_VOICE_VERIFY = "The fallback voice is not installed."
+ERR_EXTRA_RANGES_VERIFY = "The extra ranges format is invalid."
+ERR_EXTRA_RANGES_FORMAT = "Invalid extra ranges format. Expected comma-separated ranges like '1000-1999, 2000-2999'."
+ERR_EXTRA_RANGES_OVERLAP = f"Extra ranges must not overlap with the default range ({DEFAULT_RANGE_START}-{DEFAULT_RANGE_END})."
+ERR_EXTRA_RANGES_REVERSED = "Start of a range must not be greater than its end."
+
+
+def _get_extra_ranges_error(value: str) -> str | None:
+    """Returns an error message if invalid, None if valid."""
+    if not value:
+        return None
+    for part in value.split(","):
+        part = part.strip()
+        if not part:
+            continue
+        if "-" not in part:
+            return ERR_EXTRA_RANGES_FORMAT
+        try:
+            start_str, end_str = part.split("-", 1)
+            start = int(start_str.strip())
+            end = int(end_str.strip())
+            if start < 0 or end < 0:
+                return ERR_EXTRA_RANGES_FORMAT
+            if start > end:
+                return ERR_EXTRA_RANGES_REVERSED
+            if start <= DEFAULT_RANGE_END:
+                return ERR_EXTRA_RANGES_OVERLAP
+        except ValueError, TypeError:
+            return ERR_EXTRA_RANGES_FORMAT
+    return None
+
+
+def _is_valid_extra_ranges_format(value: str) -> bool:
+    return _get_extra_ranges_error(value) is None
+
+
+def validate_extra_ranges(value: str) -> bool | ValidationError:
+    error = _get_extra_ranges_error(value)
+    if error is not None:
+        return ValidationError(validate_extra_ranges, error, [("value", value)])
+    return True
+
+
+def _verify_extra_ranges(value: str) -> bool | VerificationResult:
+    error = _get_extra_ranges_error(value)
+    if error is not None:
+        return VerificationResult(message=error, status=False)
+    return True
+
+
+def _verify_default_country(country_code: str) -> bool:
+    return bool(country_code) and country_code.upper() in COUNTRIES
+
+
+def _verify_voice(shortname: str) -> bool:
+    if not shortname:
+        return False
+    voice_dir = SOUNDS_DIR / shortname
+    return voice_dir.is_dir() and (voice_dir / VOICE_METADATA_FILENAME).is_file()
+
+
+def _select_default_country() -> SelectionResult:
+    result = SelectionResult(
+        caption=DLG_DEFAULT_COUNTRY_CAPTION,
+        message=DLG_DEFAULT_COUNTRY_MESSAGE,
+        selection_type=SelectionType.SINGLE,
+    )
+    for ioc_code, data in sorted(COUNTRIES.items(), key=lambda x: x[1]["name"]):
+        result.add_value(SelectionData(ioc_code, f"{data['name']} ({ioc_code})"))
+    return result
+
+
 _cancel_event = threading.Event()
 
 
@@ -114,11 +206,9 @@ def _drain_queue(q: Queue) -> None:
 
 
 SOUNDS_DIR = Path(__file__).resolve().parent.parent / "sounds"
-DEFAULT_RANGE_START = 0
-DEFAULT_RANGE_END = 999
+
 SAMPLE_NUMBERS = (7, 104, 999)  # demo samples played when clicking "Play"
 TESTING_TEXT = "Testing, one two three"
-DEFAULT_EXTRA_RANGE = "1000-9999"
 
 TOOLTIP_PLAY_SAMPLE = "Play sample"
 TOOLTIP_DEFAULT = ""
@@ -155,12 +245,35 @@ COL_INST_FALLBACK = 6
 
 VOICEMANAGER_SECTION_NAME = "VoiceManager"
 
+
+def _is_valid_voice_dirname(dirname: str) -> bool:
+    parts = dirname.split("-")
+    return len(parts) >= 2 and len(parts[0]) == 2
+
+
+def get_installed_voice_shortnames() -> list[str]:
+    """Return installed voice shortnames for use as valid_values_gen."""
+    shortnames: list[str] = []
+    if not SOUNDS_DIR.is_dir():
+        return shortnames
+    for d in sorted(SOUNDS_DIR.iterdir()):
+        if not d.is_dir():
+            continue
+        if not _is_valid_voice_dirname(d.name):
+            continue
+        if not (d / VOICE_METADATA_FILENAME).is_file():
+            continue
+        shortnames.append(d.name)
+    return shortnames
+
+
 CONFIG_OPTION_DEFAULT_COUNTRY = ConfigOptionDefinition(
     name="defaultcountry",
     display_name="Default Country",
     value_type=str,
     description="IOC 3-letter code for the home nation.",
     default_value="SWE",
+    valid_values=list(COUNTRIES.keys()),
 )
 
 CONFIG_OPTION_DEFAULT_VOICE = ConfigOptionDefinition(
@@ -168,7 +281,8 @@ CONFIG_OPTION_DEFAULT_VOICE = ConfigOptionDefinition(
     display_name="Default Voice",
     value_type=str,
     description="ShortName of the voice for home-country runners.",
-    default_value="",
+    mandatory=True,
+    valid_values_gen=get_installed_voice_shortnames,
 )
 
 CONFIG_OPTION_FALLBACK_VOICE = ConfigOptionDefinition(
@@ -176,7 +290,8 @@ CONFIG_OPTION_FALLBACK_VOICE = ConfigOptionDefinition(
     display_name="Fallback Voice",
     value_type=str,
     description="ShortName of the voice for foreign runners.",
-    default_value="",
+    mandatory=True,
+    valid_values_gen=get_installed_voice_shortnames,
 )
 
 CONFIG_OPTION_EXTRA_RANGES = ConfigOptionDefinition(
@@ -185,6 +300,7 @@ CONFIG_OPTION_EXTRA_RANGES = ConfigOptionDefinition(
     value_type=str,
     description=f"Comma-separated list of extra number ranges (e.g. {DEFAULT_EXTRA_RANGE}).",
     default_value="",
+    validator=validate_extra_ranges,
 )
 
 VOICEMANAGER_SECTION = ConfigSectionDefinition(
@@ -201,6 +317,61 @@ VOICEMANAGER_SECTION = ConfigSectionDefinition(
 
 Config.register_config_section_definition(VOICEMANAGER_SECTION)
 
+VOICE_MANAGER_DEFAULT_COUNTRY_VERIFIER = ConfigVerifierDefinition(
+    function=_verify_default_country,
+    parameters=[
+        ConfigSectionOptionDefinition(
+            section_name=VOICEMANAGER_SECTION_NAME,
+            option_definition=CONFIG_OPTION_DEFAULT_COUNTRY,
+        ),
+    ],
+    message=ERR_COUNTRY_VERIFY,
+)
+CONFIG_OPTION_DEFAULT_COUNTRY.set_verifier(VOICE_MANAGER_DEFAULT_COUNTRY_VERIFIER)
+
+VOICE_MANAGER_DEFAULT_COUNTRY_SELECTOR = ConfigSelectorDefinition(
+    function=_select_default_country,
+    parameters=[],
+    message=MSG_SELECT_COUNTRY,
+)
+CONFIG_OPTION_DEFAULT_COUNTRY.set_selector(VOICE_MANAGER_DEFAULT_COUNTRY_SELECTOR)
+
+VOICE_MANAGER_DEFAULT_VOICE_VERIFIER = ConfigVerifierDefinition(
+    function=_verify_voice,
+    parameters=[
+        ConfigSectionOptionDefinition(
+            section_name=VOICEMANAGER_SECTION_NAME,
+            option_definition=CONFIG_OPTION_DEFAULT_VOICE,
+        ),
+    ],
+    message=ERR_DEFAULT_VOICE_VERIFY,
+)
+CONFIG_OPTION_DEFAULT_VOICE.set_verifier(VOICE_MANAGER_DEFAULT_VOICE_VERIFIER)
+
+VOICE_MANAGER_FALLBACK_VOICE_VERIFIER = ConfigVerifierDefinition(
+    function=_verify_voice,
+    parameters=[
+        ConfigSectionOptionDefinition(
+            section_name=VOICEMANAGER_SECTION_NAME,
+            option_definition=CONFIG_OPTION_FALLBACK_VOICE,
+        ),
+    ],
+    message=ERR_FALLBACK_VOICE_VERIFY,
+)
+CONFIG_OPTION_FALLBACK_VOICE.set_verifier(VOICE_MANAGER_FALLBACK_VOICE_VERIFIER)
+
+VOICE_MANAGER_EXTRA_RANGES_VERIFIER = ConfigVerifierDefinition(
+    function=_verify_extra_ranges,
+    parameters=[
+        ConfigSectionOptionDefinition(
+            section_name=VOICEMANAGER_SECTION_NAME,
+            option_definition=CONFIG_OPTION_EXTRA_RANGES,
+        ),
+    ],
+    message=ERR_EXTRA_RANGES_VERIFY,
+)
+CONFIG_OPTION_EXTRA_RANGES.set_verifier(VOICE_MANAGER_EXTRA_RANGES_VERIFIER)
+
 
 @dataclass
 class InstalledVoice:
@@ -208,11 +379,6 @@ class InstalledVoice:
     lang: str
     gender: str
     complete: bool
-
-
-def _is_valid_voice_dirname(dirname: str) -> bool:
-    parts = dirname.split("-")
-    return len(parts) >= 2 and len(parts[0]) == 2
 
 
 def _locale_to_language_name(locale: str) -> str:

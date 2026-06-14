@@ -53,6 +53,7 @@ from utils.hotkey_bindings import (
 )
 from utils.sound import Sound, verify_sound, get_all_sounds
 from utils.version import __version__
+from utils.voice_manager_dialog import VoiceManagerDialog
 
 # Column index names
 COL_NR_TIME = 0
@@ -925,17 +926,9 @@ class PreWarning(
         self.sound.play_voice_sound(test_file, voice)
 
     def _open_voice_manager(self):
-        import time as _time
-
-        _t0 = _time.time()
         self.logger.debug("Open Voice Manager")
-        from utils.voice_manager_dialog import VoiceManagerDialog
-
-        self.logger.debug("Import VoiceManagerDialog took %.3fs", _time.time() - _t0)
         dlg = VoiceManagerDialog(self)
-        self.logger.debug("Dialog construction took %.3fs", _time.time() - _t0)
         dlg.ShowModal()
-        self.logger.debug("Dialog closed after %.3fs", _time.time() - _t0)
         dlg.Destroy()
 
     def _notify_ip(self):
