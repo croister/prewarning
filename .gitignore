@@ -92,3 +92,6 @@ ENV/
 # Test and execution artifacts
 data/
 test_data/
+
+# Application logs
+logs/

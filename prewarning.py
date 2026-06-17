@@ -74,6 +74,9 @@ LOGGING_CONFIGURATION_FILE_FILTER_VALUES = {
     "APPLICATION_DIR": APPLICATION_DIR,
 }
 
+# Ensure logs directory exists before logging is configured
+(APPLICATION_DIR / "logs").mkdir(exist_ok=True)
+
 
 def _filter_logging_configuration(config_dict: dict):
     for key, value in config_dict.items():
