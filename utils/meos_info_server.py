@@ -378,9 +378,7 @@ class MeosInfoServer(
                     self._zero_time = datetime.strptime(
                         f"{date_str} {zero_str}", "%Y-%m-%d %H:%M:%S"
                     )
-                    self._competition_date = datetime.strptime(
-                        date_str, "%Y-%m-%d"
-                    )
+                    self._competition_date = datetime.strptime(date_str, "%Y-%m-%d")
                 except ValueError:
                     pass
 
