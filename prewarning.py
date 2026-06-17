@@ -28,6 +28,7 @@ from punchsources import PUNCH_SOURCES, COMMON_PUNCH_SOURCE
 from punchsources._base import PunchListener
 from startlistsources import START_LIST_SOURCES, COMMON_START_LIST_SOURCE
 from startlistsources.start_list_source_ola_mysql import StartListSourceOlaMySql
+from utils.meos_info_server import MeosInfoServer
 from utils.config import Config
 from utils.config_consumer import ConfigConsumer
 from utils.config_definitions import (
@@ -930,6 +931,8 @@ class PreWarning(
         state_providers = {}
         if self.punch_source is not None:
             state_providers[self.punch_source.name] = self.punch_source
+        if MeosInfoServer.has_instance():
+            state_providers[MeosInfoServer.CONFIG_SECTION_MEOS] = MeosInfoServer()
         settings_dialog = ConfigDialog(
             self.config, self, title="Settings", state_providers=state_providers
         )

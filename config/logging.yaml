@@ -32,9 +32,15 @@ loggers:
     level: NOTSET
   PunchSourceOlresultatSe:
     level: NOTSET
+  MeosInfoServer:
+    level: NOTSET
+  PunchSourceMeos:
+    level: NOTSET
   StartListSourceFile:
     level: NOTSET
   StartListSourceOlaMySql:
+    level: NOTSET
+  StartListSourceMeos:
     level: NOTSET
   Validators:
     level: NOTSET
