@@ -28,7 +28,7 @@ class _StateSaverGroup:
         self,
         config_section_name: str,
         runtime_state_group: RuntimeStateGroup,
-        data_dir: Path = DATA_DIR,
+        data_dir: Path | None = None,
     ):
         self.logger = logging.getLogger(self.__class__.__name__)
 
@@ -36,6 +36,8 @@ class _StateSaverGroup:
 
         self.runtime_state_group = runtime_state_group
 
+        if data_dir is None:
+            data_dir = DATA_DIR
         self._state_file_location = data_dir / runtime_state_group.state_file_name
 
         self._data_read_state = dict()
@@ -197,9 +199,12 @@ class StateSaverMixin(ABC):
         self,
         config_section_name: str,
         runtime_state_groups: List[RuntimeStateGroup],
-        data_dir: Path = DATA_DIR,
+        data_dir: Path | None = None,
     ):
         self.logger = logging.getLogger(self.__class__.__name__)
+
+        if data_dir is None:
+            data_dir = DATA_DIR
 
         if not data_dir.is_dir():
             data_dir.mkdir()

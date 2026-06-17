@@ -35,11 +35,8 @@ def _make_mop_diff(content: str, next_diff: str = "99999") -> str:
 
 @pytest.fixture(autouse=True)
 def _reset_singleton():
-    """Clear the Singleton instance between tests."""
-    from utils.constants import DATA_DIR
+    """Clear the MeosInfoServer singleton instance between tests."""
     from utils.singleton import _Singleton
-
-    state_file = DATA_DIR / "meos_info_server.dat"
 
     if MeosInfoServer in _Singleton._instances:
         instance = _Singleton._instances[MeosInfoServer]
@@ -54,8 +51,6 @@ def _reset_singleton():
             instance._ref_count = 1
             instance.stop()
         del _Singleton._instances[MeosInfoServer]
-    if state_file.exists():
-        state_file.unlink()
 
 
 @pytest.fixture
