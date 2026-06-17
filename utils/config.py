@@ -185,7 +185,7 @@ class Config(LoggingEventHandler, Singleton):
         self.config = ConfigParser()
 
         self.config_sections: dict[str, SectionProxy] = dict()
-        self.prev_config_sections: dict[str, SectionProxy] = dict()
+        self.prev_config_sections: dict[str, dict[str, str]] = dict()
 
         self.observer = Observer()
         self.observer.name = "ConfigFileObserverThread"
@@ -262,7 +262,7 @@ class Config(LoggingEventHandler, Singleton):
                     )
                 )
             option_definition.set_value(self.config[name], value)
-            option_definition.set_value(self.prev_config_sections[name], value)
+            self.prev_config_sections[name][option_definition.name] = str(value)
 
     def config_option_definition_added(
         self, config_section_name: str, config_option_definition_name: str
@@ -309,13 +309,14 @@ class Config(LoggingEventHandler, Singleton):
             for config_section_definition in self.CONFIG_SECTION_DEFINITIONS.values():
                 config_section = self._read_config_section(config_section_definition)
                 section_name = config_section_definition.name
+                snapshot = dict(config_section)
 
                 if (
                     section_name not in self.prev_config_sections
-                    or self.prev_config_sections[section_name] != config_section
+                    or self.prev_config_sections[section_name] != snapshot
                 ):
                     self.config_sections[section_name] = config_section
-                    self.prev_config_sections[section_name] = config_section
+                    self.prev_config_sections[section_name] = snapshot
                     updated_sections.append(section_name)
 
             if self.observer is not None:
