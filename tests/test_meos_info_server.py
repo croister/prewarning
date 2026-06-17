@@ -161,6 +161,22 @@ class TestDiffParsing:
         # 36000 tenths = 3600 seconds = 1 hour after zero time (05:00:00)
         assert punch["passedTime"] == datetime(2026, 6, 16, 6, 0, 0)
 
+    def test_running_time_includes_start_time_offset(self, server):
+        # st=18000 tenths = 1800s = 00:30:00 from midnight
+        server._competition_date = datetime(2026, 6, 16)
+        server._cmp_info[1] = {"card": "12345", "st": 18000}
+
+        listener = MagicMock(spec=MeosPunchListener)
+        server._listeners.append(listener)
+
+        xml = f'<cmp id="1" card="12345" xmlns="{MOP_NS}"><radio>50,36000</radio></cmp>'
+        elem = ET.fromstring(xml)
+        server._process_cmp_elem(elem)
+
+        punch = listener.meos_punch_received.call_args[0][0]
+        # midnight + (18000 + 36000) / 10 = 00:00:00 + 5400s = 01:30:00
+        assert punch["passedTime"] == datetime(2026, 6, 16, 1, 30, 0)
+
 
 class TestMopCompleteVsDiff:
     @patch("utils.meos_info_server._fetch_xml")

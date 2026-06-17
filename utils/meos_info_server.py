@@ -262,6 +262,7 @@ class MeosInfoServer(
 
         # Caches
         self._zero_time: datetime | None = None
+        self._competition_date: datetime | None = None
         self._control_map: Dict[int, str] = {}
         self._radio_control_ids: Set[int] = set()
         self._team_bib: Dict[int, str] = {}
@@ -376,6 +377,9 @@ class MeosInfoServer(
                 try:
                     self._zero_time = datetime.strptime(
                         f"{date_str} {zero_str}", "%Y-%m-%d %H:%M:%S"
+                    )
+                    self._competition_date = datetime.strptime(
+                        date_str, "%Y-%m-%d"
                     )
                 except ValueError:
                     pass
@@ -508,6 +512,13 @@ class MeosInfoServer(
                 info["card"] = card
                 self.logger.debug("Competitor %d card updated: %s", cmp_id, card)
 
+        base_elem = _find(elem, "base")
+        if base_elem is not None:
+            st = base_elem.get("st")
+            if st:
+                info = self._cmp_info.setdefault(cmp_id, {})
+                info["st"] = int(st)
+
         radio_elem = _find(elem, "radio")
         if radio_elem is None or not radio_elem.text:
             return
@@ -537,9 +548,16 @@ class MeosInfoServer(
 
             passed_time = None
             if self._zero_time and running_time > 0:
-                passed_time = (
-                    self._zero_time + timedelta(seconds=running_time / 10)
-                ).replace(microsecond=0)
+                st = cmp_data.get("st", 0)
+                if st and self._competition_date:
+                    passed_time = (
+                        self._competition_date
+                        + timedelta(seconds=(st + running_time) / 10)
+                    ).replace(microsecond=0)
+                else:
+                    passed_time = (
+                        self._zero_time + timedelta(seconds=running_time / 10)
+                    ).replace(microsecond=0)
 
             punch: Dict = {
                 "id": f"{cmp_id}_{radio_id}",
