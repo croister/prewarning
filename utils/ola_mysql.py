@@ -758,7 +758,7 @@ class OlaMySql(ConfigConsumer, Singleton, metaclass=_OlaMySqlMeta):
             CONFIG_OPTION_EVENT_RACE,
         ],
         enable_type=ConfigSectionEnableType.IF_REQUIRED,
-        sort_key_prefix=20,
+        sort_key_prefix=21,
     )
 
     MYSQL_CONNECTION_VERIFIER = ConfigVerifierDefinition(

@@ -110,7 +110,7 @@ def _register_common_source():
     )
 
     Config.register_config_option_definition(
-        Config.SECTION_COMMON, COMMON_START_LIST_SOURCE
+        Config.SECTION_DATA_SOURCES, COMMON_START_LIST_SOURCE
     )
     __all__.append("COMMON_START_LIST_SOURCE")
 

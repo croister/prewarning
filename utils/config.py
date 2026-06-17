@@ -33,6 +33,8 @@ class Config(LoggingEventHandler, Singleton):
     )
 
     SECTION_COMMON = "Common"
+    SECTION_DEDUPLICATION = "Deduplication"
+    SECTION_DATA_SOURCES = "DataSources"
 
     CONFIG_SECTION_DEFINITIONS: dict[str, ConfigSectionDefinition] = dict()
 

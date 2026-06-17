@@ -109,7 +109,9 @@ def _register_common_source():
         ],
     )
 
-    Config.register_config_option_definition(Config.SECTION_COMMON, COMMON_PUNCH_SOURCE)
+    Config.register_config_option_definition(
+        Config.SECTION_DATA_SOURCES, COMMON_PUNCH_SOURCE
+    )
     __all__.append("COMMON_PUNCH_SOURCE")
 
 

@@ -305,14 +305,14 @@ CONFIG_OPTION_EXTRA_RANGES = ConfigOptionDefinition(
 
 VOICEMANAGER_SECTION = ConfigSectionDefinition(
     name=VOICEMANAGER_SECTION_NAME,
-    display_name="VoiceManager",
+    display_name="Voice Manager",
     option_definitions=[
         CONFIG_OPTION_DEFAULT_COUNTRY,
         CONFIG_OPTION_DEFAULT_VOICE,
         CONFIG_OPTION_FALLBACK_VOICE,
         CONFIG_OPTION_EXTRA_RANGES,
     ],
-    sort_key_prefix=20,
+    sort_key_prefix=11,
 )
 
 Config.register_config_section_definition(VOICEMANAGER_SECTION)

@@ -245,11 +245,26 @@ class PreWarning(
             CONFIG_OPTION_INTRO_SOUND_FILE,
             CONFIG_OPTION_TEST_SOUND_FILE,
             CONFIG_OPTION_ADD_PRE_WARNINGS_TO_BOTTOM,
+        ],
+        sort_key_prefix=0,
+    )
+
+    DEDUP_CONFIG_SECTION_DEFINITION = ConfigSectionDefinition(
+        name=Config.SECTION_DEDUPLICATION,
+        display_name="Deduplication",
+        option_definitions=[
             CONFIG_OPTION_DEDUP_CARD_CONTROL,
             CONFIG_OPTION_DEDUP_BIB_LEG,
             CONFIG_OPTION_DEDUP_TIMEOUT_SECONDS,
         ],
-        sort_key_prefix=0,
+        sort_key_prefix=1,
+    )
+
+    DATA_SOURCES_CONFIG_SECTION_DEFINITION = ConfigSectionDefinition(
+        name=Config.SECTION_DATA_SOURCES,
+        display_name="Data Sources",
+        option_definitions=[],
+        sort_key_prefix=12,
     )
 
     COMMON_CONFIG_SECTION_INTRO_SOUND_VERIFIER = ConfigVerifierDefinition(
@@ -283,6 +298,8 @@ class PreWarning(
     )
 
     Config.register_config_section_definition(COMMON_CONFIG_SECTION_DEFINITION)
+    Config.register_config_section_definition(DEDUP_CONFIG_SECTION_DEFINITION)
+    Config.register_config_section_definition(DATA_SOURCES_CONFIG_SECTION_DEFINITION)
 
     @classmethod
     def config_section_definition(cls) -> ConfigSectionDefinition:
@@ -1109,17 +1126,22 @@ class PreWarning(
         )
 
         self._dedup_card_control_enabled = (
-            self.CONFIG_OPTION_DEDUP_CARD_CONTROL.get_value(config_section)
+            self.CONFIG_OPTION_DEDUP_CARD_CONTROL.get_value(
+                self.config.get_section(Config.SECTION_DEDUPLICATION)
+            )
         )
         self._dedup_bib_leg_enabled = self.CONFIG_OPTION_DEDUP_BIB_LEG.get_value(
-            config_section
+            self.config.get_section(Config.SECTION_DEDUPLICATION)
         )
         self._dedup_timeout = self.CONFIG_OPTION_DEDUP_TIMEOUT_SECONDS.get_value(
-            config_section
+            self.config.get_section(Config.SECTION_DEDUPLICATION)
         )
 
-        self.punch_source_name = COMMON_PUNCH_SOURCE.get_value(config_section)
-        self.start_list_source_name = COMMON_START_LIST_SOURCE.get_value(config_section)
+        data_sources_section = self.config.get_section(Config.SECTION_DATA_SOURCES)
+        self.punch_source_name = COMMON_PUNCH_SOURCE.get_value(data_sources_section)
+        self.start_list_source_name = COMMON_START_LIST_SOURCE.get_value(
+            data_sources_section
+        )
 
     def start(self):
         if self.announce_ip_on_startup:
