@@ -128,7 +128,14 @@ def _verify_url(url: str) -> VerificationResult:
         )
     except Exception as e:
         logging.getLogger(_MODULE_LOGGER_NAME).debug("_verify_url: %s", e)
-        return VerificationResult(message=str(e), status=False)
+        msg = str(e)
+        if "timed out" in msg:
+            msg = f"Connection timed out. Is MeOS running at {url}?"
+        elif "Connection refused" in msg or "No connection" in msg:
+            msg = f"Connection refused. Is MeOS running at {url}?"
+        elif "Name or service not known" in msg or "getaddrinfo failed" in msg:
+            msg = f"Unknown host. Check the URL: {url}"
+        return VerificationResult(message=msg, status=False)
 
 
 def _select_controls(url: str) -> SelectionResult | bool:
@@ -400,9 +407,9 @@ class MeosInfoServer(
         self._stop_event.set()
         self._poll_event.set()
         if self._poll_thread and self._poll_thread.is_alive():
-            self._poll_thread.join()
+            self._poll_thread.join(timeout=1)
         if self._udp_thread and self._udp_thread.is_alive():
-            self._udp_thread.join()
+            self._udp_thread.join(timeout=1)
         self._poll_thread = None
         self._udp_thread = None
 
@@ -425,18 +432,26 @@ class MeosInfoServer(
             self._fetch_competition(base)
         except Exception as e:
             self.logger.warning("Failed to prime competition cache: %s", e)
+        if self._stop_event.is_set():
+            return
         try:
             self._fetch_controls(base)
         except Exception as e:
             self.logger.warning("Failed to prime control cache: %s", e)
+        if self._stop_event.is_set():
+            return
         try:
             self._fetch_class_radio(base)
         except Exception as e:
             self.logger.warning("Failed to prime class cache: %s", e)
+        if self._stop_event.is_set():
+            return
         try:
             self._fetch_orgs(base)
         except Exception as e:
             self.logger.warning("Failed to prime org cache: %s", e)
+        if self._stop_event.is_set():
+            return
         try:
             self._fetch_teams(base)
         except Exception as e:
