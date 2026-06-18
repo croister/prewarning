@@ -27,7 +27,6 @@ import wx.lib.stattext
 from punchsources import PUNCH_SOURCES, COMMON_PUNCH_SOURCE
 from punchsources._base import PunchListener
 from startlistsources import START_LIST_SOURCES, COMMON_START_LIST_SOURCE
-from startlistsources.start_list_source_ola_mysql import StartListSourceOlaMySql
 from utils.meos_info_server import MeosInfoServer
 from utils.config import Config
 from utils.config_consumer import ConfigConsumer
@@ -47,6 +46,7 @@ from utils.constants import (
     PUNCH_KEY_CARD_NUMBER,
     PUNCH_KEY_CONTROL_CODE,
     PUNCH_KEY_COUNTRY,
+    PUNCH_KEY_IS_LAST_LEG,
     PUNCH_KEY_PASSED_TIME,
     PUNCH_KEY_RELAY_LEG,
     TESTING_FILENAME,
@@ -1227,19 +1227,30 @@ class PreWarning(
                     "Start list source not yet initialized, deferring punch."
                 )
                 continue
-            if PUNCH_KEY_BIB_NUMBER in punch:
-                if source_name != StartListSourceOlaMySql.__qualname__:
-                    pre_warn_data = source.lookup_from_card_number(
-                        punch[PUNCH_KEY_CARD_NUMBER]
+
+            has_all_fields = (
+                PUNCH_KEY_BIB_NUMBER in punch
+                and PUNCH_KEY_RELAY_LEG in punch
+                and PUNCH_KEY_IS_LAST_LEG in punch
+                and PUNCH_KEY_COUNTRY in punch
+            )
+
+            if has_all_fields:
+                pass  # All data already present, skip lookup
+            elif PUNCH_KEY_BIB_NUMBER in punch:
+                # Partial data — enrich via lookup
+                pre_warn_data = source.lookup_from_card_number(
+                    punch[PUNCH_KEY_CARD_NUMBER]
+                )
+                if pre_warn_data is None:
+                    self.logger.debug(
+                        "Could not find the team connected to the card number."
+                        " Using already existing data."
                     )
-                    if pre_warn_data is None:
-                        self.logger.debug(
-                            "Could not find the team connected to the card number."
-                            " Using already existing data."
-                        )
-                    else:
-                        punch.update(pre_warn_data)
+                else:
+                    punch.update(pre_warn_data)
             else:
+                # No bib — lookup is mandatory
                 pre_warn_data = source.lookup_from_card_number(
                     punch[PUNCH_KEY_CARD_NUMBER]
                 )
