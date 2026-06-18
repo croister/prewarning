@@ -662,9 +662,16 @@ class MeosInfoServer(
                 PUNCH_KEY_PASSED_TIME: passed_time,
             }
             if team_id is not None and team_id in self._team_bib:
-                punch[PUNCH_KEY_BIB_NUMBER] = self._team_bib[team_id]
-            if leg is not None:
-                punch[PUNCH_KEY_RELAY_LEG] = leg
+                bib = self._team_bib[team_id]
+                punch[PUNCH_KEY_BIB_NUMBER] = bib
+                if leg is not None:
+                    punch[PUNCH_KEY_RELAY_LEG] = leg
+                    max_leg = self._team_leg_count.get(team_id)
+                    is_last_leg = max_leg is not None and leg >= max_leg
+                    punch[PUNCH_KEY_IS_LAST_LEG] = is_last_leg
+                    punch[PUNCH_KEY_COUNTRY] = self._resolve_next_leg_country(
+                        team_id, leg, is_last_leg
+                    )
 
             if not suppress:
                 self._notify_listeners(punch)
@@ -682,7 +689,7 @@ class MeosInfoServer(
             self.logger.info("UDP listener bound on port %d", self._udp_port)
         except OSError as e:
             self.logger.warning(
-                "UDP bind failed (port %d): %s — using interval polling only",
+                "UDP bind failed (port %d): %s - using interval polling only",
                 self._udp_port,
                 e,
             )
@@ -744,13 +751,13 @@ class MeosInfoServer(
                     if bib:
                         result = self._build_lookup_result(team_id, bib, leg)
                         self.logger.debug(
-                            "lookup_card(%s): cache hit → %s", card_number, result
+                            "lookup_card(%s): cache hit -> %s", card_number, result
                         )
                         return result
         # Fall back to on-demand lookup
         http_result = self._lookup_card_http(card_number, retry=True)
         self.logger.debug(
-            "lookup_card(%s): http fallback → %s", card_number, http_result
+            "lookup_card(%s): http fallback -> %s", card_number, http_result
         )
         return http_result
 
