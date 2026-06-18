@@ -223,6 +223,15 @@ class PreWarning(
         default_value=False,
     )
 
+    CONFIG_OPTION_ANNOUNCE_LAST_LEG = ConfigOptionDefinition(
+        name="AnnounceLastLeg",
+        display_name="Announce Last Leg",
+        value_type=bool,
+        description="If disabled, pre-warnings for the last leg are suppressed "
+        "(not displayed or announced).",
+        default_value=False,
+    )
+
     CONFIG_OPTION_DEDUP_CARD_CONTROL = ConfigOptionDefinition(
         name="DedupCardControl",
         display_name="Deduplicate by Card + Control",
@@ -259,6 +268,7 @@ class PreWarning(
             CONFIG_OPTION_INTRO_SOUND_FILE,
             CONFIG_OPTION_TEST_SOUND_FILE,
             CONFIG_OPTION_ADD_PRE_WARNINGS_TO_BOTTOM,
+            CONFIG_OPTION_ANNOUNCE_LAST_LEG,
         ],
         sort_key_prefix=0,
     )
@@ -1143,6 +1153,10 @@ class PreWarning(
             self.CONFIG_OPTION_ADD_PRE_WARNINGS_TO_BOTTOM.get_value(config_section)
         )
 
+        self._announce_last_leg = self.CONFIG_OPTION_ANNOUNCE_LAST_LEG.get_value(
+            config_section
+        )
+
         self._dedup_card_control_enabled = (
             self.CONFIG_OPTION_DEDUP_CARD_CONTROL.get_value(
                 self.config.get_section(Config.SECTION_DEDUPLICATION)
@@ -1261,6 +1275,12 @@ class PreWarning(
                     continue
                 else:
                     punch.update(pre_warn_data)
+
+            if not self._announce_last_leg and punch.get(PUNCH_KEY_IS_LAST_LEG):
+                self.logger.debug(
+                    "Skipping last leg punch: bib=%s", punch.get(PUNCH_KEY_BIB_NUMBER)
+                )
+                continue
 
             passed_time = self._to_str(punch[PUNCH_KEY_PASSED_TIME]).rpartition(" ")[2]
             bib_number = self._to_str(punch[PUNCH_KEY_BIB_NUMBER])
