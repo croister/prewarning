@@ -47,10 +47,19 @@ class _StartListSourceBase(ConfigConsumer):
 
     @abstractmethod
     def lookup_from_card_number(self, card_number: str) -> Dict[str, str] | None:
-        """Returns Bib-Number and Relay Leg for the provided Card Number.
+        """Returns team information for the provided Card Number.
+
+        The returned dict must contain these keys:
+          - bibNumber (str): the team bib number
+          - relayLeg (int): the relay leg number
+          - isLastLeg (bool): whether this is the last leg of the relay
+          - country (str | None): IOC country code for voice selection
+
+        See ``utils.constants`` for the key name constants
+        (PUNCH_KEY_BIB_NUMBER, PUNCH_KEY_RELAY_LEG, etc.).
 
         :param str card_number: The Card Number to look up.
-        :return: A dict with the Bib-Number (bibNumber) and Relay Leg (relayLeg).
-        :rtype: Dict[str, Str] or None
+        :return: A dict with the team information, or None if not found.
+        :rtype: Dict[str, str] or None
         """
         return dict()
