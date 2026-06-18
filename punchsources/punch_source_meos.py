@@ -10,7 +10,7 @@ from utils.config_definitions import (
     ConfigSelectorDefinition,
 )
 from utils.constants import PUNCH_KEY_CONTROL_CODE
-from utils.meos_info_server import MeosInfoServer, MeosPunchListener
+from utils.meos_info_server import MeosInfoServer, MeosPunchListener, _select_controls
 from validators.regex_validators import is_control_ids
 from ._base import _PunchSourceBase
 
@@ -61,7 +61,7 @@ class PunchSourceMeos(MeosPunchListener, _PunchSourceBase):
     )
 
     CONTROLS_SELECTOR = ConfigSelectorDefinition(
-        function=lambda url: MeosInfoServer().get_selector_controls(),
+        function=lambda url: _select_controls(url),
         parameters=[
             ConfigSectionOptionDefinition(
                 section_name=MeosInfoServer.CONFIG_SECTION_MEOS,
