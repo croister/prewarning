@@ -80,6 +80,24 @@ class TestDiffParsing:
         assert server._cmp_info[67] == {"team_id": 23, "leg": 1}
         assert server._cmp_info[68] == {"team_id": 23, "leg": 2}
         assert server._cmp_info[69] == {"team_id": 23, "leg": 3}
+        assert server._team_leg_count[23] == 3
+
+    def test_process_team_elem_multiple_runners_per_leg(self, server):
+        xml = (
+            f'<tm id="50" xmlns="{MOP_NS}">'
+            f'<base bib="72">Team 102</base>'
+            f"<r>301;302,303,304;305</r>"
+            f"</tm>"
+        )
+        elem = ET.fromstring(xml)
+        server._process_team_elem(elem)
+
+        assert server._team_leg_count[50] == 3
+        assert server._cmp_info[301] == {"team_id": 50, "leg": 1}
+        assert server._cmp_info[302] == {"team_id": 50, "leg": 2}
+        assert server._cmp_info[303] == {"team_id": 50, "leg": 2}
+        assert server._cmp_info[304] == {"team_id": 50, "leg": 2}
+        assert server._cmp_info[305] == {"team_id": 50, "leg": 3}
 
     def test_process_cmp_elem_updates_card(self, server):
         xml = (
@@ -261,7 +279,28 @@ class TestLookupCard:
         server._team_bib[23] = "43"
 
         result = server.lookup_card("506576")
-        assert result == {"bibNumber": "43", "relayLeg": 1}
+        assert result == {
+            "bibNumber": "43",
+            "relayLeg": 1,
+            "isLastLeg": False,
+            "country": None,
+        }
+
+    def test_is_last_leg_true(self, server):
+        server._cmp_info[69] = {"card": "111111", "team_id": 23, "leg": 3}
+        server._team_bib[23] = "43"
+        server._team_leg_count[23] = 3
+
+        result = server.lookup_card("111111")
+        assert result["isLastLeg"] is True
+
+    def test_is_last_leg_false(self, server):
+        server._cmp_info[67] = {"card": "222222", "team_id": 23, "leg": 1}
+        server._team_bib[23] = "43"
+        server._team_leg_count[23] = 3
+
+        result = server.lookup_card("222222")
+        assert result["isLastLeg"] is False
 
     def test_cache_miss_no_bib(self, server):
         server._cmp_info[67] = {"card": "506576", "team_id": 23, "leg": 1}
@@ -298,7 +337,12 @@ class TestLookupCard:
         mock_fetch.side_effect = [competitor_xml, team_xml]
 
         result = server.lookup_card("999999")
-        assert result == {"bibNumber": "7", "relayLeg": 2}
+        assert result == {
+            "bibNumber": "7",
+            "relayLeg": 2,
+            "isLastLeg": False,
+            "country": None,
+        }
 
 
 class TestUDPBindFailure:
@@ -358,7 +402,12 @@ class TestStartListSourceMeos:
         server._team_bib[23] = "43"
 
         result = source.lookup_from_card_number("506576")
-        assert result == {"bibNumber": "43", "relayLeg": 1}
+        assert result == {
+            "bibNumber": "43",
+            "relayLeg": 1,
+            "isLastLeg": False,
+            "country": None,
+        }
 
     def test_returns_none_when_not_running(self):
         from startlistsources.start_list_source_meos import StartListSourceMeos

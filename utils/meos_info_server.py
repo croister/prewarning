@@ -33,7 +33,9 @@ from utils.constants import (
     PUNCH_KEY_BIB_NUMBER,
     PUNCH_KEY_CARD_NUMBER,
     PUNCH_KEY_CONTROL_CODE,
+    PUNCH_KEY_COUNTRY,
     PUNCH_KEY_ID,
+    PUNCH_KEY_IS_LAST_LEG,
     PUNCH_KEY_PASSED_TIME,
     PUNCH_KEY_RELAY_LEG,
 )
@@ -315,6 +317,7 @@ class MeosInfoServer(
         self._control_map: Dict[int, str] = {}
         self._radio_control_ids: Set[int] = set()
         self._team_bib: Dict[int, str] = {}
+        self._team_leg_count: Dict[int, int] = {}
         self._cmp_info: Dict[int, Dict] = {}
         self._seen_radio: Dict[int, Set[int]] = {}
 
@@ -467,15 +470,16 @@ class MeosInfoServer(
                     if bib:
                         self._team_bib[team_id] = bib
                 if r_elem is not None and r_elem.text:
-                    for leg_idx, cmp_id_str in enumerate(
-                        r_elem.text.split(";"), start=1
-                    ):
-                        cmp_id_str = cmp_id_str.strip()
-                        if cmp_id_str and cmp_id_str != _MOP_EMPTY_SLOT:
-                            cmp_id = int(cmp_id_str)
-                            info = self._cmp_info.setdefault(cmp_id, {})
-                            info[_CMP_KEY_TEAM_ID] = team_id
-                            info[_CMP_KEY_LEG] = leg_idx
+                    legs = r_elem.text.split(";")
+                    self._team_leg_count[team_id] = len(legs)
+                    for leg_idx, leg_runners in enumerate(legs, start=1):
+                        for cmp_id_str in leg_runners.split(","):
+                            cmp_id_str = cmp_id_str.strip()
+                            if cmp_id_str and cmp_id_str != _MOP_EMPTY_SLOT:
+                                cmp_id = int(cmp_id_str)
+                                info = self._cmp_info.setdefault(cmp_id, {})
+                                info[_CMP_KEY_TEAM_ID] = team_id
+                                info[_CMP_KEY_LEG] = leg_idx
 
     # ── Polling loop ──────────────────────────────────────────────────────────
 
@@ -546,13 +550,16 @@ class MeosInfoServer(
                 self._team_bib[team_id] = bib
                 self.logger.debug("Team %d bib updated: %s", team_id, bib)
         if r_elem is not None and r_elem.text:
-            for leg_idx, cmp_id_str in enumerate(r_elem.text.split(";"), start=1):
-                cmp_id_str = cmp_id_str.strip()
-                if cmp_id_str and cmp_id_str != _MOP_EMPTY_SLOT:
-                    cmp_id = int(cmp_id_str)
-                    info = self._cmp_info.setdefault(cmp_id, {})
-                    info[_CMP_KEY_TEAM_ID] = team_id
-                    info[_CMP_KEY_LEG] = leg_idx
+            legs = r_elem.text.split(";")
+            self._team_leg_count[team_id] = len(legs)
+            for leg_idx, leg_runners in enumerate(legs, start=1):
+                for cmp_id_str in leg_runners.split(","):
+                    cmp_id_str = cmp_id_str.strip()
+                    if cmp_id_str and cmp_id_str != _MOP_EMPTY_SLOT:
+                        cmp_id = int(cmp_id_str)
+                        info = self._cmp_info.setdefault(cmp_id, {})
+                        info[_CMP_KEY_TEAM_ID] = team_id
+                        info[_CMP_KEY_LEG] = leg_idx
 
     def _process_cmp_elem(self, elem: ET.Element, suppress: bool = False) -> None:
         cmp_id = int(elem.get(_ATTR_ID, 0))
@@ -697,9 +704,19 @@ class MeosInfoServer(
                 if team_id is not None and leg is not None:
                     bib = self._team_bib.get(team_id)
                     if bib:
-                        return {PUNCH_KEY_BIB_NUMBER: bib, PUNCH_KEY_RELAY_LEG: leg}
+                        return self._build_lookup_result(team_id, bib, leg)
         # Fall back to on-demand lookup
         return self._lookup_card_http(card_number, retry=True)
+
+    def _build_lookup_result(self, team_id: int, bib: str, leg: int) -> Dict:
+        max_leg = self._team_leg_count.get(team_id)
+        is_last_leg = max_leg is not None and leg >= max_leg
+        return {
+            PUNCH_KEY_BIB_NUMBER: bib,
+            PUNCH_KEY_RELAY_LEG: leg,
+            PUNCH_KEY_IS_LAST_LEG: is_last_leg,
+            PUNCH_KEY_COUNTRY: None,
+        }
 
     def _lookup_card_http(self, card_number: str, retry: bool = True) -> Dict | None:
         if not self._url:
@@ -724,7 +741,7 @@ class MeosInfoServer(
                             pass
                         bib = self._team_bib.get(team_id)
                     if bib:
-                        return {PUNCH_KEY_BIB_NUMBER: bib, PUNCH_KEY_RELAY_LEG: leg}
+                        return self._build_lookup_result(team_id, bib, leg)
         except (HTTPError, URLError) as e:
             self.logger.error("lookup_card HTTP error: %s", e)
         except Exception as e:
