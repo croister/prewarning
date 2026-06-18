@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
+import threading
 from configparser import SectionProxy
 from pathlib import Path
 from typing import Any, Dict, List
@@ -103,6 +104,7 @@ TOOLTIP_DEFAULT = "Reset to the default value."
 TOOLTIP_VERIFY = "Test the value(s)."
 TOOLTIP_SELECT = "Select a value."
 TOOLTIP_ERR_INVALID_FUNCTION = '_default_tooltip: Invalid function "{}".'
+TOOLTIP_WORKING = "Working..."
 
 
 def _default_tooltip(function: str) -> str:
@@ -751,141 +753,182 @@ class ConfigSectionPanel(wx.Panel):
             elif function == "verify":
                 if option_definition.verifier is None:
                     return
-                result = option_definition.verifier.verify()
+                if getattr(button, "_working", False):
+                    return
+                verifier = option_definition.verifier
+                button._working = True  # type: ignore[attr-defined]
+                button.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
+                button.SetBackgroundColour(wx.NullColour)
+                button.SetToolTip(TOOLTIP_WORKING)
+                button.Refresh()
 
-                self.update()
+                def _do_verify():
+                    result = verifier.verify()
+                    wx.CallAfter(self._on_verify_done, button, result)
 
-                if not result:
-                    button.SetBackgroundColour(wx.Colour("pink"))
-                    if isinstance(result, VerificationError):
-                        button.SetToolTip(result.message)
-                    else:
-                        button.SetToolTip(MSG_VERIFY_FAILED)
-                    button.SetFocus()
-                    button.Refresh()
-                else:
-                    message = MSG_SUCCESS
-                    if isinstance(result, VerificationResult):
-                        if result.message is not None:
-                            message = MSG_SUCCESS_FMT.format(result.message)
-                    button.SetBackgroundColour(wx.GREEN)
-                    button.SetToolTip(message)
-                    button.Refresh()
+                threading.Thread(target=_do_verify, daemon=True).start()
 
             elif function == "select":
                 valid_values = option_definition.get_valid_values()
                 if valid_values is None:
                     valid_values = []
                 if option_definition.selector is not None:
-                    select_result = option_definition.selector.select(
-                        parent=self.GetParent()
-                    )
+                    if getattr(button, "_working", False):
+                        return
+                    selector = option_definition.selector
+                    button._working = True  # type: ignore[attr-defined]
+                    button.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
+                    button.SetBackgroundColour(wx.NullColour)
+                    button.SetToolTip(TOOLTIP_WORKING)
+                    button.Refresh()
+
+                    def _do_select():
+                        select_result = selector.select(parent=self.GetParent())
+                        wx.CallAfter(
+                            self._on_select_done,
+                            button,
+                            name,
+                            option_definition,
+                            select_result,
+                        )
+
+                    threading.Thread(target=_do_select, daemon=True).start()
                 elif ConfigSectionPanel._use_selector_for(valid_values):
                     select_result = SelectionResult(
                         caption=DLG_VALID_VALUES_CAPTION, message=DLG_SELECT_VALUE_LABEL
                     )
                     for value in valid_values:
                         select_result.add_value(SelectionData(value, value))
+                    self._handle_select_result(
+                        button, name, option_definition, select_result
+                    )
                 else:
                     self.logger.error(ERR_UNKNOWN_SELECT_METHOD)
                     raise ValueError(ERR_UNKNOWN_SELECT_METHOD)
 
-                if select_result is not None:
-                    if isinstance(select_result, SelectionError):
-                        button.SetBackgroundColour(wx.Colour("pink"))
-                        button.SetToolTip(select_result.message)
-                        button.SetFocus()
-                        button.Refresh()
+    def _on_verify_done(self, button: wx.Button, result) -> None:
+        if not button:
+            return
+        button._working = False  # type: ignore[attr-defined]
+        button.SetCursor(wx.NullCursor)
+        self.update()
 
-                    elif isinstance(select_result, SelectionResult):
-                        option_input = wx.FindWindowByName(name, parent=self)
-                        if option_input is None:
-                            self.logger.error("Unable to find the %s input.", name)
-                            raise ValueError(ERR_INPUT_NOT_FOUND.format(name))
+        if not result:
+            button.SetBackgroundColour(wx.Colour("pink"))
+            if isinstance(result, VerificationError):
+                button.SetToolTip(result.message)
+            else:
+                button.SetToolTip(MSG_VERIFY_FAILED)
+            button.SetFocus()
+            button.Refresh()
+        else:
+            message = MSG_SUCCESS
+            if isinstance(result, VerificationResult):
+                if result.message is not None:
+                    message = MSG_SUCCESS_FMT.format(result.message)
+            button.SetBackgroundColour(wx.GREEN)
+            button.SetToolTip(message)
+            button.Refresh()
 
-                        selected = None
+    def _on_select_done(
+        self, button: wx.Button, name: str, option_definition, select_result
+    ) -> None:
+        if not button:
+            return
+        button._working = False  # type: ignore[attr-defined]
+        button.SetCursor(wx.NullCursor)
+        self._handle_select_result(button, name, option_definition, select_result)
 
-                        if len(select_result.values) > 1:
-                            old_value = str(
-                                option_definition.get_value(
-                                    self.config.get_section(
-                                        self.config_section_definition.name
-                                    )
-                                )
+    def _handle_select_result(
+        self, button: wx.Button, name: str, option_definition, select_result
+    ) -> None:
+        if select_result is None:
+            button.SetToolTip(TOOLTIP_SELECT)
+            return
+
+        if isinstance(select_result, SelectionError):
+            button.SetBackgroundColour(wx.Colour("pink"))
+            button.SetToolTip(select_result.message)
+            button.SetFocus()
+            button.Refresh()
+
+        elif isinstance(select_result, SelectionResult):
+            option_input = wx.FindWindowByName(name, parent=self)
+            if option_input is None:
+                self.logger.error("Unable to find the %s input.", name)
+                raise ValueError(ERR_INPUT_NOT_FOUND.format(name))
+
+            selected = None
+
+            if len(select_result.values) > 1:
+                old_value = str(
+                    option_definition.get_value(
+                        self.config.get_section(self.config_section_definition.name)
+                    )
+                )
+                new_values = [str(s.value) for s in select_result.values]
+
+                value_dict = {str(r.display_name): r for r in select_result.values}
+                value_list = list(value_dict.keys())
+
+                if select_result.selection_type == SelectionType.SINGLE:
+                    old_selected: int = 0
+                    if old_value is not None and old_value in new_values:
+                        old_selected = new_values.index(old_value)
+
+                    with FilterableChoiceDialog(
+                        self.GetParent(),
+                        caption=DLG_VALUES,
+                        message=DLG_SELECT_VALUE_LABEL,
+                        choices=value_list,
+                        initial_selection=old_selected,
+                    ) as dialog:
+                        if dialog.ShowModal() == wx.ID_OK:
+                            self.logger.debug(
+                                'You selected: "%s"',
+                                dialog.GetStringSelection(),
                             )
-                            new_values = [str(s.value) for s in select_result.values]
+                            selected = [value_dict[dialog.GetStringSelection()]]
 
-                            value_dict = {
-                                str(r.display_name): r for r in select_result.values
-                            }
-                            value_list = list(value_dict.keys())
+                elif select_result.selection_type == SelectionType.MULTIPLE:
+                    multi_old_selected: list[int] = []
+                    if old_value is not None:
+                        old_values = old_value.split()
+                        for old_val in old_values:
+                            if old_val in new_values:
+                                multi_old_selected.append(new_values.index(old_val))
 
-                            if select_result.selection_type == SelectionType.SINGLE:
-                                old_selected: int = 0
-                                if old_value is not None and old_value in new_values:
-                                    old_selected = new_values.index(old_value)
+                    with wx.MultiChoiceDialog(
+                        self.GetParent(),
+                        DLG_SELECT_VALUES,
+                        DLG_VALUES,
+                        value_list,
+                    ) as dialog:
+                        dialog.SetSelections(multi_old_selected)
 
-                                with FilterableChoiceDialog(
-                                    self.GetParent(),
-                                    caption=DLG_VALUES,
-                                    message=DLG_SELECT_VALUE_LABEL,
-                                    choices=value_list,
-                                    initial_selection=old_selected,
-                                ) as dialog:
-                                    if dialog.ShowModal() == wx.ID_OK:
-                                        self.logger.debug(
-                                            'You selected: "%s"',
-                                            dialog.GetStringSelection(),
-                                        )
-                                        selected = [
-                                            value_dict[dialog.GetStringSelection()]
-                                        ]
+                        if dialog.ShowModal() == wx.ID_OK:
+                            selections = dialog.GetSelections()
+                            selected = [value_dict[value_list[x]] for x in selections]
+                            self.logger.debug('You selected: "%s"', selected)
 
-                            elif select_result.selection_type == SelectionType.MULTIPLE:
-                                multi_old_selected: list[int] = []
-                                if old_value is not None:
-                                    old_values = old_value.split()
-                                    for old_val in old_values:
-                                        if old_val in new_values:
-                                            multi_old_selected.append(
-                                                new_values.index(old_val)
-                                            )
+            elif len(select_result.values) == 1:
+                selected = select_result.values
 
-                                with wx.MultiChoiceDialog(
-                                    self.GetParent(),
-                                    DLG_SELECT_VALUES,
-                                    DLG_VALUES,
-                                    value_list,
-                                ) as dialog:
-                                    dialog.SetSelections(multi_old_selected)
+            if selected is not None:
+                value = " ".join([str(s.value) for s in selected])
 
-                                    if dialog.ShowModal() == wx.ID_OK:
-                                        selections = dialog.GetSelections()
-                                        selected = [
-                                            value_dict[value_list[x]]
-                                            for x in selections
-                                        ]
-                                        self.logger.debug(
-                                            'You selected: "%s"', selected
-                                        )
+                _set_value(option_input, value)
+                if name in self._tracking_controls:
+                    self._tracking_dirty[name] = True
 
-                        elif len(select_result.values) == 1:
-                            selected = select_result.values
+                self.update()
 
-                        if selected is not None:
-                            value = " ".join([str(s.value) for s in selected])
-
-                            _set_value(option_input, value)
-                            if name in self._tracking_controls:
-                                self._tracking_dirty[name] = True
-
-                            self.update()
-
-                            button.SetBackgroundColour(wx.GREEN)
-                            button.SetToolTip(MSG_SUCCESS)
-                            button.Refresh()
-                        else:
-                            self.update()
+                button.SetBackgroundColour(wx.GREEN)
+                button.SetToolTip(MSG_SUCCESS)
+                button.Refresh()
+            else:
+                button.SetToolTip(TOOLTIP_SELECT)
+                self.update()
 
     def Validate(self) -> bool:
         for child in self.GetChildren():
