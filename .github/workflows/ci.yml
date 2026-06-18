@@ -94,7 +94,7 @@ jobs:
             target: windows
           - os: macos-latest
             target: macos
-          - os: ubuntu-latest
+          - os: ubuntu-22.04
             target: linux
     runs-on: ${{ matrix.os }}
     steps:
