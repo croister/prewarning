@@ -16,7 +16,7 @@ DATA_DIR_NAME = "data"
 # The directory where the configuration files are located
 DATA_DIR = APPLICATION_DIR / DATA_DIR_NAME
 
-# ── Punch dict keys ───────────────────────────────────────────────────────────
+# -- Punch dict keys -----------------------------------------------------------
 # Keys used in the punch dict passed between punch sources, start list sources,
 # and the main application.
 

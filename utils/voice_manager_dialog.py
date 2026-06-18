@@ -741,7 +741,7 @@ class VoiceManagerDialog(wx.Dialog):
 
         self.Bind(wx.EVT_CLOSE, self._on_close)
 
-    # ── UI building ───────────────────────────────────────────────
+    # -- UI building -----------------------------------------------
 
     def _build_ui(self):
         main_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -1170,7 +1170,7 @@ class VoiceManagerDialog(wx.Dialog):
         close_btn.Bind(wx.EVT_BUTTON, lambda e: self.Close())
         return close_btn
 
-    # ── Data loading ──────────────────────────────────────────────
+    # -- Data loading ----------------------------------------------
 
     def _load_data(self):
         self._refresh_installed_list()
@@ -1268,7 +1268,7 @@ class VoiceManagerDialog(wx.Dialog):
                 self._on_filter(None)
                 break
 
-    # ── Helpers ───────────────────────────────────────────────────
+    # -- Helpers ---------------------------------------------------
 
     @staticmethod
     def _get_selected_shortname(listctrl, col: int = 0) -> str | None:
@@ -1277,7 +1277,7 @@ class VoiceManagerDialog(wx.Dialog):
             return None
         return listctrl.GetItemText(idx, col)
 
-    # ── Discovered voices ─────────────────────────────────────────
+    # -- Discovered voices -----------------------------------------
 
     def _refresh_discovered_list(self):
         lang_filter = self.lang_combo.GetValue().lower()
@@ -1486,7 +1486,7 @@ class VoiceManagerDialog(wx.Dialog):
         self.discovered_list.Refresh()
         self._set_installed_play_images(gray=False)
 
-    # ── Installed voices ──────────────────────────────────────────
+    # -- Installed voices ------------------------------------------
 
     def _refresh_installed_list(self):
         self.installed_voices = _list_installed_voices(self.discovered_voices)
@@ -1712,7 +1712,7 @@ class VoiceManagerDialog(wx.Dialog):
             self._refresh_installed_list()
         dlg.Destroy()
 
-    # ── Install queue ─────────────────────────────────────────────
+    # -- Install queue ---------------------------------------------
 
     def _enqueue_install(self, voice_data: Voice):
         shortname = voice_data.get(_VOICE_KEY_SHORT_NAME, "")
@@ -1784,7 +1784,7 @@ class VoiceManagerDialog(wx.Dialog):
         except RuntimeError:
             pass
 
-    # ── Close ─────────────────────────────────────────────────────
+    # -- Close -----------------------------------------------------
 
     def _on_close(self, event):
         all_valid, has_conflicts = self._validate_all_range_rows()

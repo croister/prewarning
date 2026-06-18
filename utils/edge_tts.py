@@ -25,7 +25,7 @@ class EdgeTTSError(Exception):
 
 class _EdgeTTS:
     """Internal wrapper that manages a dedicated asyncio event loop in a
-    background thread. All public methods are synchronous — they submit
+    background thread. All public methods are synchronous - they submit
     coroutines to the event loop via run_coroutine_threadsafe and block
     on the result."""
 

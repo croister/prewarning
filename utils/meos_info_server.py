@@ -136,7 +136,7 @@ def _select_controls(url: str) -> SelectionResult | bool:
         )
         base = url.rstrip("/")
 
-        # Build control id → name map
+        # Build control id -> name map
         ctrl_root = _fetch_xml(f"{base}/meos?get=control")
         control_map: Dict[int, str] = {}
         for elem in ctrl_root:
@@ -363,7 +363,7 @@ class MeosInfoServer(
     def config_updated(self, section_names: List[str]) -> None:
         self.update()
 
-    # ── Lifecycle ────────────────────────────────────────────────────────────
+    # -- Lifecycle ------------------------------------------------------------
 
     def start(self) -> None:
         self._ref_count += 1
@@ -407,7 +407,7 @@ class MeosInfoServer(
         self._save_state()
         self._poll_event.set()
 
-    # ── Cache priming ─────────────────────────────────────────────────────────
+    # -- Cache priming ---------------------------------------------------------
 
     def _prime_caches(self) -> None:
         if not self._url:
@@ -504,7 +504,7 @@ class MeosInfoServer(
                                 info[_CMP_KEY_TEAM_ID] = team_id
                                 info[_CMP_KEY_LEG] = leg_idx
 
-    # ── Polling loop ──────────────────────────────────────────────────────────
+    # -- Polling loop ----------------------------------------------------------
 
     def _poll_loop(self) -> None:
         self.logger.debug("Poll loop started")
@@ -527,7 +527,7 @@ class MeosInfoServer(
         try:
             root = _fetch_xml(f"{base}/meos?difference={self._next_difference}")
         except ET.ParseError:
-            # Stale/invalid diff token — reset to zero and retry
+            # Stale/invalid diff token - reset to zero and retry
             self.logger.warning(
                 "Invalid diff response for token '%s', resetting to 'zero'",
                 self._next_difference,
@@ -676,7 +676,7 @@ class MeosInfoServer(
             if not suppress:
                 self._notify_listeners(punch)
 
-    # ── UDP listener ──────────────────────────────────────────────────────────
+    # -- UDP listener ----------------------------------------------------------
 
     _UDP_STRUCT_SIZE = 20  # 5 x int32: cmpId, runnerId, iHashType, status, time
 
@@ -718,7 +718,7 @@ class MeosInfoServer(
                 self.logger.debug("UDP recv error: %s", e)
         sock.close()
 
-    # ── Listeners ─────────────────────────────────────────────────────────────
+    # -- Listeners -------------------------------------------------------------
 
     def register_meos_punch_listener(self, listener: MeosPunchListener) -> None:
         if listener not in self._listeners:
@@ -733,7 +733,7 @@ class MeosInfoServer(
         for listener in self._listeners:
             listener.meos_punch_received(punch)
 
-    # ── Public API ────────────────────────────────────────────────────────────
+    # -- Public API ------------------------------------------------------------
 
     def get_selector_controls(self) -> "SelectionResult | bool":
         if not self._url:
@@ -777,7 +777,7 @@ class MeosInfoServer(
     ) -> str | None:
         """Resolve country for the next-leg runner.
 
-        Fallback chain: next-leg runner nat → team org nat → None.
+        Fallback chain: next-leg runner nat -> team org nat -> None.
         """
         if not is_last_leg:
             next_leg = current_leg + 1
@@ -839,7 +839,7 @@ class MeosInfoServer(
             self.logger.error("lookup_card error: %s", e)
         return None
 
-    # ── StateSaverMixin ───────────────────────────────────────────────────────
+    # -- StateSaverMixin -------------------------------------------------------
 
     def register_tracking_listener(self, callback):
         pass

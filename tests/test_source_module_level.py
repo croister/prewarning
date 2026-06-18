@@ -1,7 +1,7 @@
 """Tests for punchsources/__init__.py and startlistsources/__init__.py.
 
 Package-level initialization (source discovery, validation, COMMON_* creation)
-is lazy — triggered on first access to PUNCH_SOURCES or COMMON_PUNCH_SOURCE.
+is lazy - triggered on first access to PUNCH_SOURCES or COMMON_PUNCH_SOURCE.
 However, the explicit submodule imports still execute their module-level code
 (config definitions, registration) at import time.
 """

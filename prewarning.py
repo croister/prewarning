@@ -1238,7 +1238,7 @@ class PreWarning(
             if has_all_fields:
                 pass  # All data already present, skip lookup
             elif PUNCH_KEY_BIB_NUMBER in punch:
-                # Partial data — enrich via lookup
+                # Partial data - enrich via lookup
                 pre_warn_data = source.lookup_from_card_number(
                     punch[PUNCH_KEY_CARD_NUMBER]
                 )
@@ -1250,7 +1250,7 @@ class PreWarning(
                 else:
                     punch.update(pre_warn_data)
             else:
-                # No bib — lookup is mandatory
+                # No bib - lookup is mandatory
                 pre_warn_data = source.lookup_from_card_number(
                     punch[PUNCH_KEY_CARD_NUMBER]
                 )
