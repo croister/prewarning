@@ -302,6 +302,33 @@ class TestLookupCard:
         result = server.lookup_card("222222")
         assert result["isLastLeg"] is False
 
+    def test_country_from_next_leg_runner(self, server):
+        server._cmp_info[67] = {"card": "111111", "team_id": 23, "leg": 1}
+        server._cmp_info[68] = {"team_id": 23, "leg": 2, "nat": "NOR"}
+        server._team_bib[23] = "43"
+        server._team_leg_count[23] = 3
+
+        result = server.lookup_card("111111")
+        assert result["country"] == "NOR"
+
+    def test_country_falls_back_to_org(self, server):
+        server._cmp_info[67] = {"card": "111111", "team_id": 23, "leg": 1}
+        server._cmp_info[68] = {"team_id": 23, "leg": 2}  # no nat
+        server._team_bib[23] = "43"
+        server._team_leg_count[23] = 3
+        server._team_org[23] = 5
+        server._org_nat[5] = "SWE"
+
+        result = server.lookup_card("111111")
+        assert result["country"] == "SWE"
+
+    def test_country_none_when_no_data(self, server):
+        server._cmp_info[67] = {"card": "111111", "team_id": 23, "leg": 1}
+        server._team_bib[23] = "43"
+
+        result = server.lookup_card("111111")
+        assert result["country"] is None
+
     def test_cache_miss_no_bib(self, server):
         server._cmp_info[67] = {"card": "506576", "team_id": 23, "leg": 1}
         # No bib for team 23

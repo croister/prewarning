@@ -56,6 +56,7 @@ _TAG_CONTROL = "control"
 _TAG_CLASS = "cls"
 _TAG_TEAM = "tm"
 _TAG_COMPETITOR = "cmp"
+_TAG_ORG = "org"
 _TAG_BASE = "base"
 _TAG_RADIO = "radio"
 _TAG_RUNNERS = "r"
@@ -66,6 +67,8 @@ _ATTR_BIB = "bib"
 _ATTR_DATE = "date"
 _ATTR_ZEROTIME = "zerotime"
 _ATTR_NEXT_DIFFERENCE = "nextdifference"
+_ATTR_NAT = "nat"
+_ATTR_ORG = "org"
 
 # MOP sentinel value for empty competitor slot
 _MOP_EMPTY_SLOT = "0"
@@ -80,6 +83,7 @@ _CMP_KEY_CARD = "card"
 _CMP_KEY_TEAM_ID = "team_id"
 _CMP_KEY_LEG = "leg"
 _CMP_KEY_START_TIME = "st"
+_CMP_KEY_NAT = "nat"
 
 MEOS_INFO_SERVER_RUNTIME_STATE = RuntimeStateGroup("meos_info_server.dat")
 
@@ -316,7 +320,9 @@ class MeosInfoServer(
         self._competition_date: datetime | None = None
         self._control_map: Dict[int, str] = {}
         self._radio_control_ids: Set[int] = set()
+        self._org_nat: Dict[int, str] = {}
         self._team_bib: Dict[int, str] = {}
+        self._team_org: Dict[int, int] = {}
         self._team_leg_count: Dict[int, int] = {}
         self._cmp_info: Dict[int, Dict] = {}
         self._seen_radio: Dict[int, Set[int]] = {}
@@ -420,6 +426,10 @@ class MeosInfoServer(
         except Exception as e:
             self.logger.warning("Failed to prime class cache: %s", e)
         try:
+            self._fetch_orgs(base)
+        except Exception as e:
+            self.logger.warning("Failed to prime org cache: %s", e)
+        try:
             self._fetch_teams(base)
         except Exception as e:
             self.logger.warning("Failed to prime team cache: %s", e)
@@ -458,6 +468,16 @@ class MeosInfoServer(
                         if rid:
                             self._radio_control_ids.add(int(rid))
 
+    def _fetch_orgs(self, base: str) -> None:
+        root = _fetch_xml(f"{base}/meos?get=organization")
+        for elem in root:
+            if _strip_ns(elem.tag) == _TAG_ORG:
+                org_id = int(elem.get(_ATTR_ID, 0))
+                nat = elem.get(_ATTR_NAT)
+                if nat:
+                    self._org_nat[org_id] = nat
+        self.logger.debug("Loaded %d org nationalities", len(self._org_nat))
+
     def _fetch_teams(self, base: str) -> None:
         root = _fetch_xml(f"{base}/meos?get=team")
         for elem in root:
@@ -469,6 +489,9 @@ class MeosInfoServer(
                     bib = base_elem.get(_ATTR_BIB)
                     if bib:
                         self._team_bib[team_id] = bib
+                    org_id = base_elem.get(_ATTR_ORG)
+                    if org_id:
+                        self._team_org[team_id] = int(org_id)
                 if r_elem is not None and r_elem.text:
                     legs = r_elem.text.split(";")
                     self._team_leg_count[team_id] = len(legs)
@@ -534,11 +557,19 @@ class MeosInfoServer(
                 self._process_team_elem(elem)
             elif tag == _TAG_COMPETITOR:
                 self._process_cmp_elem(elem, suppress=suppress)
+            elif tag == _TAG_ORG:
+                self._process_org_elem(elem)
 
         if next_diff != self._next_difference:
             self._next_difference = next_diff
             self._save_state()
         self.logger.debug("Diff fetched: type=%s, next=%s", root_tag, next_diff)
+
+    def _process_org_elem(self, elem: ET.Element) -> None:
+        org_id = int(elem.get(_ATTR_ID, 0))
+        nat = elem.get(_ATTR_NAT)
+        if nat:
+            self._org_nat[org_id] = nat
 
     def _process_team_elem(self, elem: ET.Element) -> None:
         team_id = int(elem.get(_ATTR_ID, 0))
@@ -549,6 +580,9 @@ class MeosInfoServer(
             if bib:
                 self._team_bib[team_id] = bib
                 self.logger.debug("Team %d bib updated: %s", team_id, bib)
+            org_id = base_elem.get(_ATTR_ORG)
+            if org_id:
+                self._team_org[team_id] = int(org_id)
         if r_elem is not None and r_elem.text:
             legs = r_elem.text.split(";")
             self._team_leg_count[team_id] = len(legs)
@@ -576,6 +610,10 @@ class MeosInfoServer(
             if st:
                 info = self._cmp_info.setdefault(cmp_id, {})
                 info[_CMP_KEY_START_TIME] = int(st)
+            nat = base_elem.get(_ATTR_NAT)
+            if nat:
+                info = self._cmp_info.setdefault(cmp_id, {})
+                info[_CMP_KEY_NAT] = nat
 
         radio_elem = _find(elem, _TAG_RADIO)
         if radio_elem is None or not radio_elem.text:
@@ -704,19 +742,65 @@ class MeosInfoServer(
                 if team_id is not None and leg is not None:
                     bib = self._team_bib.get(team_id)
                     if bib:
-                        return self._build_lookup_result(team_id, bib, leg)
+                        result = self._build_lookup_result(team_id, bib, leg)
+                        self.logger.debug(
+                            "lookup_card(%s): cache hit → %s", card_number, result
+                        )
+                        return result
         # Fall back to on-demand lookup
-        return self._lookup_card_http(card_number, retry=True)
+        http_result = self._lookup_card_http(card_number, retry=True)
+        self.logger.debug(
+            "lookup_card(%s): http fallback → %s", card_number, http_result
+        )
+        return http_result
 
     def _build_lookup_result(self, team_id: int, bib: str, leg: int) -> Dict:
         max_leg = self._team_leg_count.get(team_id)
         is_last_leg = max_leg is not None and leg >= max_leg
+        country = self._resolve_next_leg_country(team_id, leg, is_last_leg)
         return {
             PUNCH_KEY_BIB_NUMBER: bib,
             PUNCH_KEY_RELAY_LEG: leg,
             PUNCH_KEY_IS_LAST_LEG: is_last_leg,
-            PUNCH_KEY_COUNTRY: None,
+            PUNCH_KEY_COUNTRY: country,
         }
+
+    def _resolve_next_leg_country(
+        self, team_id: int, current_leg: int, is_last_leg: bool
+    ) -> str | None:
+        """Resolve country for the next-leg runner.
+
+        Fallback chain: next-leg runner nat → team org nat → None.
+        """
+        if not is_last_leg:
+            next_leg = current_leg + 1
+            # Find a runner on the next leg for this team
+            for info in self._cmp_info.values():
+                if (
+                    info.get(_CMP_KEY_TEAM_ID) == team_id
+                    and info.get(_CMP_KEY_LEG) == next_leg
+                ):
+                    nat = info.get(_CMP_KEY_NAT)
+                    if nat:
+                        self.logger.debug(
+                            "Country for team %d leg %d: runner nat=%s",
+                            team_id,
+                            next_leg,
+                            nat,
+                        )
+                        return nat
+                    break  # Found next-leg runner but no nat, fall through
+
+        # Fall back to team's org nationality
+        org_id = self._team_org.get(team_id)
+        if org_id is not None:
+            nat = self._org_nat.get(org_id)
+            if nat:
+                self.logger.debug(
+                    "Country for team %d: org %d nat=%s", team_id, org_id, nat
+                )
+                return nat
+        return None
 
     def _lookup_card_http(self, card_number: str, retry: bool = True) -> Dict | None:
         if not self._url:
