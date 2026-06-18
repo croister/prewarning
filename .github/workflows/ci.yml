@@ -14,7 +14,7 @@ jobs:
     name: Lint (YAML)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v8.2.0
       - name: Lint (YAML) - workflow definition
         run: uvx yamllint .github/workflows/ && echo "No YAML issues found."
@@ -23,7 +23,7 @@ jobs:
     name: Audit (Dependencies)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v8.2.0
       - name: Audit (Dependencies)
         run: uv audit --preview-features audit
@@ -32,7 +32,7 @@ jobs:
     name: Lint (Spelling)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v8.2.0
       - name: Lint (Spelling)
         run: uvx codespell --skip=".git,uv.lock,dist,__pycache__,logs,startlists,test_data,**country_dict_by_ioc*" --ignore-words-list="datas"
@@ -41,7 +41,7 @@ jobs:
     name: Lint (Python)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v8.2.0
       - name: Lint (Python) - check
         run: uvx ruff check .
@@ -52,7 +52,7 @@ jobs:
     name: Tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v8.2.0
         with:
           enable-cache: true
@@ -69,7 +69,7 @@ jobs:
     name: Type Check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v8.2.0
         with:
           enable-cache: true
@@ -98,7 +98,7 @@ jobs:
             target: linux
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v8.2.0
         with:
           enable-cache: true
@@ -168,7 +168,7 @@ jobs:
             --title "${{ github.ref_name }}" \
             --generate-notes \
             *.zip
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           ref: master
           fetch-depth: 0
