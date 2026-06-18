@@ -89,6 +89,7 @@ MEOS_INFO_SERVER_RUNTIME_STATE = RuntimeStateGroup("meos_info_server.dat")
 
 
 _HTTP_TIMEOUT_SECONDS = 10
+_HTTP_SELECTOR_TIMEOUT_SECONDS = 3
 
 
 def _find(elem: ET.Element, tag: str) -> ET.Element | None:
@@ -103,16 +104,19 @@ def _strip_ns(tag: str) -> str:
     return tag.partition("}")[2] if "}" in tag else tag
 
 
-def _fetch_xml(url: str) -> ET.Element:
+def _fetch_xml(url: str, timeout: int = _HTTP_TIMEOUT_SECONDS) -> ET.Element:
     req = Request(url)
-    response = urlopen(req, timeout=_HTTP_TIMEOUT_SECONDS)
+    response = urlopen(req, timeout=timeout)
     data = response.read()
     return ET.fromstring(data)
 
 
 def _verify_url(url: str) -> VerificationResult:
     try:
-        root = _fetch_xml(f"{url.rstrip('/')}/meos?get=competition")
+        root = _fetch_xml(
+            f"{url.rstrip('/')}/meos?get=competition",
+            timeout=_HTTP_SELECTOR_TIMEOUT_SECONDS,
+        )
         if _strip_ns(root.tag) in (_ROOT_TAG_COMPLETE, _ROOT_TAG_DIFF):
             competition = root.find(f"{{{_MOP_NS}}}{_TAG_COMPETITION}")
             if competition is None:
@@ -137,7 +141,9 @@ def _select_controls(url: str) -> SelectionResult | bool:
         base = url.rstrip("/")
 
         # Build control id -> name map
-        ctrl_root = _fetch_xml(f"{base}/meos?get=control")
+        ctrl_root = _fetch_xml(
+            f"{base}/meos?get=control", timeout=_HTTP_SELECTOR_TIMEOUT_SECONDS
+        )
         control_map: Dict[int, str] = {}
         for elem in ctrl_root:
             if _strip_ns(elem.tag) == _TAG_CONTROL:
@@ -145,7 +151,9 @@ def _select_controls(url: str) -> SelectionResult | bool:
                 control_map[ctrl_id] = elem.text or str(ctrl_id)
 
         # Collect radio control IDs from classes
-        cls_root = _fetch_xml(f"{base}/meos?get=class")
+        cls_root = _fetch_xml(
+            f"{base}/meos?get=class", timeout=_HTTP_SELECTOR_TIMEOUT_SECONDS
+        )
         radio_ids: Set[int] = set()
         for elem in cls_root:
             if _strip_ns(elem.tag) == _TAG_CLASS:
