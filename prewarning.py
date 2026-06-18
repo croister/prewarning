@@ -43,6 +43,12 @@ from utils.constants import (
     APPLICATION_DIR,
     AUDIO_EXTENSION,
     DING_FILENAME,
+    PUNCH_KEY_BIB_NUMBER,
+    PUNCH_KEY_CARD_NUMBER,
+    PUNCH_KEY_CONTROL_CODE,
+    PUNCH_KEY_COUNTRY,
+    PUNCH_KEY_PASSED_TIME,
+    PUNCH_KEY_RELAY_LEG,
     TESTING_FILENAME,
 )
 from utils.about_dialog import AboutDialog
@@ -124,6 +130,10 @@ CONFIGURATION_FILE_NAME = "prewarning.ini"
 
 # Configuration file location
 CONFIGURATION_FILE = CONFIGURATION_DIR / CONFIGURATION_FILE_NAME
+
+# Announcement queue dict keys
+_ANNOUNCE_KEY_VOICE = "voice"
+_ANNOUNCE_KEY_SOUND = "sound"
 
 
 class PreWarningMeta(type(wx.Frame), type(ConfigConsumer)):  # type: ignore[misc]
@@ -969,8 +979,8 @@ class PreWarning(
         )
         self.announcement_queue.put(
             {
-                "voice": self.sound.resolve_voice(None),
-                "sound": str(self.test_bib_number),
+                _ANNOUNCE_KEY_VOICE: self.sound.resolve_voice(None),
+                _ANNOUNCE_KEY_SOUND: str(self.test_bib_number),
             }
         )
 
@@ -997,7 +1007,9 @@ class PreWarning(
         local_ip_address = s.getsockname()[0]
         self.logger.debug("local_ip_address: %s", local_ip_address)
         for number in local_ip_address.split("."):
-            self.announcement_queue.put({"voice": None, "sound": number})
+            self.announcement_queue.put(
+                {_ANNOUNCE_KEY_VOICE: None, _ANNOUNCE_KEY_SOUND: number}
+            )
             pass
         s.close()
 
@@ -1189,13 +1201,18 @@ class PreWarning(
         while True:
             punch = self.punch_queue.get()
             self.logger.debug(
-                "Processing: %s from: %s", punch["cardNumber"], punch["controlCode"]
+                "Processing: %s from: %s",
+                punch[PUNCH_KEY_CARD_NUMBER],
+                punch[PUNCH_KEY_CONTROL_CODE],
             )
 
-            punch_passed_time = self._parse_passed_time(punch["passedTime"])
+            punch_passed_time = self._parse_passed_time(punch[PUNCH_KEY_PASSED_TIME])
 
             if self._dedup_card_control_enabled:
-                key = (str(punch["cardNumber"]), str(punch["controlCode"]))
+                key = (
+                    str(punch[PUNCH_KEY_CARD_NUMBER]),
+                    str(punch[PUNCH_KEY_CONTROL_CODE]),
+                )
                 with self._dedup_lock:
                     if self._is_deduped(
                         self._dedup_card_control, key, punch_passed_time
@@ -1210,9 +1227,11 @@ class PreWarning(
                     "Start list source not yet initialized, deferring punch."
                 )
                 continue
-            if "bibNumber" in punch:
+            if PUNCH_KEY_BIB_NUMBER in punch:
                 if source_name != StartListSourceOlaMySql.__qualname__:
-                    pre_warn_data = source.lookup_from_card_number(punch["cardNumber"])
+                    pre_warn_data = source.lookup_from_card_number(
+                        punch[PUNCH_KEY_CARD_NUMBER]
+                    )
                     if pre_warn_data is None:
                         self.logger.debug(
                             "Could not find the team connected to the card number."
@@ -1221,7 +1240,9 @@ class PreWarning(
                     else:
                         punch.update(pre_warn_data)
             else:
-                pre_warn_data = source.lookup_from_card_number(punch["cardNumber"])
+                pre_warn_data = source.lookup_from_card_number(
+                    punch[PUNCH_KEY_CARD_NUMBER]
+                )
                 if pre_warn_data is None:
                     self.logger.debug(
                         "Could not find the team connected to the card number. Skipping!"
@@ -1230,9 +1251,9 @@ class PreWarning(
                 else:
                     punch.update(pre_warn_data)
 
-            passed_time = self._to_str(punch["passedTime"]).rpartition(" ")[2]
-            bib_number = self._to_str(punch["bibNumber"])
-            relay_leg = self._to_str(punch["relayLeg"])
+            passed_time = self._to_str(punch[PUNCH_KEY_PASSED_TIME]).rpartition(" ")[2]
+            bib_number = self._to_str(punch[PUNCH_KEY_BIB_NUMBER])
+            relay_leg = self._to_str(punch[PUNCH_KEY_RELAY_LEG])
 
             if self._dedup_bib_leg_enabled:
                 key = (bib_number, relay_leg)
@@ -1241,15 +1262,17 @@ class PreWarning(
                         self.logger.debug("Skipping duplicate bib+leg: %s", key)
                         continue
 
-            country = punch.get("country")
+            country = punch.get(PUNCH_KEY_COUNTRY)
             voice = self.sound.resolve_voice(country)
-            self.announcement_queue.put({"voice": voice, "sound": bib_number})
+            self.announcement_queue.put(
+                {_ANNOUNCE_KEY_VOICE: voice, _ANNOUNCE_KEY_SOUND: bib_number}
+            )
             wx.CallAfter(
                 self._add_pre_warning_with_refresh, passed_time, bib_number, relay_leg
             )
 
             if self._dedup_card_control_enabled:
-                key = (punch["cardNumber"], punch["controlCode"])
+                key = (punch[PUNCH_KEY_CARD_NUMBER], punch[PUNCH_KEY_CONTROL_CODE])
                 with self._dedup_lock:
                     if key not in self._dedup_card_control:
                         self._dedup_card_control[key] = punch_passed_time
@@ -1283,11 +1306,12 @@ class PreWarning(
                     self.sound.play_sound(self.intro_sound_file)
 
                 self.logger.debug("sound: %s", sound)
-                if sound["sound"] == "-":
+                if sound[_ANNOUNCE_KEY_SOUND] == "-":
                     self.sound.play_sound(self.intro_sound_file)
                 else:
                     self.sound.play_voice_sound(
-                        f"{sound['sound']}{AUDIO_EXTENSION}", sound.get("voice")
+                        f"{sound[_ANNOUNCE_KEY_SOUND]}{AUDIO_EXTENSION}",
+                        sound.get(_ANNOUNCE_KEY_VOICE),
                     )
 
                 self.last_sound_time = datetime.now()

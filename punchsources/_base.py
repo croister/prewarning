@@ -94,6 +94,9 @@ class _PunchSourceBase(ConfigConsumer):
         their native timestamp to ``datetime`` before inserting into
         the dict.
 
+        See ``utils.constants`` for the key name constants
+        (PUNCH_KEY_ID, PUNCH_KEY_CONTROL_CODE, etc.).
+
         :param Dict[str, str] punch: The punch to notify about
         """
         for listener in self.punch_listeners:

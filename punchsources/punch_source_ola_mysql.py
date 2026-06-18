@@ -28,15 +28,25 @@ from utils.ola_mysql import (
     get_event_race_split_times,
     get_ola_db_version,
     is_relay_event,
+    _KEY_CLASS_COUNT,
+    _KEY_CLASS_NAMES,
+    _KEY_CONTROL_ID,
+    _KEY_CONTROL_NAME,
+    _KEY_PUNCHING_CODES,
+    _KEY_SPLIT_TIME_CONTROL_NAME,
 )
 from validators.datetime_validators import is_timestamp
 from validators.regex_validators import is_control_ids, is_punch_id
+from utils.constants import FETCH_INTERVAL_VALID_VALUES, PUNCH_KEY_ID
 from ._base import _PunchSourceBase
 
 
 _MODULE_LOGGER_NAME = "PunchSourceOlaMySql"
 
 PUNCH_SOURCE_OLA_MYSQL_RUNTIME_STATE = RuntimeStateGroup("ps_ola_mysql.dat")
+
+# OLA split time result dict key
+_SPLIT_TIME_KEY_MODIFY_DATE = "modifyDate"
 
 
 def _select_control_ids(
@@ -66,7 +76,8 @@ def _select_control_ids(
             for control_id in control_ids:
                 result.add_value(
                     SelectionData(
-                        control_id["ID"], _split_time_control_description(control_id)
+                        control_id[_KEY_CONTROL_ID],
+                        _split_time_control_description(control_id),
                     )
                 )
             return result
@@ -76,9 +87,9 @@ def _select_control_ids(
 
 
 def _split_time_control_name(control_id: Dict[str, Any]) -> str:
-    split_time_control_name = control_id["splitTimeControlName"]
+    split_time_control_name = control_id[_KEY_SPLIT_TIME_CONTROL_NAME]
     if split_time_control_name is None or len(split_time_control_name) == 0:
-        split_time_control_name = control_id["controlName"]
+        split_time_control_name = control_id[_KEY_CONTROL_NAME]
     if split_time_control_name is None or len(split_time_control_name) == 0:
         split_time_control_name = ""
 
@@ -88,7 +99,7 @@ def _split_time_control_name(control_id: Dict[str, Any]) -> str:
 def _split_time_control_description(control_id: Dict[str, Any]) -> str:
     split_time_control_name = _split_time_control_name(control_id)
 
-    class_names = control_id["classNames"]
+    class_names = control_id[_KEY_CLASS_NAMES]
     if class_names is None:
         class_names = ""
     if len(class_names) > 50:
@@ -96,10 +107,10 @@ def _split_time_control_description(control_id: Dict[str, Any]) -> str:
 
     description = (
         "{id}: {name} ({e_codes}) used by {class_count} classes ({class_names})".format(
-            id=control_id["ID"],
+            id=control_id[_KEY_CONTROL_ID],
             name=split_time_control_name,
-            e_codes=control_id["punchingCodes"],
-            class_count=control_id["classCount"],
+            e_codes=control_id[_KEY_PUNCHING_CODES],
+            class_count=control_id[_KEY_CLASS_COUNT],
             class_names=class_names,
         )
     )
@@ -170,7 +181,9 @@ def _verify_fetch(
                 return VerificationResult(message="No Punches received")
 
             if last_received_punch_id is not None:
-                split_time_ids = [split_time["id"] for split_time in event_split_times]
+                split_time_ids = [
+                    split_time[PUNCH_KEY_ID] for split_time in event_split_times
+                ]
                 if last_received_punch_id in split_time_ids:
                     return VerificationResult(
                         message=f"{len(event_split_times)} Punches received and 1 ignored."
@@ -217,7 +230,7 @@ class PunchSourceOlaMySql(StateSaverMixin, _PunchSourceBase):
         value_type=int,
         description="The number of seconds between calls to the OLA MySQL database.",
         default_value=10,
-        valid_values=list(range(1, 121)),
+        valid_values=FETCH_INTERVAL_VALID_VALUES,
     )
 
     CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_MODIFIED_TIME = RuntimeStateOptionDefinition(
@@ -607,18 +620,18 @@ class PunchSourceOlaMySql(StateSaverMixin, _PunchSourceBase):
                 )
                 for split_time in split_times:
                     self.logger.debug(split_time)
-                    if self.last_received_punch_id == split_time["id"]:
+                    if self.last_received_punch_id == split_time[PUNCH_KEY_ID]:
                         self.logger.debug(
                             'Skipping: "%s" is the same as the last received Punch.',
-                            split_time["id"],
+                            split_time[PUNCH_KEY_ID],
                         )
                         continue
                     self._notify_punch_listeners(split_time)
-                    self.last_received_punch_id = split_time["id"]
+                    self.last_received_punch_id = split_time[PUNCH_KEY_ID]
                     self.logger.debug(
                         "last_received_punch_id: %s", self.last_received_punch_id
                     )
-                    self.last_modify_time = split_time["modifyDate"]
+                    self.last_modify_time = split_time[_SPLIT_TIME_KEY_MODIFY_DATE]
                     self.logger.debug("last_modify_time: %s", self.last_modify_time)
                     self._save_state()
             except OperationalError as oe:

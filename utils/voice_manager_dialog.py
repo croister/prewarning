@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from functools import partial
 from pathlib import Path
 from queue import Empty, Queue
-from typing import Any
+from typing import Any, Final
 
 import pycountry
 import wx
@@ -40,6 +40,14 @@ from utils.sound import Sound
 
 logger = logging.getLogger(__name__)
 
+# Edge-tts Voice dict keys
+_VOICE_KEY_SHORT_NAME: Final = "ShortName"
+_VOICE_KEY_GENDER: Final = "Gender"
+_VOICE_KEY_LOCALE: Final = "Locale"
+
+# Country dict key
+_COUNTRY_KEY_NAME = "name"
+
 _REFRESH_ICON = (
     Path(__file__).resolve().parent.parent
     / "resources"
@@ -71,6 +79,14 @@ LANG_COL_WIDTH = 120
 GENDER_COL_WIDTH = 70
 STATUS_COL_WIDTH = 52
 STAR_COL_WIDTH = 56
+
+# Column header labels
+_COL_HEADER_SHORT_NAME = "Short Name"
+_COL_HEADER_LANGUAGE = "Language"
+_COL_HEADER_GENDER = "Gender"
+_COL_HEADER_STATUS = "Status"
+_COL_HEADER_DEFAULT = "Default"
+_COL_HEADER_FALLBACK = "Fallback"
 
 VOICE_METADATA_FILENAME = "voice.json"
 
@@ -173,8 +189,12 @@ def _select_default_country() -> SelectionResult:
         message=DLG_DEFAULT_COUNTRY_MESSAGE,
         selection_type=SelectionType.SINGLE,
     )
-    for ioc_code, data in sorted(COUNTRIES.items(), key=lambda x: x[1]["name"]):
-        result.add_value(SelectionData(ioc_code, f"{data['name']} ({ioc_code})"))
+    for ioc_code, data in sorted(
+        COUNTRIES.items(), key=lambda x: x[1][_COUNTRY_KEY_NAME]
+    ):
+        result.add_value(
+            SelectionData(ioc_code, f"{data[_COUNTRY_KEY_NAME]} ({ioc_code})")
+        )
     return result
 
 
@@ -450,7 +470,7 @@ def _list_installed_voices(
     gender_lookup: dict[str, str] = {}
     if edge_voices:
         for v in edge_voices:
-            gender_lookup[v["ShortName"]] = v.get("Gender", "")
+            gender_lookup[v[_VOICE_KEY_SHORT_NAME]] = v.get(_VOICE_KEY_GENDER, "")
     metadata = _load_metadata()
     result: list[InstalledVoice] = []
     if not SOUNDS_DIR.is_dir():
@@ -466,13 +486,13 @@ def _list_installed_voices(
             continue
         shortname = d.name
         meta = metadata.get(shortname, {})
-        locale = meta.get("Locale", "")
+        locale = meta.get(_VOICE_KEY_LOCALE, "")
         lang = (
             _locale_to_language_name(locale)
             if locale
             else _lang_from_shortname(shortname) or ""
         )
-        gender = meta.get("Gender", gender_lookup.get(shortname, "Unknown"))
+        gender = meta.get(_VOICE_KEY_GENDER, gender_lookup.get(shortname, "Unknown"))
         complete = _is_voice_complete(d, extra_ranges)
         result.append(
             InstalledVoice(
@@ -497,7 +517,7 @@ def _load_metadata() -> dict[str, Any]:
         if vf.is_file():
             try:
                 data = json.loads(vf.read_text("utf-8"))
-                shortname = data.get("ShortName", d.name)
+                shortname = data.get(_VOICE_KEY_SHORT_NAME, d.name)
                 result[shortname] = data
             except json.JSONDecodeError, OSError:
                 logger.exception("Failed to load voice metadata for %s", d.name)
@@ -505,7 +525,7 @@ def _load_metadata() -> dict[str, Any]:
 
 
 def _save_metadata_entry(voice_data: Voice):
-    shortname = voice_data.get("ShortName", "")
+    shortname = voice_data.get(_VOICE_KEY_SHORT_NAME, "")
     target_dir = SOUNDS_DIR / shortname
     target_dir.mkdir(parents=True, exist_ok=True)
     vf = target_dir / VOICE_METADATA_FILENAME
@@ -543,7 +563,7 @@ def _install_voice(
     ranges: list[tuple[int, int]],
     progress_callback=None,
 ):
-    shortname = voice_data["ShortName"]
+    shortname = voice_data[_VOICE_KEY_SHORT_NAME]
     target_dir = SOUNDS_DIR / shortname
     _save_metadata_entry(voice_data)
     testing_text = _translate_testing_text(shortname)
@@ -1019,9 +1039,11 @@ class VoiceManagerDialog(wx.Dialog):
         )
         self.discovered_list.AppendColumn("", width=PLAY_COL_WIDTH)
         self.discovered_list.SetColumnImage(0, self.discovered_list._header_icon_idx)
-        self.discovered_list.AppendColumn("ShortName", width=SHORTNAME_COL_WIDTH)
-        self.discovered_list.AppendColumn("Language", width=LANG_COL_WIDTH)
-        self.discovered_list.AppendColumn("Gender", width=GENDER_COL_WIDTH)
+        self.discovered_list.AppendColumn(
+            _COL_HEADER_SHORT_NAME, width=SHORTNAME_COL_WIDTH
+        )
+        self.discovered_list.AppendColumn(_COL_HEADER_LANGUAGE, width=LANG_COL_WIDTH)
+        self.discovered_list.AppendColumn(_COL_HEADER_GENDER, width=GENDER_COL_WIDTH)
         self.discovered_list.Bind(
             wx.EVT_LIST_ITEM_ACTIVATED, self._on_discovered_activated
         )
@@ -1063,17 +1085,19 @@ class VoiceManagerDialog(wx.Dialog):
             size=wx.Size(-1, 120),
         )
         self.installed_list.AppendColumn("", width=PLAY_COL_WIDTH)
-        self.installed_list.AppendColumn("ShortName", width=SHORTNAME_COL_WIDTH)
-        self.installed_list.AppendColumn("Language", width=LANG_COL_WIDTH)
-        self.installed_list.AppendColumn("Gender", width=GENDER_COL_WIDTH)
         self.installed_list.AppendColumn(
-            "Status", width=STATUS_COL_WIDTH, format=wx.LIST_FORMAT_CENTER
+            _COL_HEADER_SHORT_NAME, width=SHORTNAME_COL_WIDTH
+        )
+        self.installed_list.AppendColumn(_COL_HEADER_LANGUAGE, width=LANG_COL_WIDTH)
+        self.installed_list.AppendColumn(_COL_HEADER_GENDER, width=GENDER_COL_WIDTH)
+        self.installed_list.AppendColumn(
+            _COL_HEADER_STATUS, width=STATUS_COL_WIDTH, format=wx.LIST_FORMAT_CENTER
         )
         self.installed_list.AppendColumn(
-            "Default", width=STAR_COL_WIDTH, format=wx.LIST_FORMAT_CENTER
+            _COL_HEADER_DEFAULT, width=STAR_COL_WIDTH, format=wx.LIST_FORMAT_CENTER
         )
         self.installed_list.AppendColumn(
-            "Fallback", width=STAR_COL_WIDTH, format=wx.LIST_FORMAT_CENTER
+            _COL_HEADER_FALLBACK, width=STAR_COL_WIDTH, format=wx.LIST_FORMAT_CENTER
         )
         self._init_installed_images()
         self.installed_list.Bind(
@@ -1156,7 +1180,7 @@ class VoiceManagerDialog(wx.Dialog):
     def _populate_language_filter(self):
         lang_names = set()
         for voice in self.discovered_voices:
-            name = _locale_to_language_name(voice.get("Locale", ""))
+            name = _locale_to_language_name(voice.get(_VOICE_KEY_LOCALE, ""))
             if name:
                 lang_names.add(name)
         self._lang_combo_updating = True
@@ -1261,8 +1285,8 @@ class VoiceManagerDialog(wx.Dialog):
 
         self.filtered_voices = []
         for v in self.discovered_voices:
-            gender_val = v.get("Gender", "").lower()
-            locale = v.get("Locale", "").lower()
+            gender_val = v.get(_VOICE_KEY_GENDER, "").lower()
+            locale = v.get(_VOICE_KEY_LOCALE, "").lower()
 
             if gender_filter != "all" and gender_val != gender_filter:
                 continue
@@ -1303,11 +1327,11 @@ class VoiceManagerDialog(wx.Dialog):
         if col == COL_DISC_PLAY:
             return ""
         elif col == COL_DISC_SHORTNAME:
-            return v.get("ShortName", "")
+            return v.get(_VOICE_KEY_SHORT_NAME, "")
         elif col == COL_DISC_LANGUAGE:
-            return _locale_to_language_name(v.get("Locale", ""))
+            return _locale_to_language_name(v.get(_VOICE_KEY_LOCALE, ""))
         elif col == COL_DISC_GENDER:
-            return v.get("Gender", "")
+            return v.get(_VOICE_KEY_GENDER, "")
         return ""
 
     def _on_discovered_activated(self, event):
@@ -1323,7 +1347,11 @@ class VoiceManagerDialog(wx.Dialog):
         if not shortname:
             return
         voice_data = next(
-            (v for v in self.discovered_voices if v.get("ShortName") == shortname),
+            (
+                v
+                for v in self.discovered_voices
+                if v.get(_VOICE_KEY_SHORT_NAME) == shortname
+            ),
             None,
         )
         if not voice_data:
@@ -1360,7 +1388,7 @@ class VoiceManagerDialog(wx.Dialog):
         if row < 0 or row >= len(self.filtered_voices):
             self.install_btn.Disable()
             return
-        shortname = self.filtered_voices[row].get("ShortName", "")
+        shortname = self.filtered_voices[row].get(_VOICE_KEY_SHORT_NAME, "")
         self.install_btn.Enable(not (SOUNDS_DIR / shortname).is_dir())
 
     def _on_installed_sel_changed(self, event):
@@ -1421,7 +1449,7 @@ class VoiceManagerDialog(wx.Dialog):
         if row >= len(self.filtered_voices):
             return
         voice = self.filtered_voices[row]
-        shortname = voice.get("ShortName", "")
+        shortname = voice.get(_VOICE_KEY_SHORT_NAME, "")
         if not shortname:
             return
         self._play_in_progress = True
@@ -1687,7 +1715,7 @@ class VoiceManagerDialog(wx.Dialog):
     # ── Install queue ─────────────────────────────────────────────
 
     def _enqueue_install(self, voice_data: Voice):
-        shortname = voice_data.get("ShortName", "")
+        shortname = voice_data.get(_VOICE_KEY_SHORT_NAME, "")
         _save_metadata_entry(voice_data)
         self._refresh_installed_list()
         extra = parse_extra_ranges(
@@ -1705,7 +1733,11 @@ class VoiceManagerDialog(wx.Dialog):
         ranges = [(DEFAULT_RANGE_START, DEFAULT_RANGE_END)]
         ranges.extend(extra)
         voice_data = next(
-            (v for v in self.discovered_voices if v.get("ShortName") == shortname),
+            (
+                v
+                for v in self.discovered_voices
+                if v.get(_VOICE_KEY_SHORT_NAME) == shortname
+            ),
             None,
         )
         if voice_data is not None:

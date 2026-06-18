@@ -23,12 +23,30 @@ from utils.config_definitions import (
     VerificationResult,
 )
 from utils.config_selection import select_file
+from utils.constants import (
+    PUNCH_KEY_BIB_NUMBER,
+    PUNCH_KEY_COUNTRY,
+    PUNCH_KEY_IS_LAST_LEG,
+    PUNCH_KEY_RELAY_LEG,
+)
 from utils.sound import Sound, verify_sound, get_all_sounds
 from validators.path_validators import file_exists
 from ._base import _StartListSourceBase
 
 
 _MODULE_LOGGER_NAME = "StartListSourceFile"
+
+# Internal runner dict keys
+_RUNNER_KEY_ID = "id"
+_RUNNER_KEY_FAMILY = "family"
+_RUNNER_KEY_GIVEN = "given"
+_RUNNER_KEY_LEG = "leg"
+_RUNNER_KEY_LEG_ORDER = "leg_order"
+_RUNNER_KEY_TEAM_BIB_NUMBER = "team_bib_number"
+_RUNNER_KEY_BIB_NUMBER = "bib_number"
+_RUNNER_KEY_CONTROL_CARD = "control_card"
+_RUNNER_KEY_COUNTRY = "country"
+_RUNNER_KEY_IS_LAST_LEG = "is_last_leg"
 
 DEFAULT_START_LIST_FILE_FOLDER = Path(__file__).resolve().parent.parent.absolute()
 
@@ -155,15 +173,15 @@ def _read_start_list(start_list_file: str):
             if team_member_control_card is not None:
                 country = _get_country(xml_team, team_member, ns)
                 runners[team_member_control_card] = {
-                    "id": team_member_id,
-                    "family": team_member_name_family,
-                    "given": team_member_name_given,
-                    "leg": team_member_leg,
-                    "leg_order": team_member_leg_order,
-                    "team_bib_number": team_bib_number,
-                    "bib_number": team_member_bib_number,
-                    "control_card": team_member_control_card,
-                    "country": country,
+                    _RUNNER_KEY_ID: team_member_id,
+                    _RUNNER_KEY_FAMILY: team_member_name_family,
+                    _RUNNER_KEY_GIVEN: team_member_name_given,
+                    _RUNNER_KEY_LEG: team_member_leg,
+                    _RUNNER_KEY_LEG_ORDER: team_member_leg_order,
+                    _RUNNER_KEY_TEAM_BIB_NUMBER: team_bib_number,
+                    _RUNNER_KEY_BIB_NUMBER: team_member_bib_number,
+                    _RUNNER_KEY_CONTROL_CARD: team_member_control_card,
+                    _RUNNER_KEY_COUNTRY: country,
                 }
                 if team_member_leg not in team:
                     team[team_member_leg] = dict()
@@ -513,16 +531,16 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
                     if team_member_control_card is not None:
                         country = _get_country(xml_team, team_member, ns)
                         self.runners[team_member_control_card] = {
-                            "id": team_member_id,
-                            "family": team_member_name_family,
-                            "given": team_member_name_given,
-                            "leg": team_member_leg,
-                            "leg_order": team_member_leg_order,
-                            "team_bib_number": team_bib_number,
-                            "bib_number": team_member_bib_number,
-                            "control_card": team_member_control_card,
-                            "country": country,
-                            "is_last_leg": False,
+                            _RUNNER_KEY_ID: team_member_id,
+                            _RUNNER_KEY_FAMILY: team_member_name_family,
+                            _RUNNER_KEY_GIVEN: team_member_name_given,
+                            _RUNNER_KEY_LEG: team_member_leg,
+                            _RUNNER_KEY_LEG_ORDER: team_member_leg_order,
+                            _RUNNER_KEY_TEAM_BIB_NUMBER: team_bib_number,
+                            _RUNNER_KEY_BIB_NUMBER: team_member_bib_number,
+                            _RUNNER_KEY_CONTROL_CARD: team_member_control_card,
+                            _RUNNER_KEY_COUNTRY: country,
+                            _RUNNER_KEY_IS_LAST_LEG: False,
                         }
                         if team_member_leg not in team:
                             team[team_member_leg] = dict()
@@ -535,7 +553,7 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
                     leg = team[last_leg]
                     if leg:
                         for member in leg.values():
-                            member["is_last_leg"] = True
+                            member[_RUNNER_KEY_IS_LAST_LEG] = True
 
                 team = dict(natsorted(team.items()))
 
@@ -564,9 +582,9 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
         with self._data_lock:
             runner = self.runners.get(card_number)
             if runner is not None:
-                team_bib_number = runner["team_bib_number"]
-                leg = runner["leg"]
-                is_last_leg = runner["is_last_leg"]
+                team_bib_number = runner[_RUNNER_KEY_TEAM_BIB_NUMBER]
+                leg = runner[_RUNNER_KEY_LEG]
+                is_last_leg = runner[_RUNNER_KEY_IS_LAST_LEG]
                 next_country = None
                 if not is_last_leg:
                     next_leg = leg + 1
@@ -575,12 +593,12 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
                         next_runners = team[next_leg]
                         if next_runners:
                             first_next = next(iter(next_runners.values()))
-                            next_country = first_next.get("country")
+                            next_country = first_next.get(_RUNNER_KEY_COUNTRY)
                 return {
-                    "bibNumber": team_bib_number,
-                    "relayLeg": leg,
-                    "isLastLeg": is_last_leg,
-                    "country": next_country,
+                    PUNCH_KEY_BIB_NUMBER: team_bib_number,
+                    PUNCH_KEY_RELAY_LEG: leg,
+                    PUNCH_KEY_IS_LAST_LEG: is_last_leg,
+                    PUNCH_KEY_COUNTRY: next_country,
                 }
             else:
                 self.logger.warning("Not found: %s", card_number)

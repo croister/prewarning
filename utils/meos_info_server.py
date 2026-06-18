@@ -28,12 +28,61 @@ from utils.singleton import Singleton
 from utils.state_saver import StateSaverMixin
 from validators.url_validators import is_http_or_https_url
 from utils.config import ConfigConsumer
+from utils.constants import (
+    FETCH_INTERVAL_VALID_VALUES,
+    PUNCH_KEY_BIB_NUMBER,
+    PUNCH_KEY_CARD_NUMBER,
+    PUNCH_KEY_CONTROL_CODE,
+    PUNCH_KEY_ID,
+    PUNCH_KEY_PASSED_TIME,
+    PUNCH_KEY_RELAY_LEG,
+)
 
 _MODULE_LOGGER_NAME = "MeosInfoServer"
 
 _MOP_NS = "http://www.melin.nu/mop"
 
+_INITIAL_DIFF_TOKEN = "zero"
+
+# MOP XML response root tags
+_ROOT_TAG_COMPLETE = "MOPComplete"
+_ROOT_TAG_DIFF = "MOPDiff"
+
+# MOP XML element tags
+_TAG_COMPETITION = "competition"
+_TAG_CONTROL = "control"
+_TAG_CLASS = "cls"
+_TAG_TEAM = "tm"
+_TAG_COMPETITOR = "cmp"
+_TAG_BASE = "base"
+_TAG_RADIO = "radio"
+_TAG_RUNNERS = "r"
+
+# MOP XML attribute names
+_ATTR_ID = "id"
+_ATTR_BIB = "bib"
+_ATTR_DATE = "date"
+_ATTR_ZEROTIME = "zerotime"
+_ATTR_NEXT_DIFFERENCE = "nextdifference"
+
+# MOP sentinel value for empty competitor slot
+_MOP_EMPTY_SLOT = "0"
+
+# MeOS lookup API element tags
+_LOOKUP_TAG_COMPETITOR = "Competitor"
+_LOOKUP_TAG_TEAM = "Team"
+_LOOKUP_TAG_LEG = "Leg"
+
+# Internal cache dict keys for competitor info
+_CMP_KEY_CARD = "card"
+_CMP_KEY_TEAM_ID = "team_id"
+_CMP_KEY_LEG = "leg"
+_CMP_KEY_START_TIME = "st"
+
 MEOS_INFO_SERVER_RUNTIME_STATE = RuntimeStateGroup("meos_info_server.dat")
+
+
+_HTTP_TIMEOUT_SECONDS = 10
 
 
 def _find(elem: ET.Element, tag: str) -> ET.Element | None:
@@ -50,7 +99,7 @@ def _strip_ns(tag: str) -> str:
 
 def _fetch_xml(url: str) -> ET.Element:
     req = Request(url)
-    response = urlopen(req, timeout=10)
+    response = urlopen(req, timeout=_HTTP_TIMEOUT_SECONDS)
     data = response.read()
     return ET.fromstring(data)
 
@@ -58,10 +107,10 @@ def _fetch_xml(url: str) -> ET.Element:
 def _verify_url(url: str) -> VerificationResult:
     try:
         root = _fetch_xml(f"{url.rstrip('/')}/meos?get=competition")
-        if _strip_ns(root.tag) in ("MOPComplete", "MOPDiff"):
-            competition = root.find(f"{{{_MOP_NS}}}competition")
+        if _strip_ns(root.tag) in (_ROOT_TAG_COMPLETE, _ROOT_TAG_DIFF):
+            competition = root.find(f"{{{_MOP_NS}}}{_TAG_COMPETITION}")
             if competition is None:
-                competition = root.find("competition")
+                competition = root.find(_TAG_COMPETITION)
             name = competition.text if competition is not None else "?"
             return VerificationResult(message=f"Connected. Competition: {name}")
         return VerificationResult(
@@ -85,16 +134,16 @@ def _select_controls(url: str) -> SelectionResult | bool:
         ctrl_root = _fetch_xml(f"{base}/meos?get=control")
         control_map: Dict[int, str] = {}
         for elem in ctrl_root:
-            if _strip_ns(elem.tag) == "control":
-                ctrl_id = int(elem.get("id", 0))
+            if _strip_ns(elem.tag) == _TAG_CONTROL:
+                ctrl_id = int(elem.get(_ATTR_ID, 0))
                 control_map[ctrl_id] = elem.text or str(ctrl_id)
 
         # Collect radio control IDs from classes
         cls_root = _fetch_xml(f"{base}/meos?get=class")
         radio_ids: Set[int] = set()
         for elem in cls_root:
-            if _strip_ns(elem.tag) == "cls":
-                radio_attr = elem.get("radio", "")
+            if _strip_ns(elem.tag) == _TAG_CLASS:
+                radio_attr = elem.get(_TAG_RADIO, "")
                 for leg in radio_attr.split(";"):
                     for rid in leg.split(","):
                         rid = rid.strip()
@@ -156,7 +205,7 @@ class MeosInfoServer(
         value_type=int,
         description="Seconds between polls of the MeOS Information Server.",
         default_value=10,
-        valid_values=list(range(1, 121)),
+        valid_values=FETCH_INTERVAL_VALID_VALUES,
     )
 
     CONFIG_OPTION_USE_UDP = ConfigOptionDefinition(
@@ -193,7 +242,7 @@ class MeosInfoServer(
         display_name="Next Difference",
         value_type=str,
         description="MOP diff token, persisted across restarts.",
-        default_value="zero",
+        default_value=_INITIAL_DIFF_TOKEN,
     )
 
     MEOS_INFO_SERVER_CONFIG_SECTION = ConfigSectionDefinition(
@@ -255,10 +304,10 @@ class MeosInfoServer(
         self.logger = logging.getLogger(_MODULE_LOGGER_NAME)
 
         self._url: str | None = None
-        self._fetch_interval: int = 10
+        self._fetch_interval: int = self.CONFIG_OPTION_FETCH_INTERVAL.default_value
         self._use_udp: bool = True
-        self._udp_port: int = 21338
-        self._next_difference: str = "zero"
+        self._udp_port: int = self.CONFIG_OPTION_UDP_PORT.default_value
+        self._next_difference: str = _INITIAL_DIFF_TOKEN
 
         # Caches
         self._zero_time: datetime | None = None
@@ -288,12 +337,16 @@ class MeosInfoServer(
         section = Config().get_section(self.CONFIG_SECTION_MEOS)
         self._url = self.CONFIG_OPTION_URL.get_value(section)
         self._fetch_interval = (
-            self.CONFIG_OPTION_FETCH_INTERVAL.get_value(section) or 10
+            self.CONFIG_OPTION_FETCH_INTERVAL.get_value(section)
+            or self.CONFIG_OPTION_FETCH_INTERVAL.default_value
         )
         self._use_udp = self.CONFIG_OPTION_USE_UDP.get_value(section)
         if self._use_udp is None:
-            self._use_udp = True
-        self._udp_port = self.CONFIG_OPTION_UDP_PORT.get_value(section) or 21338
+            self._use_udp = self.CONFIG_OPTION_USE_UDP.default_value
+        self._udp_port = (
+            self.CONFIG_OPTION_UDP_PORT.get_value(section)
+            or self.CONFIG_OPTION_UDP_PORT.default_value
+        )
 
     def update(self) -> None:
         self._parse_config()
@@ -340,7 +393,7 @@ class MeosInfoServer(
         return self._ref_count > 0
 
     def reset(self) -> None:
-        self._next_difference = "zero"
+        self._next_difference = _INITIAL_DIFF_TOKEN
         self._seen_radio.clear()
         self._save_state()
         self._poll_event.set()
@@ -371,9 +424,9 @@ class MeosInfoServer(
     def _fetch_competition(self, base: str) -> None:
         root = _fetch_xml(f"{base}/meos?get=competition")
         for elem in root:
-            if _strip_ns(elem.tag) == "competition":
-                date_str = elem.get("date", "")
-                zero_str = elem.get("zerotime", "00:00:00")
+            if _strip_ns(elem.tag) == _TAG_COMPETITION:
+                date_str = elem.get(_ATTR_DATE, "")
+                zero_str = elem.get(_ATTR_ZEROTIME, "00:00:00")
                 try:
                     self._zero_time = datetime.strptime(
                         f"{date_str} {zero_str}", "%Y-%m-%d %H:%M:%S"
@@ -386,16 +439,16 @@ class MeosInfoServer(
         root = _fetch_xml(f"{base}/meos?get=control")
         self._control_map.clear()
         for elem in root:
-            if _strip_ns(elem.tag) == "control":
-                ctrl_id = int(elem.get("id", 0))
+            if _strip_ns(elem.tag) == _TAG_CONTROL:
+                ctrl_id = int(elem.get(_ATTR_ID, 0))
                 self._control_map[ctrl_id] = elem.text or str(ctrl_id)
 
     def _fetch_class_radio(self, base: str) -> None:
         root = _fetch_xml(f"{base}/meos?get=class")
         self._radio_control_ids.clear()
         for elem in root:
-            if _strip_ns(elem.tag) == "cls":
-                radio_attr = elem.get("radio", "")
+            if _strip_ns(elem.tag) == _TAG_CLASS:
+                radio_attr = elem.get(_TAG_RADIO, "")
                 for leg in radio_attr.split(";"):
                     for rid in leg.split(","):
                         rid = rid.strip()
@@ -405,12 +458,12 @@ class MeosInfoServer(
     def _fetch_teams(self, base: str) -> None:
         root = _fetch_xml(f"{base}/meos?get=team")
         for elem in root:
-            if _strip_ns(elem.tag) == "tm":
-                team_id = int(elem.get("id", 0))
-                base_elem = _find(elem, "base")
-                r_elem = _find(elem, "r")
+            if _strip_ns(elem.tag) == _TAG_TEAM:
+                team_id = int(elem.get(_ATTR_ID, 0))
+                base_elem = _find(elem, _TAG_BASE)
+                r_elem = _find(elem, _TAG_RUNNERS)
                 if base_elem is not None:
-                    bib = base_elem.get("bib")
+                    bib = base_elem.get(_ATTR_BIB)
                     if bib:
                         self._team_bib[team_id] = bib
                 if r_elem is not None and r_elem.text:
@@ -418,17 +471,17 @@ class MeosInfoServer(
                         r_elem.text.split(";"), start=1
                     ):
                         cmp_id_str = cmp_id_str.strip()
-                        if cmp_id_str and cmp_id_str != "0":
+                        if cmp_id_str and cmp_id_str != _MOP_EMPTY_SLOT:
                             cmp_id = int(cmp_id_str)
                             info = self._cmp_info.setdefault(cmp_id, {})
-                            info["team_id"] = team_id
-                            info["leg"] = leg_idx
+                            info[_CMP_KEY_TEAM_ID] = team_id
+                            info[_CMP_KEY_LEG] = leg_idx
 
     # ── Polling loop ──────────────────────────────────────────────────────────
 
     def _poll_loop(self) -> None:
         self.logger.debug("Poll loop started")
-        self._next_difference = "zero"
+        self._next_difference = _INITIAL_DIFF_TOKEN
         self._suppress_notifications = True
         self._prime_caches()
         while not self._stop_event.is_set():
@@ -452,16 +505,16 @@ class MeosInfoServer(
                 "Invalid diff response for token '%s', resetting to 'zero'",
                 self._next_difference,
             )
-            self._next_difference = "zero"
+            self._next_difference = _INITIAL_DIFF_TOKEN
             self._save_state()
-            root = _fetch_xml(f"{base}/meos?difference=zero")
+            root = _fetch_xml(f"{base}/meos?difference={_INITIAL_DIFF_TOKEN}")
         root_tag = _strip_ns(root.tag)
 
-        next_diff = root.get("nextdifference")
+        next_diff = root.get(_ATTR_NEXT_DIFFERENCE)
         if not next_diff:
             return
 
-        is_complete = root_tag == "MOPComplete"
+        is_complete = root_tag == _ROOT_TAG_COMPLETE
         if is_complete:
             self.logger.debug("Received MOPComplete, resetting caches")
             self._prime_caches()
@@ -473,9 +526,9 @@ class MeosInfoServer(
 
         for elem in root:
             tag = _strip_ns(elem.tag)
-            if tag == "tm":
+            if tag == _TAG_TEAM:
                 self._process_team_elem(elem)
-            elif tag == "cmp":
+            elif tag == _TAG_COMPETITOR:
                 self._process_cmp_elem(elem, suppress=suppress)
 
         if next_diff != self._next_difference:
@@ -484,40 +537,40 @@ class MeosInfoServer(
         self.logger.debug("Diff fetched: type=%s, next=%s", root_tag, next_diff)
 
     def _process_team_elem(self, elem: ET.Element) -> None:
-        team_id = int(elem.get("id", 0))
-        base_elem = _find(elem, "base")
-        r_elem = _find(elem, "r")
+        team_id = int(elem.get(_ATTR_ID, 0))
+        base_elem = _find(elem, _TAG_BASE)
+        r_elem = _find(elem, _TAG_RUNNERS)
         if base_elem is not None:
-            bib = base_elem.get("bib")
+            bib = base_elem.get(_ATTR_BIB)
             if bib:
                 self._team_bib[team_id] = bib
                 self.logger.debug("Team %d bib updated: %s", team_id, bib)
         if r_elem is not None and r_elem.text:
             for leg_idx, cmp_id_str in enumerate(r_elem.text.split(";"), start=1):
                 cmp_id_str = cmp_id_str.strip()
-                if cmp_id_str and cmp_id_str != "0":
+                if cmp_id_str and cmp_id_str != _MOP_EMPTY_SLOT:
                     cmp_id = int(cmp_id_str)
                     info = self._cmp_info.setdefault(cmp_id, {})
-                    info["team_id"] = team_id
-                    info["leg"] = leg_idx
+                    info[_CMP_KEY_TEAM_ID] = team_id
+                    info[_CMP_KEY_LEG] = leg_idx
 
     def _process_cmp_elem(self, elem: ET.Element, suppress: bool = False) -> None:
-        cmp_id = int(elem.get("id", 0))
-        card = elem.get("card")
-        if card and card != "0":
+        cmp_id = int(elem.get(_ATTR_ID, 0))
+        card = elem.get(_CMP_KEY_CARD)
+        if card and card != _MOP_EMPTY_SLOT:
             info = self._cmp_info.setdefault(cmp_id, {})
-            if info.get("card") != card:
-                info["card"] = card
+            if info.get(_CMP_KEY_CARD) != card:
+                info[_CMP_KEY_CARD] = card
                 self.logger.debug("Competitor %d card updated: %s", cmp_id, card)
 
-        base_elem = _find(elem, "base")
+        base_elem = _find(elem, _TAG_BASE)
         if base_elem is not None:
-            st = base_elem.get("st")
+            st = base_elem.get(_CMP_KEY_START_TIME)
             if st:
                 info = self._cmp_info.setdefault(cmp_id, {})
-                info["st"] = int(st)
+                info[_CMP_KEY_START_TIME] = int(st)
 
-        radio_elem = _find(elem, "radio")
+        radio_elem = _find(elem, _TAG_RADIO)
         if radio_elem is None or not radio_elem.text:
             return
 
@@ -540,13 +593,13 @@ class MeosInfoServer(
             seen.add(radio_id)
 
             cmp_data = self._cmp_info.get(cmp_id, {})
-            card_number = cmp_data.get("card", "")
-            team_id = cmp_data.get("team_id")
-            leg = cmp_data.get("leg")
+            card_number = cmp_data.get(_CMP_KEY_CARD, "")
+            team_id = cmp_data.get(_CMP_KEY_TEAM_ID)
+            leg = cmp_data.get(_CMP_KEY_LEG)
 
             passed_time = None
             if self._zero_time and running_time > 0:
-                st = cmp_data.get("st", 0)
+                st = cmp_data.get(_CMP_KEY_START_TIME, 0)
                 if st and self._competition_date:
                     passed_time = (
                         self._competition_date
@@ -558,15 +611,15 @@ class MeosInfoServer(
                     ).replace(microsecond=0)
 
             punch: Dict = {
-                "id": f"{cmp_id}_{radio_id}",
-                "controlCode": str(radio_id),
-                "cardNumber": card_number,
-                "passedTime": passed_time,
+                PUNCH_KEY_ID: f"{cmp_id}_{radio_id}",
+                PUNCH_KEY_CONTROL_CODE: str(radio_id),
+                PUNCH_KEY_CARD_NUMBER: card_number,
+                PUNCH_KEY_PASSED_TIME: passed_time,
             }
             if team_id is not None and team_id in self._team_bib:
-                punch["bibNumber"] = self._team_bib[team_id]
+                punch[PUNCH_KEY_BIB_NUMBER] = self._team_bib[team_id]
             if leg is not None:
-                punch["relayLeg"] = leg
+                punch[PUNCH_KEY_RELAY_LEG] = leg
 
             if not suppress:
                 self._notify_listeners(punch)
@@ -638,13 +691,13 @@ class MeosInfoServer(
     def lookup_card(self, card_number: str) -> Dict | None:
         # Check cache first
         for cmp_id, info in self._cmp_info.items():
-            if info.get("card") == card_number:
-                team_id = info.get("team_id")
-                leg = info.get("leg")
+            if info.get(_CMP_KEY_CARD) == card_number:
+                team_id = info.get(_CMP_KEY_TEAM_ID)
+                leg = info.get(_CMP_KEY_LEG)
                 if team_id is not None and leg is not None:
                     bib = self._team_bib.get(team_id)
                     if bib:
-                        return {"bibNumber": bib, "relayLeg": leg}
+                        return {PUNCH_KEY_BIB_NUMBER: bib, PUNCH_KEY_RELAY_LEG: leg}
         # Fall back to on-demand lookup
         return self._lookup_card_http(card_number, retry=True)
 
@@ -655,12 +708,12 @@ class MeosInfoServer(
             base = self._url.rstrip("/")
             root = _fetch_xml(f"{base}/meos?lookup=competitor&card={card_number}")
             for elem in root:
-                if _strip_ns(elem.tag) == "Competitor":
-                    team_elem = _find(elem, "Team")
-                    leg_elem = _find(elem, "Leg")
+                if _strip_ns(elem.tag) == _LOOKUP_TAG_COMPETITOR:
+                    team_elem = _find(elem, _LOOKUP_TAG_TEAM)
+                    leg_elem = _find(elem, _LOOKUP_TAG_LEG)
                     if team_elem is None or leg_elem is None:
                         return None
-                    team_id = int(team_elem.get("id", 0))
+                    team_id = int(team_elem.get(_ATTR_ID, 0))
                     leg = int(leg_elem.text or 0)
                     bib = self._team_bib.get(team_id)
                     if bib is None and retry:
@@ -671,7 +724,7 @@ class MeosInfoServer(
                             pass
                         bib = self._team_bib.get(team_id)
                     if bib:
-                        return {"bibNumber": bib, "relayLeg": leg}
+                        return {PUNCH_KEY_BIB_NUMBER: bib, PUNCH_KEY_RELAY_LEG: leg}
         except (HTTPError, URLError) as e:
             self.logger.error("lookup_card HTTP error: %s", e)
         except Exception as e:
@@ -693,7 +746,7 @@ class MeosInfoServer(
 
     def set_runtime_value(self, option_definition, value: str):
         if option_definition is self.CONFIG_OPTION_NEXT_DIFFERENCE:
-            self._next_difference = value if value else "zero"
+            self._next_difference = value if value else _INITIAL_DIFF_TOKEN
             self._save_state()
             self._seen_radio.clear()
             self._poll_event.set()

@@ -9,6 +9,7 @@ from utils.config_definitions import (
     ConfigSectionOptionDefinition,
     ConfigSelectorDefinition,
 )
+from utils.constants import PUNCH_KEY_CONTROL_CODE
 from utils.meos_info_server import MeosInfoServer, MeosPunchListener
 from validators.regex_validators import is_control_ids
 from ._base import _PunchSourceBase
@@ -128,9 +129,9 @@ class PunchSourceMeos(MeosPunchListener, _PunchSourceBase):
     def meos_punch_received(self, punch: Dict) -> None:
         if not self._running:
             return
-        if punch.get("controlCode") not in self._control_codes:
+        if punch.get(PUNCH_KEY_CONTROL_CODE) not in self._control_codes:
             self.logger.debug(
-                "Punch filtered out: controlCode=%s", punch.get("controlCode")
+                "Punch filtered out: controlCode=%s", punch.get(PUNCH_KEY_CONTROL_CODE)
             )
             return
         self.logger.debug("Punch accepted: %s", punch)

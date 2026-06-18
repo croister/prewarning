@@ -19,6 +19,13 @@ from utils.config_definitions import (
     RuntimeStateGroup,
     RuntimeStateOptionDefinition,
 )
+from utils.constants import (
+    FETCH_INTERVAL_VALID_VALUES,
+    PUNCH_KEY_CARD_NUMBER,
+    PUNCH_KEY_CONTROL_CODE,
+    PUNCH_KEY_ID,
+    PUNCH_KEY_PASSED_TIME,
+)
 from validators.datetime_validators import is_date, is_time
 from validators.number_validators import is_not_negative_int
 from validators.regex_validators import is_control_ids
@@ -33,7 +40,12 @@ PUNCH_SOURCE_OL_RESULTAT_SE_RUNTIME_STATE = RuntimeStateGroup("ps_olresultatse.d
 DEFAULT_RESPONSE_ENCODING = "utf-8"
 
 
-PUNCH_KEYS = ("id", "controlCode", "cardNumber", "passedTime")
+PUNCH_KEYS = (
+    PUNCH_KEY_ID,
+    PUNCH_KEY_CONTROL_CODE,
+    PUNCH_KEY_CARD_NUMBER,
+    PUNCH_KEY_PASSED_TIME,
+)
 
 
 def _normalize_passed_time(raw: str) -> datetime:
@@ -83,10 +95,13 @@ def _fetch_punches(
             )
             for line in splitlines:
                 punch_dict = dict(zip(PUNCH_KEYS, line.split(";")))
-                punch_dict["passedTime"] = _normalize_passed_time(
-                    punch_dict["passedTime"]
+                punch_dict[PUNCH_KEY_PASSED_TIME] = _normalize_passed_time(
+                    punch_dict[PUNCH_KEY_PASSED_TIME]
                 )
-                if control_codes is None or punch_dict["controlCode"] in control_codes:
+                if (
+                    control_codes is None
+                    or punch_dict[PUNCH_KEY_CONTROL_CODE] in control_codes
+                ):
                     punches.append(punch_dict)
         logging.getLogger(_MODULE_LOGGER_NAME).debug(
             '_fetch_punches punches: %d "%s"', len(punches), punches
@@ -245,7 +260,7 @@ class PunchSourceOlresultatSe(StateSaverMixin, _PunchSourceBase):
             value_type=int,
             description="The number of seconds between calls to the Punch Source URL.",
             default_value=10,
-            valid_values=list(range(1, 121)),
+            valid_values=FETCH_INTERVAL_VALID_VALUES,
         )
     )
 
@@ -557,13 +572,13 @@ class PunchSourceOlresultatSe(StateSaverMixin, _PunchSourceBase):
                     self.logger.debug(data)
                     for line in splitlines:
                         punch_dict = dict(zip(PUNCH_KEYS, line.split(";")))
-                        punch_dict["passedTime"] = _normalize_passed_time(
-                            punch_dict["passedTime"]
+                        punch_dict[PUNCH_KEY_PASSED_TIME] = _normalize_passed_time(
+                            punch_dict[PUNCH_KEY_PASSED_TIME]
                         )
                         self.logger.debug(punch_dict)
-                        if punch_dict["controlCode"] in self.control_codes:
+                        if punch_dict[PUNCH_KEY_CONTROL_CODE] in self.control_codes:
                             self._notify_punch_listeners(punch_dict)
-                        self.last_received_punch_id = int(punch_dict["id"])
+                        self.last_received_punch_id = int(punch_dict[PUNCH_KEY_ID])
                         self.logger.debug(self.last_received_punch_id)
                     self._save_state()
             except HTTPError as e:

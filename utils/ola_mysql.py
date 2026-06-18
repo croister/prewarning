@@ -49,6 +49,27 @@ OLA_6_3_0_0_DB_VERSION = 564
 OLA_6_3_9_DB_VERSION = 565
 NULL_TIMESTAMP = "0000-00-00 00:00:00.000"
 
+_RUNNER_STATUS_PASSED = "passed"
+
+# OLA SQL result dict keys
+_KEY_VERSION_NUMBER = "versionNumber"
+_KEY_EVENT_ID = "eventId"
+_KEY_EVENT_NAME = "name"
+_KEY_EVENT_FORM = "eventForm"
+_KEY_EVENT_START_DATE = "startDate"
+_KEY_EVENT_FINISH_DATE = "finishDate"
+_KEY_EVENT_RACE_ID = "eventRaceId"
+_KEY_EVENT_RACE_NAME = "name"
+_KEY_EVENT_RACE_LIGHT = "raceLightCondition"
+_KEY_EVENT_RACE_DISTANCE = "raceDistance"
+_KEY_EVENT_RACE_DATE = "raceDate"
+_KEY_CONTROL_ID = "ID"
+_KEY_SPLIT_TIME_CONTROL_NAME = "splitTimeControlName"
+_KEY_CONTROL_NAME = "controlName"
+_KEY_CLASS_NAMES = "classNames"
+_KEY_PUNCHING_CODES = "punchingCodes"
+_KEY_CLASS_COUNT = "classCount"
+
 
 def get_database_names(connection: Connection) -> List[str]:
     logging.getLogger(LOGGER_NAME).debug("get_database_names")
@@ -92,7 +113,7 @@ def get_ola_db_version(connection: Connection) -> int:
 
     version_number = 0
     for version in versions:
-        version_number = max(version_number, version["versionNumber"])
+        version_number = max(version_number, version[_KEY_VERSION_NUMBER])
     logging.getLogger(LOGGER_NAME).debug("Version number: %d", version_number)
     return version_number
 
@@ -232,7 +253,7 @@ def is_valid_event(
     event_exists = event is not None
     if event_exists:
         assert event is not None
-        event_form_str = event["eventForm"]
+        event_form_str = event[_KEY_EVENT_FORM]
         correct_event_type = event_forms == event_form_str
 
     valid_event = event_exists and correct_event_type
@@ -272,7 +293,7 @@ def is_valid_event_race(
     logging.getLogger(LOGGER_NAME).debug("is_valid_event_race")
 
     valid_event_race = event_race_id in [
-        er["eventRaceId"] for er in get_event_races(connection, event_id)
+        er[_KEY_EVENT_RACE_ID] for er in get_event_races(connection, event_id)
     ]
     logging.getLogger(LOGGER_NAME).debug(
         "is_valid_event_race({}) == {}".format(event_race_id, valid_event_race)
@@ -436,7 +457,7 @@ def are_valid_event_race_control_ids(
 
     if len(control_ids) > 0:
         event_race_control_ids = [
-            er["ID"]
+            er[_KEY_CONTROL_ID]
             for er in get_event_race_split_time_controls(
                 connection,
                 ola_db_version=ola_db_version,
@@ -508,13 +529,13 @@ def _select_event(
             for event in events:
                 result.add_value(
                     SelectionData(
-                        event["eventId"],
+                        event[_KEY_EVENT_ID],
                         "{id}: {name} ({form}) {start}-{end}".format(
-                            id=event["eventId"],
-                            name=event["name"],
-                            form=event["eventForm"],
-                            start=event["startDate"],
-                            end=event["finishDate"],
+                            id=event[_KEY_EVENT_ID],
+                            name=event[_KEY_EVENT_NAME],
+                            form=event[_KEY_EVENT_FORM],
+                            start=event[_KEY_EVENT_START_DATE],
+                            end=event[_KEY_EVENT_FINISH_DATE],
                         ),
                     )
                 )
@@ -557,13 +578,13 @@ def _select_event_race(
             for events_race in events_races:
                 result.add_value(
                     SelectionData(
-                        events_race["eventRaceId"],
+                        events_race[_KEY_EVENT_RACE_ID],
                         "{id}: {name} ({light}) {distance} distance {date}".format(
-                            id=events_race["eventRaceId"],
-                            name=events_race["name"],
-                            light=events_race["raceLightCondition"],
-                            distance=events_race["raceDistance"],
-                            date=events_race["raceDate"],
+                            id=events_race[_KEY_EVENT_RACE_ID],
+                            name=events_race[_KEY_EVENT_RACE_NAME],
+                            light=events_race[_KEY_EVENT_RACE_LIGHT],
+                            distance=events_race[_KEY_EVENT_RACE_DISTANCE],
+                            date=events_race[_KEY_EVENT_RACE_DATE],
                         ),
                     )
                 )
@@ -1155,7 +1176,7 @@ class OlaMySql(ConfigConsumer, Singleton, metaclass=_OlaMySqlMeta):
         if self.event_race is None:
             raise ValueError("A Event Race needs to be selected first")
         if runner_statuses is None:
-            runner_statuses = ["passed"]
+            runner_statuses = [_RUNNER_STATUS_PASSED]
         event_results = []
         connection = self._connect()
         with connection:
