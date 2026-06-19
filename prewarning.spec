@@ -39,6 +39,7 @@ a = Analysis(
     binaries=[],
     datas=datas,
     hiddenimports=[
+        '_cffi_backend',
         'xml.etree.ElementTree',
         'zipfile',
         'urllib.error',
