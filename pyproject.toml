@@ -14,6 +14,7 @@ dependencies = [
     "ruamel.yaml==0.19.1",
     "watchdog==6.0.0",
     "wxpython==4.2.5",
+    "miniaudio>=1.71",
 ]
 
 [dependency-groups]
@@ -41,7 +42,7 @@ exclude = [
 show_error_codes = true
 
 [[tool.mypy.overrides]]
-module = ["wx.*", "consolemenu", "consolemenu.*", "wx", "consolemenu"]
+module = ["wx.*", "consolemenu", "consolemenu.*", "wx", "consolemenu", "miniaudio"]
 ignore_missing_imports = true
 
 [tool.ruff]

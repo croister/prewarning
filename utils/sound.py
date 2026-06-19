@@ -2,11 +2,10 @@
 
 import logging
 import os
-import subprocess
-from threading import Lock
+from threading import Event, Lock
 
+import miniaudio
 from natsort import natsorted
-from subprocess import run
 from typing import List
 
 from watchdog.events import (
@@ -33,14 +32,6 @@ from utils.constants import AUDIO_EXTENSION, DING_FILENAME
 from utils.singleton import Singleton
 
 SOUNDS_DIR = "sounds"
-
-MPG123_BINARY = "mpg123"
-MPG123_RELATIVE_PATH = f"mpg123/win/{MPG123_BINARY}"
-MPG123_VERSION_ARGUMENT = "--version"
-MPG123_QUIET_ARGUMENT = "-q"
-MPG123_NOT_FOUND_MSG = (
-    "Unable to locate the mpg123 binary, please install it and add it to the path."
-)
 
 
 _VM_KEY_DEFAULT_COUNTRY = "defaultcountry"
@@ -178,35 +169,26 @@ class Sound(ConfigConsumer, Singleton, metaclass=_SoundMeta):
     def play_file(cls, path: str | Path, override: bool = False):
         Sound().play_file_path(path, override)
 
-    def _run_cmd(self, cmd: List[str]) -> int:
-        self.logger.debug("_run_cmd(%s)", cmd)
-        startupinfo = None
-        if os.name == "nt":
-            startupinfo = subprocess.STARTUPINFO()  # type: ignore[attr-defined]
-            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW  # type: ignore[attr-defined]
-        result = run(cmd, capture_output=True, text=True, startupinfo=startupinfo)
-        self.logger.debug("_run_cmd(%s) -> %d", cmd, result.returncode)
-        if result.stdout:
-            self.logger.debug("_run_cmd(%s) stdout: %s", cmd, result.stdout)
-        if result.stderr:
-            self.logger.error("_run_cmd(%s) stderr: %s", cmd, result.stderr)
-        result.check_returncode()
-        return result.returncode
-
-    def _get_player_command(self) -> str:
-        try:
-            self._run_cmd([MPG123_BINARY, MPG123_VERSION_ARGUMENT])
-            return MPG123_BINARY
-        except FileNotFoundError, subprocess.CalledProcessError:
-            try:
-                mpg123_path = (
-                    Path(__file__).resolve().parent.parent / MPG123_RELATIVE_PATH
-                )
-                self._run_cmd([str(mpg123_path), MPG123_VERSION_ARGUMENT])
-                return str(mpg123_path)
-            except FileNotFoundError, subprocess.CalledProcessError:
-                self.logger.error(MPG123_NOT_FOUND_MSG)
-                raise FileNotFoundError(MPG123_NOT_FOUND_MSG)
+    def _play_audio(self, file_path: str) -> None:
+        """Play an audio file using miniaudio (blocking until finished)."""
+        self.logger.debug("_play_audio(%s)", file_path)
+        decoded = miniaudio.decode_file(file_path)
+        device = miniaudio.PlaybackDevice(
+            output_format=decoded.sample_format,
+            nchannels=decoded.nchannels,
+            sample_rate=decoded.sample_rate,
+        )
+        end_event = Event()
+        stream = miniaudio.stream_with_callbacks(
+            miniaudio.stream_raw_pcm_memory(
+                decoded.samples, decoded.nchannels, decoded.sample_width
+            ),
+            end_callback=lambda: end_event.set(),
+        )
+        next(stream)
+        device.start(stream)
+        end_event.wait()
+        device.close()
 
     name = __qualname__
 
@@ -257,8 +239,6 @@ class Sound(ConfigConsumer, Singleton, metaclass=_SoundMeta):
 
         self.sound_enabled = None
 
-        self.player_command = self._get_player_command()
-
         self.sound_folder = SoundFolder()
 
         self._parse_config()
@@ -293,9 +273,7 @@ class Sound(ConfigConsumer, Singleton, metaclass=_SoundMeta):
                         "The requested sound does not exist: %s", sound_file
                     )
                     sound_file = self.sound_folder.get_sounds_dir() / DING_FILENAME
-                self._run_cmd(
-                    [self.player_command, MPG123_QUIET_ARGUMENT, sound_file.as_posix()]
-                )
+                self._play_audio(str(sound_file))
             else:
                 self.logger.debug("Sound playback disabled, not playing.")
 
@@ -319,9 +297,7 @@ class Sound(ConfigConsumer, Singleton, metaclass=_SoundMeta):
                         "The requested file does not exist: %s", sound_file
                     )
                     sound_file = self.sound_folder.get_sounds_dir() / DING_FILENAME
-                self._run_cmd(
-                    [self.player_command, MPG123_QUIET_ARGUMENT, str(sound_file)]
-                )
+                self._play_audio(str(sound_file))
             else:
                 self.logger.debug("Sound playback disabled, not playing.")
 

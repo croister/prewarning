@@ -1,6 +1,4 @@
-import os
-from unittest.mock import patch, MagicMock
-import subprocess
+from unittest.mock import patch
 import pytest
 
 from utils.sound import (
@@ -14,7 +12,7 @@ from utils.config_definitions import VerificationResult
 
 @pytest.fixture(autouse=True)
 def _patch_sound_init_deps():
-    """Prevent observer threads and real subprocess in Sound/SoundFolder init."""
+    """Prevent observer threads in Sound/SoundFolder init."""
     with patch("watchdog.observers.Observer") as mock_obs:
         mock_obs.return_value.is_alive.return_value = False
         mock_obs.return_value.name = "MockedObserver"
@@ -23,8 +21,7 @@ def _patch_sound_init_deps():
 
 
 def _make_sound():
-    with patch.object(Sound, "_get_player_command", return_value="mpg123"):
-        return Sound()
+    return Sound()
 
 
 @pytest.fixture
@@ -32,215 +29,108 @@ def sound():
     return _make_sound()
 
 
-class TestRunCmd:
-    def test_runs_subprocess(self, sound):
-        with patch("utils.sound.run") as mock_run:
-            mock_result = MagicMock()
-            mock_result.returncode = 0
-            mock_result.stdout = ""
-            mock_result.stderr = ""
-            mock_run.return_value = mock_result
-
-            sound._run_cmd(["echo", "hello"])
-
-            mock_run.assert_called_once()
-            args, kwargs = mock_run.call_args
-            assert args[0] == ["echo", "hello"]
-
-    def test_raises_on_nonzero_returncode(self, sound):
-        with patch("utils.sound.run") as mock_run:
-            mock_result = MagicMock()
-            mock_result.returncode = 1
-            mock_result.check_returncode.side_effect = subprocess.CalledProcessError(
-                1, ["cmd"]
-            )
-            mock_run.return_value = mock_result
-
-            with pytest.raises(subprocess.CalledProcessError):
-                sound._run_cmd(["cmd"])
-
-    @pytest.mark.skipif(os.name != "nt", reason="STARTUPINFO is Windows-only")
-    def test_passes_startupinfo(self, sound):
-        with (
-            patch("utils.sound.subprocess.STARTUPINFO") as mock_si,
-            patch("utils.sound.run") as mock_run,
-        ):
-            mock_result = MagicMock()
-            mock_result.returncode = 0
-            mock_result.stdout = ""
-            mock_result.stderr = ""
-            mock_run.return_value = mock_result
-
-            sound._run_cmd(["cmd"])
-
-            mock_si.assert_called_once()
-            args, kwargs = mock_run.call_args
-            assert "startupinfo" in kwargs
-
-
-class TestGetPlayerCommand:
-    def test_returns_mpg123_when_found(self):
-        sound = _make_sound()
-        with patch.object(sound, "_run_cmd") as mock_run:
-            cmd = sound._get_player_command()
-            assert cmd == "mpg123"
-            mock_run.assert_called_once_with(["mpg123", "--version"])
-
-    def test_falls_back_to_relative_path(self):
-        sound = _make_sound()
-        from pathlib import Path
-
-        expected = str(Path(__file__).resolve().parent.parent / "mpg123/win/mpg123")
-        with patch.object(sound, "_run_cmd") as mock_run:
-            mock_run.side_effect = [
-                FileNotFoundError("mpg123 not found"),
-                None,
-            ]
-            cmd = sound._get_player_command()
-            assert cmd == expected
-            assert mock_run.call_count == 2
-
-    def test_falls_back_on_called_process_error(self):
-        sound = _make_sound()
-        from pathlib import Path
-
-        expected = str(Path(__file__).resolve().parent.parent / "mpg123/win/mpg123")
-        with patch.object(sound, "_run_cmd") as mock_run:
-            mock_run.side_effect = [
-                subprocess.CalledProcessError(1, ["mpg123", "--version"]),
-                None,
-            ]
-            cmd = sound._get_player_command()
-            assert cmd == expected
-            assert mock_run.call_count == 2
-
-    def test_raises_when_not_found_anywhere(self):
-        sound = _make_sound()
-        with patch.object(sound, "_run_cmd") as mock_run:
-            mock_run.side_effect = FileNotFoundError("not found")
-            with pytest.raises(
-                FileNotFoundError, match="Unable to locate the mpg123 binary"
-            ):
-                sound._get_player_command()
-
-
 class TestPlaySound:
     def test_plays_sound_when_enabled(self, sound):
         with (
             patch("utils.sound.os.path.exists", return_value=True),
-            patch.object(sound, "_run_cmd") as mock_run,
+            patch.object(sound, "_play_audio") as mock_play,
         ):
             with patch.object(sound, "sound_enabled", True):
                 sound.play_sound("test.mp3")
 
-            mock_run.assert_called_once()
-            args = mock_run.call_args[0][0]
-            assert any("test.mp3" in a for a in args)
+            mock_play.assert_called_once()
+            assert "test.mp3" in mock_play.call_args[0][0]
 
     def test_does_not_play_when_disabled(self, sound):
-        with patch.object(sound, "_run_cmd") as mock_run:
+        with patch.object(sound, "_play_audio") as mock_play:
             with patch.object(sound, "sound_enabled", False):
                 sound.play_sound("test.mp3", override=False)
-            mock_run.assert_not_called()
+            mock_play.assert_not_called()
 
     def test_plays_when_disabled_but_override(self, sound):
         with (
             patch("utils.sound.os.path.exists", return_value=True),
-            patch.object(sound, "_run_cmd") as mock_run,
+            patch.object(sound, "_play_audio") as mock_play,
         ):
             with patch.object(sound, "sound_enabled", False):
                 sound.play_sound("test.mp3", override=True)
-            mock_run.assert_called_once()
+            mock_play.assert_called_once()
 
     def test_falls_back_to_ding_when_file_missing(self, sound):
         with (
             patch(
                 "utils.sound.os.path.exists", side_effect=lambda p: "ding.mp3" in str(p)
             ),
-            patch.object(sound, "_run_cmd") as mock_run,
+            patch.object(sound, "_play_audio") as mock_play,
         ):
             with patch.object(sound, "sound_enabled", True):
                 sound.play_sound("missing.mp3")
-            args = mock_run.call_args[0][0]
-            assert any("ding.mp3" in a for a in args)
-
-    def test_quiet_flag_in_command(self, sound):
-        with (
-            patch("utils.sound.os.path.exists", return_value=True),
-            patch.object(sound, "_run_cmd") as mock_run,
-        ):
-            with patch.object(sound, "sound_enabled", True):
-                sound.play_sound("test.mp3")
-            args = mock_run.call_args[0][0]
-            assert "-q" in args
+            assert "ding.mp3" in mock_play.call_args[0][0]
 
 
 class TestPlayVoice:
     def test_plays_with_voice_prefix(self, sound):
         with (
             patch("utils.sound.os.path.exists", return_value=True),
-            patch.object(sound, "_run_cmd") as mock_run,
+            patch.object(sound, "_play_audio") as mock_play,
         ):
             with patch.object(sound, "sound_enabled", True):
                 sound.play_voice_sound("hello.mp3", "en-voice")
 
-            args = mock_run.call_args[0][0]
-            assert any("en-voice" in a and "hello.mp3" in a for a in args)
+            path = mock_play.call_args[0][0]
+            assert "en-voice" in path and "hello.mp3" in path
 
     def test_plays_without_prefix_when_voice_none(self, sound):
         sound.default_voice = ""
         with (
             patch("utils.sound.os.path.exists", return_value=True),
-            patch.object(sound, "_run_cmd") as mock_run,
+            patch.object(sound, "_play_audio") as mock_play,
         ):
             with patch.object(sound, "sound_enabled", True):
                 sound.play_voice_sound("hello.mp3", None)
 
-            args = mock_run.call_args[0][0]
-            assert any("hello.mp3" in a for a in args)
-            assert not any("\\" in a or "//" in a for a in args)
+            path = mock_play.call_args[0][0]
+            assert "hello.mp3" in path
 
     def test_voice_none_falls_back_to_default_voice(self, sound):
         sound.default_voice = "sv-SE-ExampleVoice"
         with (
             patch("utils.sound.os.path.exists", return_value=True),
-            patch.object(sound, "_run_cmd") as mock_run,
+            patch.object(sound, "_play_audio") as mock_play,
         ):
             with patch.object(sound, "sound_enabled", True):
                 sound.play_voice_sound("hello.mp3", None)
 
-            args = mock_run.call_args[0][0]
-            assert any("sv-SE-ExampleVoice" in a and "hello.mp3" in a for a in args)
+            path = mock_play.call_args[0][0]
+            assert "sv-SE-ExampleVoice" in path and "hello.mp3" in path
 
 
 class TestPlayFile:
     def test_plays_file_when_enabled(self, sound):
         with (
             patch("utils.sound.os.path.exists", return_value=True),
-            patch.object(sound, "_run_cmd") as mock_run,
+            patch.object(sound, "_play_audio") as mock_play,
         ):
             with patch.object(sound, "sound_enabled", True):
                 sound.play_file_path("some/path/test.mp3")
 
-            mock_run.assert_called_once()
-            args = mock_run.call_args[0][0]
-            assert any("test.mp3" in a for a in args)
-            assert "-q" in args
+            mock_play.assert_called_once()
+            assert "test.mp3" in mock_play.call_args[0][0]
 
     def test_does_not_play_when_disabled(self, sound):
-        with patch.object(sound, "_run_cmd") as mock_run:
+        with patch.object(sound, "_play_audio") as mock_play:
             with patch.object(sound, "sound_enabled", False):
                 sound.play_file_path("some/path/test.mp3", override=False)
-            mock_run.assert_not_called()
+            mock_play.assert_not_called()
 
     def test_plays_when_disabled_but_override(self, sound):
         with (
             patch("utils.sound.os.path.exists", return_value=True),
-            patch.object(sound, "_run_cmd") as mock_run,
+            patch.object(sound, "_play_audio") as mock_play,
         ):
             with patch.object(sound, "sound_enabled", False):
                 sound.play_file_path("some/path/test.mp3", override=True)
-            mock_run.assert_called_once()
+            mock_play.assert_called_once()
 
     def test_falls_back_to_ding_when_file_missing(self, sound):
         with (
@@ -248,24 +138,21 @@ class TestPlayFile:
                 "utils.sound.os.path.exists",
                 side_effect=lambda p: "ding.mp3" in str(p),
             ),
-            patch.object(sound, "_run_cmd") as mock_run,
+            patch.object(sound, "_play_audio") as mock_play,
         ):
             with patch.object(sound, "sound_enabled", True):
                 sound.play_file_path("missing.mp3")
-            args = mock_run.call_args[0][0]
-            assert any("ding.mp3" in a for a in args)
+            assert "ding.mp3" in mock_play.call_args[0][0]
 
     def test_classmethod_delegates_to_instance(self):
         with (
             patch("utils.sound.os.path.exists", return_value=True),
-            patch.object(Sound, "_get_player_command", return_value="mpg123"),
-            patch.object(Sound, "_run_cmd") as mock_run,
+            patch.object(Sound, "_play_audio") as mock_play,
         ):
             Sound.play_file("some/path/test.mp3", override=True)
 
-            mock_run.assert_called_once()
-            args = mock_run.call_args[0][0]
-            assert any("test.mp3" in a for a in args)
+            mock_play.assert_called_once()
+            assert "test.mp3" in mock_play.call_args[0][0]
 
 
 class TestVerifySound:
