@@ -180,6 +180,7 @@ class Sound(ConfigConsumer, Singleton, metaclass=_SoundMeta):
                 output_format=info.sample_format,
                 nchannels=info.nchannels,
                 sample_rate=info.sample_rate,
+                frames_to_read=4096,
             ),
             end_callback=lambda: end_event.set(),
         )
@@ -188,7 +189,7 @@ class Sound(ConfigConsumer, Singleton, metaclass=_SoundMeta):
             output_format=info.sample_format,
             nchannels=info.nchannels,
             sample_rate=info.sample_rate,
-            buffersize_msec=100,
+            buffersize_msec=200,
         )
         device.start(stream)
         end_event.wait()
