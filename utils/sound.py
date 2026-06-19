@@ -172,20 +172,24 @@ class Sound(ConfigConsumer, Singleton, metaclass=_SoundMeta):
     def _play_audio(self, file_path: str) -> None:
         """Play an audio file using miniaudio (blocking until finished)."""
         self.logger.debug("_play_audio(%s)", file_path)
-        decoded = miniaudio.decode_file(file_path)
-        device = miniaudio.PlaybackDevice(
-            output_format=decoded.sample_format,
-            nchannels=decoded.nchannels,
-            sample_rate=decoded.sample_rate,
-        )
+        info = miniaudio.get_file_info(file_path)
         end_event = Event()
         stream = miniaudio.stream_with_callbacks(
-            miniaudio.stream_raw_pcm_memory(
-                decoded.samples, decoded.nchannels, decoded.sample_width
+            miniaudio.stream_file(
+                file_path,
+                output_format=info.sample_format,
+                nchannels=info.nchannels,
+                sample_rate=info.sample_rate,
             ),
             end_callback=lambda: end_event.set(),
         )
         next(stream)
+        device = miniaudio.PlaybackDevice(
+            output_format=info.sample_format,
+            nchannels=info.nchannels,
+            sample_rate=info.sample_rate,
+            buffersize_msec=100,
+        )
         device.start(stream)
         end_event.wait()
         device.close()
