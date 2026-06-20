@@ -131,7 +131,7 @@ def _verify_url(url: str) -> VerificationResult:
         msg = str(e)
         if "timed out" in msg:
             msg = f"Connection timed out. Is MeOS running at {url}?"
-        elif "Connection refused" in msg or "No connection" in msg:
+        elif "Connection refused" in msg or "10061" in msg:
             msg = f"Connection refused. Is MeOS running at {url}?"
         elif "Name or service not known" in msg or "getaddrinfo failed" in msg:
             msg = f"Unknown host. Check the URL: {url}"
