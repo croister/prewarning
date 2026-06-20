@@ -455,6 +455,7 @@ class ConfigSectionPanel(wx.Panel):
                 if (
                     option_definition.selector is not None
                     or ConfigSectionPanel._use_selector_for(valid_values)
+                    or option_definition.read_only
                 ):
                     text_ctrl_style |= wx.TE_READONLY
                 if option_definition.value_type is str:

@@ -264,6 +264,7 @@ class MeosInfoServer(
         value_type=str,
         description="MOP diff token, persisted across restarts.",
         default_value=_INITIAL_DIFF_TOKEN,
+        read_only=True,
     )
 
     MEOS_INFO_SERVER_CONFIG_SECTION = ConfigSectionDefinition(
