@@ -329,6 +329,14 @@ class PreWarning(
     def config_section_definition(cls) -> ConfigSectionDefinition:
         return cls.COMMON_CONFIG_SECTION_DEFINITION
 
+    @classmethod
+    def get_config_section_definitions(cls) -> List[ConfigSectionDefinition]:
+        return [
+            cls.COMMON_CONFIG_SECTION_DEFINITION,
+            cls.DEDUP_CONFIG_SECTION_DEFINITION,
+            cls.DATA_SOURCES_CONFIG_SECTION_DEFINITION,
+        ]
+
     def __init__(self):
         # ensure the parent's __init__ is called
         wx.Frame.__init__(self, None, wx.ID_ANY, "PreWarning " + __version__)
