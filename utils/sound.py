@@ -220,6 +220,12 @@ class Sound(ConfigConsumer, Singleton, metaclass=_SoundMeta):
     def config_section_definition(cls) -> ConfigSectionDefinition:
         return cls.SOUND_CONFIG_SECTION_DEFINITION
 
+    @classmethod
+    def get_config_section_definitions(cls) -> List[ConfigSectionDefinition]:
+        from utils.voice_manager_dialog import VOICEMANAGER_SECTION
+
+        return [cls.config_section_definition(), VOICEMANAGER_SECTION]
+
     def __repr__(self) -> str:
         return f"Sound(sound_enabled={self.sound_enabled})"
 
