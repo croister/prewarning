@@ -122,7 +122,7 @@ jobs:
           with open(os.environ["GITHUB_OUTPUT"], "a") as f:
               f.write(f"version={version}\n")
           open("pyproject.toml", "w").write(
-              re.sub(r"version = \".*?\"", f"version = \"{version}\"", content)
+              re.sub(r"version = \".*?\"", f"version = \"{version}\"", content, count=1)
           )
           '
       - name: Install Linux system dependencies
@@ -184,7 +184,7 @@ jobs:
           base = current.replace("-dev", "")
           major, minor, _ = map(int, base.split("."))
           next_ver = f"{major}.{minor + 1}.0-dev"
-          content = re.sub(r"version = \".*?\"", f"version = \"{next_ver}\"", content)
+          content = re.sub(r"version = \".*?\"", f"version = \"{next_ver}\"", content, count=1)
           open("pyproject.toml", "w").write(content)
           with open(os.environ["GITHUB_OUTPUT"], "a") as f:
               f.write(f"version={next_ver}\n")

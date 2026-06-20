@@ -46,7 +46,7 @@ module = ["wx.*", "consolemenu", "consolemenu.*", "wx", "consolemenu", "miniaudi
 ignore_missing_imports = true
 
 [tool.ruff]
-target-version = "2.3.0-dev"
+target-version = "py314"
 exclude = ["dist", "build"]
 
 [build-system]
