@@ -173,6 +173,7 @@ jobs:
         with:
           ref: master
           fetch-depth: 0
+      - uses: astral-sh/setup-uv@v8.2.0
       - name: Bump version to next dev (minor)
         id: bump
         shell: bash
@@ -193,6 +194,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add pyproject.toml
+          uv lock
+          git add pyproject.toml uv.lock
           git commit -m "Bump version to ${{ steps.bump.outputs.version }}"
           git push
