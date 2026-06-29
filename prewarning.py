@@ -654,7 +654,7 @@ class PreWarning(
 
         # Create the header label
         self.header_label = wx.StaticText(
-            self.header_panel, label="Förvarning", style=wx.ALIGN_CENTER
+            self.header_panel, label="Pre-Warning", style=wx.ALIGN_CENTER
         )
         self.header_label.SetBackgroundColour(self.header_color)
 
@@ -687,9 +687,9 @@ class PreWarning(
         # Create the pre-warning grid
         self.prewarning_grid = wx.grid.Grid(self.grid_panel)
         self.prewarning_grid.CreateGrid(0, 3)
-        self.prewarning_grid.SetColLabelValue(COL_NR_TIME, "Tid")
-        self.prewarning_grid.SetColLabelValue(COL_NR_TEAM, "Lag")
-        self.prewarning_grid.SetColLabelValue(COL_NR_LEG, "Sträcka")
+        self.prewarning_grid.SetColLabelValue(COL_NR_TIME, "Time")
+        self.prewarning_grid.SetColLabelValue(COL_NR_TEAM, "Team")
+        self.prewarning_grid.SetColLabelValue(COL_NR_LEG, "Leg")
         self.prewarning_grid.SetColLabelAlignment(wx.LEFT, wx.CENTER)
         self.prewarning_grid.EnableEditing(False)
         self.prewarning_grid.EnableVisibleFocus(False)
