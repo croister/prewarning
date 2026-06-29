@@ -16,6 +16,7 @@ datas = [
     ('utils', 'utils'),
     ('validators', 'validators'),
     ('config', 'config'),
+    ('locales', 'locales'),
     ('favicon.ico', '.'),
 ]
 

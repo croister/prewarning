@@ -19,6 +19,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "babel>=2.16.0",
     "mypy>=2.1.0",
     "pyinstaller>=6",
     "pytest>=9.0.3",

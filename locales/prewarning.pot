@@ -1,0 +1,1115 @@
+# Translations template for PROJECT.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-07-10 22:02+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: prewarning.py:157 utils/voice_manager_dialog.py:86
+msgid "Language"
+msgstr ""
+
+#: prewarning.py:160
+msgid "The language used for the application UI. Requires restart to take effect."
+msgstr ""
+
+#: prewarning.py:168
+msgid "Interactive Mode"
+msgstr ""
+
+#: prewarning.py:171
+msgid ""
+"Enables or disables the interactive mode. If this is enabled the default "
+"method of configuration is via the GUI and if errors are detected in the "
+"configuration the Settings Dialog is opened. If this is disabled the "
+"configuration file is expected to be used as the means of changing the "
+"configuration and if errors are detected in the configuration errors are "
+"written to the log and the program exits."
+msgstr ""
+
+#: prewarning.py:183
+msgid "Announce IP on Startup"
+msgstr ""
+
+#: prewarning.py:186
+msgid "Enables or disables the readout of the current IP address at startup."
+msgstr ""
+
+#: prewarning.py:193
+msgid "Enable Intro Sound"
+msgstr ""
+
+#: prewarning.py:196
+msgid ""
+"Enable or disable the intro sound played before the first team number is "
+"read after a timeout."
+msgstr ""
+
+#: prewarning.py:203
+msgid "Intro Sound Timeout"
+msgstr ""
+
+#: prewarning.py:206
+msgid ""
+"The timeout in seconds after the last announcement before the intro sound"
+" is played again before the next announcement."
+msgstr ""
+
+#: prewarning.py:216
+msgid "Intro Sound"
+msgstr ""
+
+#: prewarning.py:219
+msgid "The path to the sound file to use as the intro sound before announcements."
+msgstr ""
+
+#: prewarning.py:233
+msgid "Test Sound"
+msgstr ""
+
+#: prewarning.py:235
+msgid "The path to the sound file to use as the test sound."
+msgstr ""
+
+#: prewarning.py:242
+msgid "Add Pre-Warnings to Bottom"
+msgstr ""
+
+#: prewarning.py:245
+msgid ""
+"Set to True if new Pre-Warnings should be added to the bottom of the "
+"screen."
+msgstr ""
+
+#: prewarning.py:252
+msgid "Announce Last Leg"
+msgstr ""
+
+#: prewarning.py:255
+msgid ""
+"If disabled, pre-warnings for the last leg are suppressed (not displayed "
+"or announced)."
+msgstr ""
+
+#: prewarning.py:263
+msgid "Deduplicate by Card + Control"
+msgstr ""
+
+#: prewarning.py:266
+msgid ""
+"Skip re-announcement when the same SI card punches the same control code "
+"again."
+msgstr ""
+
+#: prewarning.py:273
+msgid "Deduplicate by Bib + Leg"
+msgstr ""
+
+#: prewarning.py:276
+msgid ""
+"Skip re-announcement when the same team bib number appears on the same "
+"relay leg again."
+msgstr ""
+
+#: prewarning.py:283
+msgid "Dedup Timeout (seconds)"
+msgstr ""
+
+#: prewarning.py:285
+msgid "How long a dedup key remains active. 0 = forever (session)."
+msgstr ""
+
+#: prewarning.py:292
+msgid "Common"
+msgstr ""
+
+#: prewarning.py:309
+msgid "Deduplication"
+msgstr ""
+
+#: prewarning.py:320
+msgid "Data Sources"
+msgstr ""
+
+#: prewarning.py:411 prewarning.py:1005
+msgid "Settings"
+msgstr ""
+
+#: prewarning.py:414
+msgid "Opens the Settings Dialog"
+msgstr ""
+
+#: prewarning.py:418 utils/voice_manager_dialog.py:345
+#: utils/voice_manager_dialog.py:743
+msgid "Voice Manager"
+msgstr ""
+
+#: prewarning.py:421
+msgid "Opens the Voice Manager dialog"
+msgstr ""
+
+#: prewarning.py:425 utils/help_dialog.py:23
+msgid "Help"
+msgstr ""
+
+#: prewarning.py:428
+msgid "Opens the Help Dialog"
+msgstr ""
+
+#: prewarning.py:435 utils/about_dialog.py:16
+msgid "About"
+msgstr ""
+
+#: prewarning.py:438
+msgid "Opens the About Dialog"
+msgstr ""
+
+#: prewarning.py:442
+msgid "Full Screen"
+msgstr ""
+
+#: prewarning.py:445
+msgid "Switches full screen on and off"
+msgstr ""
+
+#: prewarning.py:449
+msgid "Fake Punch"
+msgstr ""
+
+#: prewarning.py:452
+msgid "Simulates a pre-warning"
+msgstr ""
+
+#: prewarning.py:459
+msgid "Refresh Display"
+msgstr ""
+
+#: prewarning.py:462
+msgid "Refreshes the display"
+msgstr ""
+
+#: prewarning.py:469
+msgid "Clear Display"
+msgstr ""
+
+#: prewarning.py:472
+msgid "Clears the display from pre-warning entries"
+msgstr ""
+
+#: prewarning.py:476
+msgid "Play Testing Sound"
+msgstr ""
+
+#: prewarning.py:479
+msgid "Plays a test sound"
+msgstr ""
+
+#: prewarning.py:483
+msgid "Announce IP Address"
+msgstr ""
+
+#: prewarning.py:486
+msgid "Reads the IP (v4) address aloud section for section"
+msgstr ""
+
+#: prewarning.py:498
+msgid "Increase Font Size"
+msgstr ""
+
+#: prewarning.py:501
+msgid "Increases the font size"
+msgstr ""
+
+#: prewarning.py:508
+msgid "Decrease Font Size"
+msgstr ""
+
+#: prewarning.py:511
+msgid "Decreases the font size"
+msgstr ""
+
+#: prewarning.py:518
+msgid "Restore Font Size"
+msgstr ""
+
+#: prewarning.py:521
+msgid "Restores the font size to default"
+msgstr ""
+
+#: prewarning.py:528
+msgid "Exit"
+msgstr ""
+
+#: prewarning.py:531
+msgid "Exits the application"
+msgstr ""
+
+#: prewarning.py:688
+msgid "Pre-Warning"
+msgstr ""
+
+#: prewarning.py:721
+msgid "Time"
+msgstr ""
+
+#: prewarning.py:722
+msgid "Team"
+msgstr ""
+
+#: prewarning.py:723
+msgid "Leg"
+msgstr ""
+
+#: prewarning.py:1029
+msgid ""
+"The language has been changed. Please restart the application for the "
+"change to take effect."
+msgstr ""
+
+#: prewarning.py:1031
+msgid "Restart Required"
+msgstr ""
+
+#: punchsources/__init__.py:101
+msgid "Punch Source"
+msgstr ""
+
+#: punchsources/__init__.py:103
+msgid "Determines the source from which Punches are fetched."
+msgstr ""
+
+#: punchsources/punch_source_meos.py:29
+msgid "MeOS Information Server Punch Source"
+msgstr ""
+
+#: punchsources/punch_source_meos.py:32
+msgid ""
+"Fetches electronic punches from a running <a "
+"href=\"https://www.melin.nu/meos/\">MeOS</a> instance via its Information"
+" Server REST API. MeOS must have the Information Server enabled (Services"
+" → Information Server). For real-time notifications, enable 'Send and "
+"receive fast advance information' in MeOS (requires a networked setup)."
+msgstr ""
+
+#: punchsources/punch_source_meos.py:42
+#: punchsources/punch_source_olresultat_se.py:278
+msgid "Control Codes"
+msgstr ""
+
+#: punchsources/punch_source_meos.py:45
+msgid ""
+"The control codes to use for pre-warning, separated by space. Use the "
+"selector to populate the list from MeOS. The selector shows controls that"
+" MeOS has identified as radio controls (controls with a name and OK "
+"status, or explicitly flagged as radio). If no such controls exist, all "
+"controls in the competition are shown as a fallback."
+msgstr ""
+
+#: punchsources/punch_source_ola_mysql.py:208
+msgid "OLA MySQL Punch Source"
+msgstr ""
+
+#: punchsources/punch_source_ola_mysql.py:211
+msgid ""
+"Fetches electronic punches from the MySQL database used by the <a "
+"href=\"https://www.svenskorientering.se/Arrangera/itochtavlings-"
+"administration/OLAtidtagnings-program/\">OLA event organizing "
+"software</a>. These punches have been fetched or received using one of "
+"the built-in methods in OLA. OLA must be using MySQL as the database "
+"engine, the built-in database is not supported."
+msgstr ""
+
+#: punchsources/punch_source_ola_mysql.py:220
+msgid "Control Ids"
+msgstr ""
+
+#: punchsources/punch_source_ola_mysql.py:223
+msgid ""
+"The Control IDs to use for Pre-Warning, separated by space. Use the "
+"Control Code (Kodsiffra) from OLA, NOT the punching units (Elektronisk "
+"stämplingskod)."
+msgstr ""
+
+#: punchsources/punch_source_ola_mysql.py:233
+#: punchsources/punch_source_olresultat_se.py:266 utils/meos_info_server.py:228
+msgid "Fetch Interval"
+msgstr ""
+
+#: punchsources/punch_source_ola_mysql.py:236
+msgid "The number of seconds between calls to the OLA MySQL database."
+msgstr ""
+
+#: punchsources/punch_source_ola_mysql.py:246
+msgid "Last Modified Time"
+msgstr ""
+
+#: punchsources/punch_source_ola_mysql.py:249
+msgid ""
+"The Modified Time of the last retrieved Punch, used to only fetch Punches"
+" that are newer. On the format of \"YYYY-MM-DD hh:mm:ss.fff\"."
+msgstr ""
+
+#: punchsources/punch_source_ola_mysql.py:259
+#: punchsources/punch_source_olresultat_se.py:231
+msgid "Last Received Punch Id"
+msgstr ""
+
+#: punchsources/punch_source_ola_mysql.py:262
+msgid ""
+"The Id of the last received Punch, used to not process it again. On the "
+"format of `resultRaceIndividualNumber`_`passedCount`_`timingControl` from"
+" the table `SplitTimes`, example \"1_1_1\"."
+msgstr ""
+
+#: punchsources/punch_source_olresultat_se.py:202
+msgid "OLResultat.se Punch Source"
+msgstr ""
+
+#: punchsources/punch_source_olresultat_se.py:205
+msgid ""
+"Fetches electronic punches from the site <a "
+"href=\"https://roc.olresultat.se/\">roc.olresultat.se</a>. These punches "
+"have been sent to the site using a Raspberry Pi running the ROC software "
+"or an Android device running the <a href=\"http://www.joja.se/\">SI-Droid"
+" ROC</a> app."
+msgstr ""
+
+#: punchsources/punch_source_olresultat_se.py:213 utils/meos_info_server.py:216
+msgid "URL"
+msgstr ""
+
+#: punchsources/punch_source_olresultat_se.py:215
+msgid "The URL to the resource that provides the Punches."
+msgstr ""
+
+#: punchsources/punch_source_olresultat_se.py:222
+msgid "Competition or Device Id"
+msgstr ""
+
+#: punchsources/punch_source_olresultat_se.py:224
+msgid "The Competition Id or Device Id to fetch Punches from."
+msgstr ""
+
+#: punchsources/punch_source_olresultat_se.py:234
+msgid ""
+"The Id of the last received Punch, used to only fetch Punches with a "
+"higher Id."
+msgstr ""
+
+#: punchsources/punch_source_olresultat_se.py:242
+msgid "From Date"
+msgstr ""
+
+#: punchsources/punch_source_olresultat_se.py:245
+msgid ""
+"The date to fetch Punches from, used to only fetch newer Punches. ISO "
+"8601 format (YYYY-MM-DD)"
+msgstr ""
+
+#: punchsources/punch_source_olresultat_se.py:253
+msgid "From Time"
+msgstr ""
+
+#: punchsources/punch_source_olresultat_se.py:256
+msgid ""
+"The time to fetch Punches from, used to only fetch newer Punches. ISO "
+"8601 format (hh:mm:ss)"
+msgstr ""
+
+#: punchsources/punch_source_olresultat_se.py:269
+msgid "The number of seconds between calls to the Punch Source URL."
+msgstr ""
+
+#: punchsources/punch_source_olresultat_se.py:280
+msgid "The Control Codes to use for Pre-Warning, separated by space."
+msgstr ""
+
+#: startlistsources/__init__.py:101
+msgid "Start List Source"
+msgstr ""
+
+#: startlistsources/__init__.py:104
+msgid "Determines the source of the Start List to look up team information from."
+msgstr ""
+
+#: startlistsources/start_list_source_file.py:241
+msgid "File Start List Source"
+msgstr ""
+
+#: startlistsources/start_list_source_file.py:244
+msgid ""
+"Reads a start list file following the <a "
+"href=\"https://orienteering.sport/iof/it/data-standard-3-0/\">IOF 3.0 "
+"Data Standard</a> and uses it to look up the team bib number and relay "
+"leg. Files generated by <a "
+"href=\"https://www.orientering.se/forening/arrangor/tavlingsadministration/ola/\">OLA</a>"
+" and <a href=\"https://sportsoftware.de/orienteering/os\">OS12</a> have "
+"been tested.The file will be monitored and re-read if it changes."
+msgstr ""
+
+#: startlistsources/start_list_source_file.py:254
+msgid "Start List File"
+msgstr ""
+
+#: startlistsources/start_list_source_file.py:257
+msgid "The path on the file system where the start list file is located."
+msgstr ""
+
+#: startlistsources/start_list_source_file.py:265
+msgid "Start List Update Sound"
+msgstr ""
+
+#: startlistsources/start_list_source_file.py:268
+msgid "The path to the sound file to use when the start list is updated."
+msgstr ""
+
+#: startlistsources/start_list_source_meos.py:24
+msgid "MeOS Information Server Start List Source"
+msgstr ""
+
+#: startlistsources/start_list_source_meos.py:27
+msgid ""
+"Looks up team bib number and relay leg from a running <a "
+"href=\"https://www.melin.nu/meos/\">MeOS</a> instance via its Information"
+" Server REST API. MeOS must have the Information Server enabled (Services"
+" → Information Server). If the received punch data already contains the "
+"bib number and leg, no operation will be performed."
+msgstr ""
+
+#: startlistsources/start_list_source_ola_mysql.py:22
+msgid "OLA MySQL Start List Source"
+msgstr ""
+
+#: startlistsources/start_list_source_ola_mysql.py:25
+msgid ""
+"Looks up the team bib number and relay leg from the MySQL database used "
+"by the <a href=\"https://www.svenskorientering.se/Arrangera"
+"/itochtavlings-administration/OLAtidtagnings-program/\">OLA event "
+"organizing software</a>. OLA must be using MySQL as the database engine, "
+"the built-in database is not supported. If the received punch data "
+"already contains the bib number and leg no operation will be performed."
+msgstr ""
+
+#: utils/about_dialog.py:46
+msgid "Author:"
+msgstr ""
+
+#: utils/about_dialog.py:52
+msgid ""
+"PreWarning is intended to be used to perform pre-warning for an "
+"Orienteering Relay event."
+msgstr ""
+
+#: utils/about_dialog.py:57
+msgid "System"
+msgstr ""
+
+#: utils/about_dialog.py:63
+msgid "Dependencies"
+msgstr ""
+
+#: utils/config_dialog.py:49
+msgid "Verification failed."
+msgstr ""
+
+#: utils/config_dialog.py:50
+msgid "Success"
+msgstr ""
+
+#: utils/config_dialog.py:51
+#, python-brace-format
+msgid "Success: {}"
+msgstr ""
+
+#: utils/config_dialog.py:52
+msgid "Valid Values"
+msgstr ""
+
+#: utils/config_dialog.py:53
+msgid "Select a Value:"
+msgstr ""
+
+#: utils/config_dialog.py:54
+msgid "Values"
+msgstr ""
+
+#: utils/config_dialog.py:55
+msgid "Select value(s)"
+msgstr ""
+
+#: utils/config_dialog.py:57
+msgid "No options available."
+msgstr ""
+
+#: utils/config_dialog.py:58
+#, python-brace-format
+msgid "Depends on: {}"
+msgstr ""
+
+#: utils/config_dialog.py:59
+msgid "Type to filter..."
+msgstr ""
+
+#: utils/config_dialog.py:103
+msgid "Reset to the default value."
+msgstr ""
+
+#: utils/config_dialog.py:104
+msgid "Test the value(s)."
+msgstr ""
+
+#: utils/config_dialog.py:105
+msgid "Select a value."
+msgstr ""
+
+#: utils/config_dialog.py:107
+msgid "Working..."
+msgstr ""
+
+#: utils/config_dialog.py:1029
+msgid "OK"
+msgstr ""
+
+#: utils/config_dialog.py:1033
+msgid "Save"
+msgstr ""
+
+#: utils/config_dialog.py:1037
+msgid "Cancel"
+msgstr ""
+
+#: utils/help_dialog.py:41
+#, python-brace-format
+msgid "Help for PreWarning {app_version}"
+msgstr ""
+
+#: utils/help_dialog.py:47
+msgid ""
+"The PreWarning application is intended to be used to perform pre-warning "
+"for an Orienteering Relay event."
+msgstr ""
+
+#: utils/help_dialog.py:52
+msgid ""
+"It can be used with a display and a speaker to give both visual and "
+"audible pre-warnings. Either can be omitted to use only one of them."
+msgstr ""
+
+#: utils/help_dialog.py:57
+msgid ""
+"When using a display it is best used in the portrait orientation, but "
+"both orientations are supported. A TV can be used to get a bigger screen."
+msgstr ""
+
+#: utils/help_dialog.py:65
+msgid "The application fetches electronic punches from a <b>Punch Source</b>."
+msgstr ""
+
+#: utils/help_dialog.py:70
+msgid ""
+"Looks up the teams' bib number and which relay leg that punch belongs to "
+"from a <b>Start List Source</b>."
+msgstr ""
+
+#: utils/help_dialog.py:76
+msgid ""
+"Displays the punch time, bib number and relay leg on the display and "
+"reads out the bib number in the speakers."
+msgstr ""
+
+#: utils/help_dialog.py:83
+msgid "There are multiple choices for both Punch Sources and Start List Sources."
+msgstr ""
+
+#: utils/help_dialog.py:88
+msgid ""
+"The application can be controlled interactively or driven entirely from "
+"the configuration file."
+msgstr ""
+
+#: utils/help_dialog.py:92
+msgid "In the interactive mode the right click menu or hotkeys can be used."
+msgstr ""
+
+#: utils/help_dialog.py:98
+msgid "Punch Sources"
+msgstr ""
+
+#: utils/help_dialog.py:101
+msgid ""
+"One of these Punch Sources is selected to be used to fetch the electronic"
+" punches."
+msgstr ""
+
+#: utils/help_dialog.py:114
+msgid "Start List Sources"
+msgstr ""
+
+#: utils/help_dialog.py:117
+msgid ""
+"One of these Start List Sources is selected to be used to look up the bib"
+" number and relay leg for the punches."
+msgstr ""
+
+#: utils/help_dialog.py:132
+msgid "Hotkeys"
+msgstr ""
+
+#: utils/help_dialog.py:135
+msgid "Hotkey (Alternate hotkeys)"
+msgstr ""
+
+#: utils/help_dialog.py:137
+msgid "Description"
+msgstr ""
+
+#: utils/meos_info_server.py:219
+msgid "Base URL of the MeOS Information Server, e.g. http://localhost:2009."
+msgstr ""
+
+#: utils/meos_info_server.py:230
+msgid "Seconds between polls of the MeOS Information Server."
+msgstr ""
+
+#: utils/meos_info_server.py:237
+msgid "Use UDP"
+msgstr ""
+
+#: utils/meos_info_server.py:240
+msgid ""
+"Enable UDP listener for real-time punch notifications. Requires MeOS to "
+"be running in a networked setup with 'Send and receive fast advance "
+"information' enabled. When a UDP packet is received, a diff fetch is "
+"triggered immediately and the interval timer is reset. Interval polling "
+"always runs as a fallback regardless of this setting."
+msgstr ""
+
+#: utils/meos_info_server.py:252
+msgid "UDP Port"
+msgstr ""
+
+#: utils/meos_info_server.py:255
+msgid ""
+"UDP broadcast port for MeOS fast advance information. Must match the "
+"DirectPort setting in MeOS Local Settings (default 21338). When running "
+"multiple competitions on the same network, use a different DirectPort in "
+"each MeOS instance to avoid receiving packets from the wrong competition."
+msgstr ""
+
+#: utils/meos_info_server.py:266
+msgid "Next Difference"
+msgstr ""
+
+#: utils/meos_info_server.py:268
+msgid "MOP diff token, persisted across restarts."
+msgstr ""
+
+#: utils/meos_info_server.py:275
+msgid "MeOS Information Server"
+msgstr ""
+
+#: utils/ola_mysql.py:767
+msgid "Host"
+msgstr ""
+
+#: utils/ola_mysql.py:769
+msgid "Host where the database server is located."
+msgstr ""
+
+#: utils/ola_mysql.py:776
+msgid "User"
+msgstr ""
+
+#: utils/ola_mysql.py:778
+msgid "The username to log in as."
+msgstr ""
+
+#: utils/ola_mysql.py:784
+msgid "Password"
+msgstr ""
+
+#: utils/ola_mysql.py:786
+msgid "The password to use."
+msgstr ""
+
+#: utils/ola_mysql.py:791
+msgid "Database"
+msgstr ""
+
+#: utils/ola_mysql.py:793
+msgid "The database to use."
+msgstr ""
+
+#: utils/ola_mysql.py:799
+msgid "Event Id"
+msgstr ""
+
+#: utils/ola_mysql.py:801
+msgid "The Event in the Database to use."
+msgstr ""
+
+#: utils/ola_mysql.py:807
+msgid "Event Race Id"
+msgstr ""
+
+#: utils/ola_mysql.py:809
+msgid "The Event Race in the Database to use."
+msgstr ""
+
+#: utils/ola_mysql.py:815
+msgid "OLA MySQL Database"
+msgstr ""
+
+#: utils/sound.py:203
+msgid "Enable Sound"
+msgstr ""
+
+#: utils/sound.py:205
+msgid "Enables or disables the playback of sounds."
+msgstr ""
+
+#: utils/sound.py:211
+msgid "Sound"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:85
+msgid "Short Name"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:87
+msgid "Gender"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:88
+msgid "Status"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:89
+msgid "Default"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:90
+msgid "Fallback"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:121
+msgid "Select Default Country"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:122
+msgid "Select a country:"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:123
+msgid "Select a country code."
+msgstr ""
+
+#: utils/voice_manager_dialog.py:124
+msgid "The selected country code is not a valid IOC code."
+msgstr ""
+
+#: utils/voice_manager_dialog.py:125
+msgid "The default voice is not installed."
+msgstr ""
+
+#: utils/voice_manager_dialog.py:126
+msgid "The fallback voice is not installed."
+msgstr ""
+
+#: utils/voice_manager_dialog.py:127
+msgid "The extra ranges format is invalid."
+msgstr ""
+
+#: utils/voice_manager_dialog.py:129
+msgid ""
+"Invalid extra ranges format. Expected comma-separated ranges like "
+"'1000-1999, 2000-2999'."
+msgstr ""
+
+#: utils/voice_manager_dialog.py:132
+#, python-brace-format
+msgid "Extra ranges must not overlap with the default range ({start}-{end})."
+msgstr ""
+
+#: utils/voice_manager_dialog.py:134
+msgid "Start of a range must not be greater than its end."
+msgstr ""
+
+#: utils/voice_manager_dialog.py:240
+msgid "Play sample"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:242
+msgid "Refresh from edge-tts"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:244 utils/voice_manager_dialog.py:249
+msgid "All"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:250
+msgid "Male"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:251
+msgid "Female"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:254
+msgid "Current default voice"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:255
+msgid "Set as Default"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:256
+msgid "Current fallback voice"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:257
+msgid "Set as Fallback"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:306
+msgid "Default Country"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:308
+msgid "IOC 3-letter code for the home nation."
+msgstr ""
+
+#: utils/voice_manager_dialog.py:315
+msgid "Default Voice"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:317
+msgid "ShortName of the voice for home-country runners."
+msgstr ""
+
+#: utils/voice_manager_dialog.py:324
+msgid "Fallback Voice"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:326
+msgid "ShortName of the voice for foreign runners."
+msgstr ""
+
+#: utils/voice_manager_dialog.py:333
+msgid "Extra Ranges"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:336
+#, python-brace-format
+msgid "Comma-separated list of extra number ranges (e.g. {default_extra_range})."
+msgstr ""
+
+#: utils/voice_manager_dialog.py:458
+msgid "Voice directory not found"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:462
+msgid "Could not read voice directory"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:478
+#, python-brace-format
+msgid "Complete: {present} files present"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:481
+#, python-brace-format
+msgid "Incomplete: {present}/{expected} files present, missing {missing_files}"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:488
+#, python-brace-format
+msgid ""
+"Incomplete: {present}/{expected} files present, missing {missing_count} "
+"files (e.g. {examples}...)"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:526
+msgid "Unknown"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:816
+msgid "Number Ranges to Generate"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:823
+msgid "Add Range"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:845
+msgid "(always generated)"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:879 utils/voice_manager_dialog.py:1168
+msgid "Remove"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:936
+msgid "start"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:938
+msgid "must be >= 0 and less than or equal to end"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:961 utils/voice_manager_dialog.py:966
+msgid "extra range"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:969 utils/voice_manager_dialog.py:972
+msgid "overlaps with"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:1030
+msgid "Language:"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:1044
+msgid "Gender:"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:1080
+msgid "Discovered Voices"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:1108
+msgid "No voices match the current filters."
+msgstr ""
+
+#: utils/voice_manager_dialog.py:1119
+msgid "Install Selected"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:1128
+msgid "Installed Voices"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:1164
+msgid "Repair"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:1216
+msgid "Close"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:1224 utils/voice_manager_dialog.py:1271
+msgid "Loading voices from edge-tts..."
+msgstr ""
+
+#: utils/voice_manager_dialog.py:1264
+msgid "Could not fetch voices from edge-tts. Check your internet connection."
+msgstr ""
+
+#: utils/voice_manager_dialog.py:1265
+msgid "Error"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:1739
+msgid ""
+"Cannot remove the current default or fallback voice. Set a different "
+"voice as default/fallback first."
+msgstr ""
+
+#: utils/voice_manager_dialog.py:1742
+msgid "Remove Disabled"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:1748
+msgid "An install or repair is currently in progress."
+msgstr ""
+
+#: utils/voice_manager_dialog.py:1750
+#, python-brace-format
+msgid "Removing voice '{shortname}' will cancel the operation."
+msgstr ""
+
+#: utils/voice_manager_dialog.py:1754
+msgid "Continue?"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:1755
+msgid "Cancel Operation"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:1765
+#, python-brace-format
+msgid "Remove voice '{shortname}'?"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:1767
+#, python-brace-format
+msgid "All files under sounds/{shortname}/ will be deleted."
+msgstr ""
+
+#: utils/voice_manager_dialog.py:1770
+msgid "Confirm Remove"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:1828
+msgid "Repairing"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:1828
+msgid "Installing"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:1837
+msgid "Finished"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:1864
+msgid ""
+"An install or repair is currently in progress. Closing will cancel the "
+"operation."
+msgstr ""
+
+#: utils/voice_manager_dialog.py:1871
+msgid ""
+"One or more extra ranges have invalid values. These ranges will be "
+"discarded when closing."
+msgstr ""
+
+#: utils/voice_manager_dialog.py:1878
+msgid ""
+"One or more extra ranges overlap with another range. These ranges will "
+"still be saved, but may generate files that already exist."
+msgstr ""
+
+#: utils/voice_manager_dialog.py:1887
+#, python-brace-format
+msgid ""
+"The following installed voices are incomplete: {names}. They will not "
+"have all required sound files available. Some numbers may fall back to "
+"the default ding sound when announced. Use Repair to generate the missing"
+" files."
+msgstr ""
+
+#: utils/voice_manager_dialog.py:1896
+msgid "There are issues that may affect voice playback."
+msgstr ""
+
+#: utils/voice_manager_dialog.py:1900
+msgid "Close anyway?"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:1904
+msgid "Confirm Close"
+msgstr ""
+

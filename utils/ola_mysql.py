@@ -20,6 +20,7 @@ from utils.config_definitions import (
     SelectionResult,
 )
 from utils.config_definitions import ConfigVerifierDefinition
+from utils.i18n import N_
 from utils.singleton import Singleton
 from validators.host_and_domain_name_validators import is_hostname_or_ip
 
@@ -763,55 +764,55 @@ class OlaMySql(ConfigConsumer, Singleton, metaclass=_OlaMySqlMeta):
 
     CONFIG_OPTION_HOST = ConfigOptionDefinition(
         name="Host",
-        display_name="Host",
+        display_name=N_("Host"),
         value_type=str,
-        description="Host where the database server is located.",
+        description=N_("Host where the database server is located."),
         mandatory=True,
         validator=is_hostname_or_ip,
     )
 
     CONFIG_OPTION_USER = ConfigOptionDefinition(
         name="User",
-        display_name="User",
+        display_name=N_("User"),
         value_type=str,
-        description="The username to log in as.",
+        description=N_("The username to log in as."),
         mandatory=True,
     )
 
     CONFIG_OPTION_PASSWORD = ConfigOptionDefinition(
         name="Password",
-        display_name="Password",
+        display_name=N_("Password"),
         value_type=str,
-        description="The password to use.",
+        description=N_("The password to use."),
     )
 
     CONFIG_OPTION_DATABASE = ConfigOptionDefinition(
         name="Database",
-        display_name="Database",
+        display_name=N_("Database"),
         value_type=str,
-        description="The database to use.",
+        description=N_("The database to use."),
         mandatory=True,
     )
 
     CONFIG_OPTION_EVENT = ConfigOptionDefinition(
         name="Event",
-        display_name="Event Id",
+        display_name=N_("Event Id"),
         value_type=int,
-        description="The Event in the Database to use.",
+        description=N_("The Event in the Database to use."),
         mandatory=True,
     )
 
     CONFIG_OPTION_EVENT_RACE = ConfigOptionDefinition(
         name="EventRace",
-        display_name="Event Race Id",
+        display_name=N_("Event Race Id"),
         value_type=int,
-        description="The Event Race in the Database to use.",
+        description=N_("The Event Race in the Database to use."),
         mandatory=True,
     )
 
     OLA_MYSQL_CONFIG_SECTION_DEFINITION = ConfigSectionDefinition(
         name=CONFIG_SECTION_OLA_MYSQL,
-        display_name="OLA MySQL Database",
+        display_name=N_("OLA MySQL Database"),
         option_definitions=[
             CONFIG_OPTION_HOST,
             CONFIG_OPTION_USER,

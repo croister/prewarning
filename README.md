@@ -88,6 +88,7 @@ This project uses [uv](https://docs.astral.sh/uv/) for dependency management and
 | Build executable (PyInstaller) | `uv run scripts/package.py` |
 | Clean build artifacts | `uv run scripts/clean.py` |
 | Run all CI checks locally | `uv run scripts/precommit.py` |
+| Update translations | `uv run scripts/update_translations.py` |
 
 ### Test structure
 
@@ -106,7 +107,59 @@ uv run scripts/precommit.py
 ```
 
 This runs: YAML lint, spelling, Ruff lint, Ruff format, dependency audit,
-mypy type checking, and pytest. The same checks run in CI on every push.
+mypy type checking, translation completeness, and pytest. The same checks run in CI on every push.
+
+### Internationalization (i18n)
+
+The UI supports multiple languages via Python's `gettext` module. English is the
+source language (strings in code); translations are stored as `.po`/`.mo` files
+under `locales/`.
+
+**Add a new language:**
+```
+uv run pybabel init -i locales/prewarning.pot -d locales -l <lang_code> -D prewarning
+```
+
+**Update translations after code changes:**
+```
+uv run scripts/update_translations.py
+```
+
+This extracts strings from source, updates all `.po` files (marking changed
+strings as fuzzy), and compiles `.mo` files in one step.
+
+**Translation workflow:**
+
+1. Run `uv run scripts/update_translations.py`
+2. Open `locales/<lang>/LC_MESSAGES/prewarning.po` in [Poedit](https://poedit.net/)
+   or a text editor — translate new entries and review fuzzy entries
+3. Run `uv run pybabel compile -d locales -D prewarning` to recompile after editing
+4. Run `uv run scripts/precommit.py` to verify everything passes
+5. Commit the updated `.pot`, `.po`, and `.mo` files
+
+**Compile translations:**
+```
+uv run pybabel compile -d locales -D prewarning
+```
+
+The language is selected in the Settings dialog (`Language` option) and takes
+effect after restarting the application.
+
+**Adding translatable strings:**
+
+When writing code that displays text to the user, use these conventions:
+
+- `_("text")` — translate a string at the point it's displayed (labels, button text,
+  messages shown at runtime).
+- `N_("text")` — mark a string for extraction without translating it yet. Use this for
+  strings defined at class/module level (e.g. `display_name=N_("...")` in
+  `ConfigOptionDefinition`) that are translated later via `_()` at render time.
+- Do **not** wrap log messages, internal identifiers, config keys, or technical
+  strings that are never shown to the user.
+
+After adding new `_()` or `N_()` calls, run the extract/update/compile commands
+above and provide translations in the `.po` files. The CI check will fail if the
+POT is stale, translations are incomplete, or `.mo` files are not compiled.
 
 ### Upgrading
 

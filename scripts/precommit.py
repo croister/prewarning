@@ -26,7 +26,7 @@ def _yamllint_cmd() -> list[str]:
 
 
 def main():
-    total = 7
+    total = 8
 
     _run_step(1, total, "YAML Lint", _yamllint_cmd(), "No YAML issues found.")
     _run_step(
@@ -37,7 +37,7 @@ def main():
         cmd=[
             "uvx",
             "codespell",
-            "--skip=.git,uv.lock,dist,__pycache__,logs,build,startlists,test_data,**country_dict_by_ioc*",
+            "--skip=.git,uv.lock,dist,__pycache__,logs,build,startlists,test_data,**country_dict_by_ioc*,locales",
             "--ignore-words-list=datas",
         ],
     )
@@ -62,7 +62,13 @@ def main():
             "startlistsources",
         ],
     )
-    _run_step(7, total, "Tests", ["uv", "run", "pytest", "-q"])
+    _run_step(
+        7,
+        total,
+        "Translations",
+        ["uv", "run", "python", "scripts/check_translations.py"],
+    )
+    _run_step(8, total, "Tests", ["uv", "run", "pytest", "-q"])
 
     print("\nAll checks passed!")
 

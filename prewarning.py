@@ -58,6 +58,7 @@ from utils.hotkey_bindings import (
     HotKeyDefinition,
     key_event_to_str,
 )
+from utils.i18n import _, N_
 from utils.sound import Sound, verify_sound, get_all_sounds
 from utils.version import __version__
 from utils.voice_manager_dialog import VoiceManagerDialog
@@ -151,41 +152,60 @@ class PreWarning(
     The PreWarning main class
     """
 
+    CONFIG_OPTION_LANGUAGE = ConfigOptionDefinition(
+        name="Language",
+        display_name=N_("Language"),
+        value_type=str,
+        description=N_(
+            "The language used for the application UI. Requires restart to take effect."
+        ),
+        default_value="en",
+        valid_values=["en", "sv"],
+    )
+
     CONFIG_OPTION_INTERACTIVE_MODE = ConfigOptionDefinition(
         name="InteractiveMode",
-        display_name="Interactive Mode",
+        display_name=N_("Interactive Mode"),
         value_type=bool,
-        description="Enables or disables the interactive mode. "
-        "If this is enabled the default method of configuration is via the GUI and if errors are detected "
-        "in the configuration the Settings Dialog is opened. "
-        "If this is disabled the configuration file is expected to be used as the means of changing the "
-        "configuration and if errors are detected in the configuration errors are written to the log "
-        "and the program exits.",
+        description=N_(
+            "Enables or disables the interactive mode. "
+            "If this is enabled the default method of configuration is via the GUI and if errors are detected "
+            "in the configuration the Settings Dialog is opened. "
+            "If this is disabled the configuration file is expected to be used as the means of changing the "
+            "configuration and if errors are detected in the configuration errors are written to the log "
+            "and the program exits."
+        ),
         default_value=True,
     )
 
     CONFIG_OPTION_ANNOUNCE_IP_ON_STARTUP = ConfigOptionDefinition(
         name="AnnounceIpOnStartup",
-        display_name="Announce IP on Startup",
+        display_name=N_("Announce IP on Startup"),
         value_type=bool,
-        description="Enables or disables the readout of the current IP address at startup.",
+        description=N_(
+            "Enables or disables the readout of the current IP address at startup."
+        ),
         default_value=False,
     )
 
     CONFIG_OPTION_ENABLE_INTRO_SOUND = ConfigOptionDefinition(
         name="EnableIntroSound",
-        display_name="Enable Intro Sound",
+        display_name=N_("Enable Intro Sound"),
         value_type=bool,
-        description="Enable or disable the intro sound played before the first team number is read after a timeout.",
+        description=N_(
+            "Enable or disable the intro sound played before the first team number is read after a timeout."
+        ),
         default_value=True,
     )
 
     CONFIG_OPTION_INTRO_SOUND_TRIGGER_TIMEOUT_SECONDS = ConfigOptionDefinition(
         name="IntroSoundTriggerTimeoutSeconds",
-        display_name="Intro Sound Timeout",
+        display_name=N_("Intro Sound Timeout"),
         value_type=int,
-        description="The timeout in seconds after the last announcement before the intro sound is played again before"
-        " the next announcement.",
+        description=N_(
+            "The timeout in seconds after the last announcement before the intro sound is played again before"
+            " the next announcement."
+        ),
         default_value=10,
         valid_values=list(range(0, 121)),
         enabled_by=CONFIG_OPTION_ENABLE_INTRO_SOUND,
@@ -193,9 +213,11 @@ class PreWarning(
 
     CONFIG_OPTION_INTRO_SOUND_FILE = ConfigOptionDefinition(
         name="IntroSoundFile",
-        display_name="Intro Sound",
+        display_name=N_("Intro Sound"),
         value_type=Path,
-        description="The path to the sound file to use as the intro sound before announcements.",
+        description=N_(
+            "The path to the sound file to use as the intro sound before announcements."
+        ),
         default_value=Path(DING_FILENAME),
         valid_values_gen=get_all_sounds,
         enabled_by=CONFIG_OPTION_ENABLE_INTRO_SOUND,
@@ -208,59 +230,68 @@ class PreWarning(
 
     CONFIG_OPTION_TEST_SOUND_FILE = ConfigOptionDefinition(
         name="TestSoundFile",
-        display_name="Test Sound",
+        display_name=N_("Test Sound"),
         value_type=Path,
-        description="The path to the sound file to use as the test sound.",
+        description=N_("The path to the sound file to use as the test sound."),
         default_value=Path(TESTING_FILENAME),
         valid_values_gen=get_all_sounds,
     )
 
     CONFIG_OPTION_ADD_PRE_WARNINGS_TO_BOTTOM = ConfigOptionDefinition(
         name="AddPreWarningsToBottom",
-        display_name="Add Pre-Warnings to Bottom",
+        display_name=N_("Add Pre-Warnings to Bottom"),
         value_type=bool,
-        description="Set to True if new Pre-Warnings should be added to the bottom of the screen.",
+        description=N_(
+            "Set to True if new Pre-Warnings should be added to the bottom of the screen."
+        ),
         default_value=False,
     )
 
     CONFIG_OPTION_ANNOUNCE_LAST_LEG = ConfigOptionDefinition(
         name="AnnounceLastLeg",
-        display_name="Announce Last Leg",
+        display_name=N_("Announce Last Leg"),
         value_type=bool,
-        description="If disabled, pre-warnings for the last leg are suppressed "
-        "(not displayed or announced).",
+        description=N_(
+            "If disabled, pre-warnings for the last leg are suppressed "
+            "(not displayed or announced)."
+        ),
         default_value=False,
     )
 
     CONFIG_OPTION_DEDUP_CARD_CONTROL = ConfigOptionDefinition(
         name="DedupCardControl",
-        display_name="Deduplicate by Card + Control",
+        display_name=N_("Deduplicate by Card + Control"),
         value_type=bool,
-        description="Skip re-announcement when the same SI card punches the same control code again.",
+        description=N_(
+            "Skip re-announcement when the same SI card punches the same control code again."
+        ),
         default_value=False,
     )
 
     CONFIG_OPTION_DEDUP_BIB_LEG = ConfigOptionDefinition(
         name="DedupBibLeg",
-        display_name="Deduplicate by Bib + Leg",
+        display_name=N_("Deduplicate by Bib + Leg"),
         value_type=bool,
-        description="Skip re-announcement when the same team bib number appears on the same relay leg again.",
+        description=N_(
+            "Skip re-announcement when the same team bib number appears on the same relay leg again."
+        ),
         default_value=False,
     )
 
     CONFIG_OPTION_DEDUP_TIMEOUT_SECONDS = ConfigOptionDefinition(
         name="DedupTimeoutSeconds",
-        display_name="Dedup Timeout (seconds)",
+        display_name=N_("Dedup Timeout (seconds)"),
         value_type=int,
-        description="How long a dedup key remains active. 0 = forever (session).",
+        description=N_("How long a dedup key remains active. 0 = forever (session)."),
         default_value=0,
         valid_values=list(range(0, 3601)),
     )
 
     COMMON_CONFIG_SECTION_DEFINITION = ConfigSectionDefinition(
         name=Config.SECTION_COMMON,
-        display_name=Config.SECTION_COMMON,
+        display_name=N_("Common"),
         option_definitions=[
+            CONFIG_OPTION_LANGUAGE,
             CONFIG_OPTION_INTERACTIVE_MODE,
             CONFIG_OPTION_ANNOUNCE_IP_ON_STARTUP,
             CONFIG_OPTION_ENABLE_INTRO_SOUND,
@@ -275,7 +306,7 @@ class PreWarning(
 
     DEDUP_CONFIG_SECTION_DEFINITION = ConfigSectionDefinition(
         name=Config.SECTION_DEDUPLICATION,
-        display_name="Deduplication",
+        display_name=N_("Deduplication"),
         option_definitions=[
             CONFIG_OPTION_DEDUP_CARD_CONTROL,
             CONFIG_OPTION_DEDUP_BIB_LEG,
@@ -286,7 +317,7 @@ class PreWarning(
 
     DATA_SOURCES_CONFIG_SECTION_DEFINITION = ConfigSectionDefinition(
         name=Config.SECTION_DATA_SOURCES,
-        display_name="Data Sources",
+        display_name=N_("Data Sources"),
         option_definitions=[],
         sort_key_prefix=12,
     )
@@ -377,82 +408,82 @@ class PreWarning(
         # Hotkey binding definitions
         self.hotkey_bindings = [
             HotKeyBindingDefinition(
-                name="Settings",
+                name=_("Settings"),
                 hotkey=HotKeyDefinition(key_code=ord("S")).with_ctrl(),
                 handler=self._config_dialog,
-                description="Opens the Settings Dialog",
+                description=_("Opens the Settings Dialog"),
                 bitmap_name=wx.ART_EXECUTABLE_FILE,
             ),
             HotKeyBindingDefinition(
-                name="Voice Manager",
+                name=_("Voice Manager"),
                 hotkey=HotKeyDefinition(key_code=ord("M")).with_ctrl().with_shift(),
                 handler=self._open_voice_manager,
-                description="Opens the Voice Manager dialog",
+                description=_("Opens the Voice Manager dialog"),
                 bitmap_name=wx.ART_CDROM,
             ),
             HotKeyBindingDefinition(
-                name="Help",
+                name=_("Help"),
                 hotkey=HotKeyDefinition(key_code=wx.WXK_F1),
                 handler=self._help_dialog,
-                description="Opens the Help Dialog",
+                description=_("Opens the Help Dialog"),
                 alternate_hotkeys=[
                     HotKeyDefinition(key_code=ord("H")).with_ctrl(),
                 ],
                 bitmap_name=wx.ART_HELP,
             ),
             HotKeyBindingDefinition(
-                name="About",
+                name=_("About"),
                 hotkey=HotKeyDefinition(key_code=ord("A")).with_ctrl(),
                 handler=self._about_dialog,
-                description="Opens the About Dialog",
+                description=_("Opens the About Dialog"),
                 bitmap_name=wx.ART_INFORMATION,
             ),
             HotKeyBindingDefinition(
-                name="Full Screen",
+                name=_("Full Screen"),
                 hotkey=HotKeyDefinition(key_code=wx.WXK_F11),
                 handler=self._toggle_full_screen,
-                description="Switches full screen on and off",
+                description=_("Switches full screen on and off"),
                 bitmap_name=wx.ART_FIND,
             ),
             HotKeyBindingDefinition(
-                name="Fake Punch",
+                name=_("Fake Punch"),
                 hotkey=HotKeyDefinition(key_code=wx.WXK_SPACE).with_ctrl(),
                 handler=self._simulate_punch,
-                description="Simulates a pre-warning",
+                description=_("Simulates a pre-warning"),
                 alternate_hotkeys=[
                     HotKeyDefinition(key_code=ord("P")).with_ctrl(),
                 ],
                 bitmap_name=wx.ART_GO_DOWN,
             ),
             HotKeyBindingDefinition(
-                name="Refresh Display",
+                name=_("Refresh Display"),
                 hotkey=HotKeyDefinition(key_code=wx.WXK_F5),
                 handler=self._refresh,
-                description="Refreshes the display",
+                description=_("Refreshes the display"),
                 alternate_hotkeys=[
                     HotKeyDefinition(key_code=ord("R")).with_ctrl(),
                 ],
                 bitmap_name=wx.ART_LIST_VIEW,
             ),
             HotKeyBindingDefinition(
-                name="Clear Display",
+                name=_("Clear Display"),
                 hotkey=HotKeyDefinition(key_code=ord("C")).with_ctrl(),
                 handler=self._clear,
-                description="Clears the display from pre-warning entries",
+                description=_("Clears the display from pre-warning entries"),
                 bitmap_name=wx.ART_DELETE,
             ),
             HotKeyBindingDefinition(
-                name="Play Testing Sound",
+                name=_("Play Testing Sound"),
                 hotkey=HotKeyDefinition(key_code=ord("T")).with_ctrl(),
                 handler=self._play_test_sound,
-                description="Plays a test sound",
+                description=_("Plays a test sound"),
                 bitmap_name=wx.ART_QUESTION,
             ),
             HotKeyBindingDefinition(
-                name="Announce IP Address",
+                name=_("Announce IP Address"),
                 hotkey=HotKeyDefinition(key_code=ord("I")).with_ctrl(),
                 handler=self._notify_ip,
-                description="Reads the IP (v4) address aloud section for section",
+                description=_("Reads the IP (v4) address aloud section for section"),
                 bitmap_name=wx.ART_INFORMATION,
             ),
             HotKeyBindingDefinition(
@@ -464,40 +495,40 @@ class PreWarning(
                 bitmap_name=wx.ART_TIP,
             ),
             HotKeyBindingDefinition(
-                name="Increase Font Size",
+                name=_("Increase Font Size"),
                 hotkey=HotKeyDefinition(key_code=wx.WXK_NUMPAD_ADD).with_ctrl(),
                 handler=self._increase_font_size,
-                description="Increases the font size",
+                description=_("Increases the font size"),
                 alternate_hotkeys=[
                     HotKeyDefinition(key_code=ord("+")).with_ctrl(),
                 ],
                 bitmap_name=wx.ART_PLUS,
             ),
             HotKeyBindingDefinition(
-                name="Decrease Font Size",
+                name=_("Decrease Font Size"),
                 hotkey=HotKeyDefinition(key_code=wx.WXK_NUMPAD_SUBTRACT).with_ctrl(),
                 handler=self._decrease_font_size,
-                description="Decreases the font size",
+                description=_("Decreases the font size"),
                 alternate_hotkeys=[
                     HotKeyDefinition(key_code=ord("-")).with_ctrl(),
                 ],
                 bitmap_name=wx.ART_MINUS,
             ),
             HotKeyBindingDefinition(
-                name="Restore Font Size",
+                name=_("Restore Font Size"),
                 hotkey=HotKeyDefinition(key_code=wx.WXK_NUMPAD0).with_ctrl(),
                 handler=self._restore_font_size,
-                description="Restores the font size to default",
+                description=_("Restores the font size to default"),
                 alternate_hotkeys=[
                     HotKeyDefinition(key_code=ord("0")).with_ctrl(),
                 ],
                 bitmap_name=wx.ART_UNDO,
             ),
             HotKeyBindingDefinition(
-                name="Exit",
+                name=_("Exit"),
                 hotkey=HotKeyDefinition(key_code=ord("X")).with_ctrl(),
                 handler=self.Close,
-                description="Exits the application",
+                description=_("Exits the application"),
                 alternate_hotkeys=[
                     HotKeyDefinition(key_code=ord("Q")).with_ctrl(),
                     HotKeyDefinition(key_code=ord("D")).with_ctrl(),
@@ -654,7 +685,7 @@ class PreWarning(
 
         # Create the header label
         self.header_label = wx.StaticText(
-            self.header_panel, label="Pre-Warning", style=wx.ALIGN_CENTER
+            self.header_panel, label=_("Pre-Warning"), style=wx.ALIGN_CENTER
         )
         self.header_label.SetBackgroundColour(self.header_color)
 
@@ -687,9 +718,9 @@ class PreWarning(
         # Create the pre-warning grid
         self.prewarning_grid = wx.grid.Grid(self.grid_panel)
         self.prewarning_grid.CreateGrid(0, 3)
-        self.prewarning_grid.SetColLabelValue(COL_NR_TIME, "Time")
-        self.prewarning_grid.SetColLabelValue(COL_NR_TEAM, "Team")
-        self.prewarning_grid.SetColLabelValue(COL_NR_LEG, "Leg")
+        self.prewarning_grid.SetColLabelValue(COL_NR_TIME, _("Time"))
+        self.prewarning_grid.SetColLabelValue(COL_NR_TEAM, _("Team"))
+        self.prewarning_grid.SetColLabelValue(COL_NR_LEG, _("Leg"))
         self.prewarning_grid.SetColLabelAlignment(wx.LEFT, wx.CENTER)
         self.prewarning_grid.EnableEditing(False)
         self.prewarning_grid.EnableVisibleFocus(False)
@@ -964,8 +995,14 @@ class PreWarning(
             state_providers[self.punch_source.name] = self.punch_source
         if MeosInfoServer.has_instance():
             state_providers[MeosInfoServer.CONFIG_SECTION_MEOS] = MeosInfoServer()
+
+        old_lang = self.config.get_section(Config.SECTION_COMMON).get(
+            self.CONFIG_OPTION_LANGUAGE.name,
+            self.CONFIG_OPTION_LANGUAGE.default_value,
+        )
+
         settings_dialog = ConfigDialog(
-            self.config, self, title="Settings", state_providers=state_providers
+            self.config, self, title=_("Settings"), state_providers=state_providers
         )
         created = time()
         self.logger.debug("Config Dialog created: %d seconds", created - start)
@@ -980,6 +1017,20 @@ class PreWarning(
         if res == wx.ID_CANCEL and perform_validation:
             sys.exit(1)
         settings_dialog.Destroy()
+
+        if res == wx.ID_OK:
+            new_lang = self.config.get_section(Config.SECTION_COMMON).get(
+                self.CONFIG_OPTION_LANGUAGE.name,
+                self.CONFIG_OPTION_LANGUAGE.default_value,
+            )
+            if new_lang != old_lang:
+                wx.MessageBox(
+                    _(
+                        "The language has been changed. Please restart the application for the change to take effect."
+                    ),
+                    _("Restart Required"),
+                    wx.OK | wx.ICON_INFORMATION,
+                )
 
     def _toggle_full_screen(self):
         self.logger.debug("Toggle Full Screen")
@@ -1356,7 +1407,24 @@ class PreWarning(
                 self.last_sound_time = datetime.now()
 
 
+def _init_language():
+    """Read the language setting from the config file and activate i18n."""
+    from configparser import ConfigParser
+
+    from utils.i18n import set_language
+
+    config = ConfigParser()
+    config.read(CONFIGURATION_FILE)
+    lang = config.get(
+        Config.SECTION_COMMON,
+        PreWarning.CONFIG_OPTION_LANGUAGE.name,
+        fallback=PreWarning.CONFIG_OPTION_LANGUAGE.default_value,
+    )
+    set_language(lang)
+
+
 def main():
+    _init_language()
     app = wx.App()
     frm = PreWarning()
     frm.Show()

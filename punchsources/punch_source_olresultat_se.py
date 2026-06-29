@@ -30,6 +30,7 @@ from validators.datetime_validators import is_date, is_time
 from validators.number_validators import is_not_negative_int
 from validators.regex_validators import is_control_ids
 from validators.url_validators import is_http_or_https_url
+from utils.i18n import N_
 from ._base import _PunchSourceBase
 
 
@@ -198,9 +199,9 @@ class PunchSourceOlresultatSe(StateSaverMixin, _PunchSourceBase):
 
     name = __qualname__
 
-    display_name = "OLResultat.se Punch Source"
+    display_name = N_("OLResultat.se Punch Source")
 
-    description = (
+    description = N_(
         "Fetches electronic punches from the site "
         '<a href="https://roc.olresultat.se/">roc.olresultat.se</a>. '
         "These punches have been sent to the site using a Raspberry Pi running the ROC software or an "
@@ -209,45 +210,51 @@ class PunchSourceOlresultatSe(StateSaverMixin, _PunchSourceBase):
 
     CONFIG_OPTION_PUNCH_SOURCE_OL_RESULTAT_SE_URL = ConfigOptionDefinition(
         name="PunchSourceUrl",
-        display_name="URL",
+        display_name=N_("URL"),
         value_type=str,
-        description="The URL to the resource that provides the Punches.",
+        description=N_("The URL to the resource that provides the Punches."),
         default_value="http://roc.olresultat.se/getpunches.asp",
         validator=is_http_or_https_url,
     )
 
     CONFIG_OPTION_PUNCH_SOURCE_OL_RESULTAT_SE_COMPETITION_ID = ConfigOptionDefinition(
         name="CompetitionId",
-        display_name="Competition or Device Id",
+        display_name=N_("Competition or Device Id"),
         value_type=str,
-        description="The Competition Id or Device Id to fetch Punches from.",
+        description=N_("The Competition Id or Device Id to fetch Punches from."),
         mandatory=True,
     )
 
     CONFIG_OPTION_PUNCH_SOURCE_OL_RESULTAT_SE_LAST_RECEIVED_PUNCH_ID = RuntimeStateOptionDefinition(
         runtime_state_group=PUNCH_SOURCE_OL_RESULTAT_SE_RUNTIME_STATE,
         name="LastReceivedPunchId",
-        display_name="Last Received Punch Id",
+        display_name=N_("Last Received Punch Id"),
         value_type=int,
-        description="The Id of the last received Punch, used to only fetch Punches with a higher Id.",
+        description=N_(
+            "The Id of the last received Punch, used to only fetch Punches with a higher Id."
+        ),
         default_value=0,
         validator=is_not_negative_int,
     )
 
     CONFIG_OPTION_PUNCH_SOURCE_OL_RESULTAT_SE_FROM_DATE = ConfigOptionDefinition(
         name="FromDate",
-        display_name="From Date",
+        display_name=N_("From Date"),
         value_type=str,
-        description="The date to fetch Punches from, used to only fetch newer Punches. ISO 8601 format (YYYY-MM-DD)",
+        description=N_(
+            "The date to fetch Punches from, used to only fetch newer Punches. ISO 8601 format (YYYY-MM-DD)"
+        ),
         default_value=date.today().isoformat(),
         validator=is_date,
     )
 
     CONFIG_OPTION_PUNCH_SOURCE_OL_RESULTAT_SE_FROM_TIME = ConfigOptionDefinition(
         name="FromTime",
-        display_name="From Time",
+        display_name=N_("From Time"),
         value_type=str,
-        description="The time to fetch Punches from, used to only fetch newer Punches. ISO 8601 format (hh:mm:ss)",
+        description=N_(
+            "The time to fetch Punches from, used to only fetch newer Punches. ISO 8601 format (hh:mm:ss)"
+        ),
         default_value="00:00:00",
         # default_value=time.isoformat(timespec='seconds'),
         validator=is_time,
@@ -256,9 +263,11 @@ class PunchSourceOlresultatSe(StateSaverMixin, _PunchSourceBase):
     CONFIG_OPTION_PUNCH_SOURCE_OL_RESULTAT_SE_FETCH_INTERVAL_SECONDS = (
         ConfigOptionDefinition(
             name="FetchIntervalSeconds",
-            display_name="Fetch Interval",
+            display_name=N_("Fetch Interval"),
             value_type=int,
-            description="The number of seconds between calls to the Punch Source URL.",
+            description=N_(
+                "The number of seconds between calls to the Punch Source URL."
+            ),
             default_value=10,
             valid_values=FETCH_INTERVAL_VALID_VALUES,
         )
@@ -266,9 +275,9 @@ class PunchSourceOlresultatSe(StateSaverMixin, _PunchSourceBase):
 
     CONFIG_OPTION_PUNCH_SOURCE_OL_RESULTAT_SE_CONTROL_CODES = ConfigOptionDefinition(
         name="ControlCodes",
-        display_name="Control Codes",
+        display_name=N_("Control Codes"),
         value_type=str,
-        description="The Control Codes to use for Pre-Warning, separated by space.",
+        description=N_("The Control Codes to use for Pre-Warning, separated by space."),
         mandatory=True,
         validator=is_control_ids,
     )

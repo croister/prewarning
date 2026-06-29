@@ -5,6 +5,7 @@ from punchsources._base import _PunchSourceBase, _NOT_OVERRIDDEN
 from punchsources.punch_source_olresultat_se import PunchSourceOlresultatSe
 from utils.config import Config
 from utils.config_definitions import ConfigOptionDefinition
+from utils.i18n import N_
 
 if TYPE_CHECKING:
     _PunchSourceClass = type[_PunchSourceBase]
@@ -97,9 +98,9 @@ def _register_common_source():
     global COMMON_PUNCH_SOURCE
     COMMON_PUNCH_SOURCE = ConfigOptionDefinition(
         name="PunchSource",
-        display_name="Punch Source",
+        display_name=N_("Punch Source"),
         value_type=str,
-        description="Determines the source from which Punches are fetched.",
+        description=N_("Determines the source from which Punches are fetched."),
         default_value=PunchSourceOlresultatSe.__qualname__,
         valid_values=list(PUNCH_SOURCES.keys()),
         mandatory=True,

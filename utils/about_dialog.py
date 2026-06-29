@@ -5,13 +5,15 @@ from pathlib import Path
 import wx
 import wx.html
 
+from utils.i18n import _
+
 
 APP_ICON_PATH = str(Path(__file__).resolve().parent.parent / "favicon.ico")
 
 
 class AboutDialog(wx.Frame):
     def __init__(self, parent, app_version: str):
-        wx.Frame.__init__(self, parent, wx.ID_ANY, title="About")
+        wx.Frame.__init__(self, parent, wx.ID_ANY, title=_("About"))
 
         app_icon = wx.Icon(APP_ICON_PATH, wx.BITMAP_TYPE_ICO)
         self.SetIcon(app_icon)
@@ -41,18 +43,24 @@ class AboutDialog(wx.Frame):
         self.SetSizer(main_sizer)
 
         contents = (
-            "<p><b>Author:</b> Christian Lindblom<br>"
+            "<p><b>" + _("Author:") + "</b> Christian Lindblom<br>"
             '<a href="mailto:croister@croister.se">croister@croister.se</a></p>'
         )
-        contents += "<p>PreWarning is intended to be used to perform pre-warning for an Orienteering Relay event.</p>"
+        contents += (
+            "<p>"
+            + _(
+                "PreWarning is intended to be used to perform pre-warning for an Orienteering Relay event."
+            )
+            + "</p>"
+        )
 
-        contents += "<h3>System</h3>"
+        contents += "<h3>" + _("System") + "</h3>"
         contents += "<p>Python {python_version}<br>{platform}</p>".format(
             python_version=platform.python_version(),
             platform=platform.platform(),
         )
 
-        contents += "<h3>Dependencies</h3><table>"
+        contents += "<h3>" + _("Dependencies") + "</h3><table>"
         try:
             requirements = importlib.metadata.requires("prewarning")
             if requirements:

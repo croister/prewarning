@@ -26,6 +26,7 @@ from utils.config_definitions import (
 )
 from utils.constants import AUDIO_EXTENSION, TESTING_FILENAME
 from utils.country_dict_by_ioc import COUNTRIES
+from utils.i18n import _, N_
 from validators.validation_error import ValidationError
 from utils.edge_tts import (
     EdgeTTSError,
@@ -81,12 +82,12 @@ STATUS_COL_WIDTH = 52
 STAR_COL_WIDTH = 56
 
 # Column header labels
-_COL_HEADER_SHORT_NAME = "Short Name"
-_COL_HEADER_LANGUAGE = "Language"
-_COL_HEADER_GENDER = "Gender"
-_COL_HEADER_STATUS = "Status"
-_COL_HEADER_DEFAULT = "Default"
-_COL_HEADER_FALLBACK = "Fallback"
+_COL_HEADER_SHORT_NAME = N_("Short Name")
+_COL_HEADER_LANGUAGE = N_("Language")
+_COL_HEADER_GENDER = N_("Gender")
+_COL_HEADER_STATUS = N_("Status")
+_COL_HEADER_DEFAULT = N_("Default")
+_COL_HEADER_FALLBACK = N_("Fallback")
 
 VOICE_METADATA_FILENAME = "voice.json"
 
@@ -117,16 +118,20 @@ DEFAULT_RANGE_START = 0
 DEFAULT_RANGE_END = 999
 DEFAULT_EXTRA_RANGE = "1000-9999"
 
-DLG_DEFAULT_COUNTRY_CAPTION = "Select Default Country"
-DLG_DEFAULT_COUNTRY_MESSAGE = "Select a country:"
-MSG_SELECT_COUNTRY = "Select a country code."
-ERR_COUNTRY_VERIFY = "The selected country code is not a valid IOC code."
-ERR_DEFAULT_VOICE_VERIFY = "The default voice is not installed."
-ERR_FALLBACK_VOICE_VERIFY = "The fallback voice is not installed."
-ERR_EXTRA_RANGES_VERIFY = "The extra ranges format is invalid."
-ERR_EXTRA_RANGES_FORMAT = "Invalid extra ranges format. Expected comma-separated ranges like '1000-1999, 2000-2999'."
-ERR_EXTRA_RANGES_OVERLAP = f"Extra ranges must not overlap with the default range ({DEFAULT_RANGE_START}-{DEFAULT_RANGE_END})."
-ERR_EXTRA_RANGES_REVERSED = "Start of a range must not be greater than its end."
+DLG_DEFAULT_COUNTRY_CAPTION = N_("Select Default Country")
+DLG_DEFAULT_COUNTRY_MESSAGE = N_("Select a country:")
+MSG_SELECT_COUNTRY = N_("Select a country code.")
+ERR_COUNTRY_VERIFY = N_("The selected country code is not a valid IOC code.")
+ERR_DEFAULT_VOICE_VERIFY = N_("The default voice is not installed.")
+ERR_FALLBACK_VOICE_VERIFY = N_("The fallback voice is not installed.")
+ERR_EXTRA_RANGES_VERIFY = N_("The extra ranges format is invalid.")
+ERR_EXTRA_RANGES_FORMAT = N_(
+    "Invalid extra ranges format. Expected comma-separated ranges like '1000-1999, 2000-2999'."
+)
+ERR_EXTRA_RANGES_OVERLAP = N_(
+    "Extra ranges must not overlap with the default range ({start}-{end})."
+)
+ERR_EXTRA_RANGES_REVERSED = N_("Start of a range must not be greater than its end.")
 
 
 def _get_extra_ranges_error(value: str) -> str | None:
@@ -138,19 +143,21 @@ def _get_extra_ranges_error(value: str) -> str | None:
         if not part:
             continue
         if "-" not in part:
-            return ERR_EXTRA_RANGES_FORMAT
+            return _(ERR_EXTRA_RANGES_FORMAT)
         try:
             start_str, end_str = part.split("-", 1)
             start = int(start_str.strip())
             end = int(end_str.strip())
             if start < 0 or end < 0:
-                return ERR_EXTRA_RANGES_FORMAT
+                return _(ERR_EXTRA_RANGES_FORMAT)
             if start > end:
-                return ERR_EXTRA_RANGES_REVERSED
+                return _(ERR_EXTRA_RANGES_REVERSED)
             if start <= DEFAULT_RANGE_END:
-                return ERR_EXTRA_RANGES_OVERLAP
+                return _(ERR_EXTRA_RANGES_OVERLAP).format(
+                    start=DEFAULT_RANGE_START, end=DEFAULT_RANGE_END
+                )
         except ValueError, TypeError:
-            return ERR_EXTRA_RANGES_FORMAT
+            return _(ERR_EXTRA_RANGES_FORMAT)
     return None
 
 
@@ -185,8 +192,8 @@ def _verify_voice(shortname: str) -> bool:
 
 def _select_default_country() -> SelectionResult:
     result = SelectionResult(
-        caption=DLG_DEFAULT_COUNTRY_CAPTION,
-        message=DLG_DEFAULT_COUNTRY_MESSAGE,
+        caption=_(DLG_DEFAULT_COUNTRY_CAPTION),
+        message=_(DLG_DEFAULT_COUNTRY_MESSAGE),
         selection_type=SelectionType.SINGLE,
     )
     for ioc_code, data in sorted(
@@ -230,17 +237,24 @@ SOUNDS_DIR = Path(__file__).resolve().parent.parent / "sounds"
 SAMPLE_NUMBERS = (7, 104, 999)  # demo samples played when clicking "Play"
 TESTING_TEXT = "Testing, one two three"
 
-TOOLTIP_PLAY_SAMPLE = "Play sample"
+TOOLTIP_PLAY_SAMPLE = N_("Play sample")
 TOOLTIP_DEFAULT = ""
-TOOLTIP_REFRESH_EDGE_TTS = "Refresh from edge-tts"
+TOOLTIP_REFRESH_EDGE_TTS = N_("Refresh from edge-tts")
 
-FILTER_ALL = "All"
-GENDER_CHOICES = ("All", "Male", "Female")
+FILTER_ALL = N_("All")
+_GENDER_ALL = "All"
+_GENDER_MALE = "Male"
+_GENDER_FEMALE = "Female"
+GENDER_CHOICES = (
+    (_GENDER_ALL, N_("All")),
+    (_GENDER_MALE, N_("Male")),
+    (_GENDER_FEMALE, N_("Female")),
+)
 NO_TOOLTIP_KEY = (-1, -1)
-TOOLTIP_IS_DEFAULT = "Current default voice"
-TOOLTIP_SET_DEFAULT = "Set as Default"
-TOOLTIP_IS_FALLBACK = "Current fallback voice"
-TOOLTIP_SET_FALLBACK = "Set as Fallback"
+TOOLTIP_IS_DEFAULT = N_("Current default voice")
+TOOLTIP_SET_DEFAULT = N_("Set as Default")
+TOOLTIP_IS_FALLBACK = N_("Current fallback voice")
+TOOLTIP_SET_FALLBACK = N_("Set as Fallback")
 
 UI_SECTION_BORDER = 8
 UI_SMALL_BORDER = 4
@@ -289,43 +303,46 @@ def get_installed_voice_shortnames() -> list[str]:
 
 CONFIG_OPTION_DEFAULT_COUNTRY = ConfigOptionDefinition(
     name="defaultcountry",
-    display_name="Default Country",
+    display_name=N_("Default Country"),
     value_type=str,
-    description="IOC 3-letter code for the home nation.",
+    description=N_("IOC 3-letter code for the home nation."),
     default_value="SWE",
     valid_values=list(COUNTRIES.keys()),
 )
 
 CONFIG_OPTION_DEFAULT_VOICE = ConfigOptionDefinition(
     name="defaultvoice",
-    display_name="Default Voice",
+    display_name=N_("Default Voice"),
     value_type=str,
-    description="ShortName of the voice for home-country runners.",
+    description=N_("ShortName of the voice for home-country runners."),
     mandatory=True,
     valid_values_gen=get_installed_voice_shortnames,
 )
 
 CONFIG_OPTION_FALLBACK_VOICE = ConfigOptionDefinition(
     name="fallbackvoice",
-    display_name="Fallback Voice",
+    display_name=N_("Fallback Voice"),
     value_type=str,
-    description="ShortName of the voice for foreign runners.",
+    description=N_("ShortName of the voice for foreign runners."),
     mandatory=True,
     valid_values_gen=get_installed_voice_shortnames,
 )
 
 CONFIG_OPTION_EXTRA_RANGES = ConfigOptionDefinition(
     name="extraranges",
-    display_name="Extra Ranges",
+    display_name=N_("Extra Ranges"),
     value_type=str,
-    description=f"Comma-separated list of extra number ranges (e.g. {DEFAULT_EXTRA_RANGE}).",
+    description=N_(
+        "Comma-separated list of extra number ranges (e.g. {default_extra_range})."
+    ),
+    description_format_args={"default_extra_range": DEFAULT_EXTRA_RANGE},
     default_value="",
     validator=validate_extra_ranges,
 )
 
 VOICEMANAGER_SECTION = ConfigSectionDefinition(
     name=VOICEMANAGER_SECTION_NAME,
-    display_name="Voice Manager",
+    display_name=N_("Voice Manager"),
     option_definitions=[
         CONFIG_OPTION_DEFAULT_COUNTRY,
         CONFIG_OPTION_DEFAULT_VOICE,
@@ -438,11 +455,11 @@ def _is_voice_complete(voice_dir: Path, extra_ranges: list[tuple[int, int]]) -> 
 
 def _voice_status_detail(voice_dir: Path, extra_ranges: list[tuple[int, int]]) -> str:
     if not voice_dir.is_dir():
-        return "Voice directory not found"
+        return _("Voice directory not found")
     try:
         files = {f.name for f in voice_dir.iterdir()}
     except OSError:
-        return "Could not read voice directory"
+        return _("Could not read voice directory")
     missing: list[str] = []
     expected = 0
     checks = [(DEFAULT_RANGE_START, DEFAULT_RANGE_END)]
@@ -458,10 +475,24 @@ def _voice_status_detail(voice_dir: Path, extra_ranges: list[tuple[int, int]]) -
         missing.append(TESTING_FILENAME)
     present = expected - len(missing)
     if not missing:
-        return f"Complete ({present} files present)"
+        return _("Complete: {present} files present").format(present=present)
     if len(missing) <= 5:
-        return f"Incomplete: {present}/{expected} files present, missing {', '.join(missing)}"
-    return f"Incomplete: {present}/{expected} files present, missing {len(missing)} files (e.g. {', '.join(missing[:3])}...)"
+        return _(
+            "Incomplete: {present}/{expected} files present, missing {missing_files}"
+        ).format(
+            present=present,
+            expected=expected,
+            missing_files=", ".join(missing),
+        )
+    return _(
+        "Incomplete: {present}/{expected} files present, missing {missing_count} files"
+        " (e.g. {examples}...)"
+    ).format(
+        present=present,
+        expected=expected,
+        missing_count=len(missing),
+        examples=", ".join(missing[:3]),
+    )
 
 
 def _list_installed_voices(
@@ -492,7 +523,7 @@ def _list_installed_voices(
             if locale
             else _lang_from_shortname(shortname) or ""
         )
-        gender = meta.get(_VOICE_KEY_GENDER, gender_lookup.get(shortname, "Unknown"))
+        gender = meta.get(_VOICE_KEY_GENDER, gender_lookup.get(shortname, _("Unknown")))
         complete = _is_voice_complete(d, extra_ranges)
         result.append(
             InstalledVoice(
@@ -709,7 +740,7 @@ class _DiscoveredVoiceList(wx.ListCtrl):
 
 class VoiceManagerDialog(wx.Dialog):
     def __init__(self, parent: wx.Window | None = None):
-        super().__init__(parent, title="Voice Manager", size=wx.Size(800, 700))
+        super().__init__(parent, title=_("Voice Manager"), size=wx.Size(800, 700))
         icon = wx.Icon()
         icon.CopyFromBitmap(
             wx.ArtProvider.GetBitmap(
@@ -782,14 +813,14 @@ class VoiceManagerDialog(wx.Dialog):
         self.SetSizer(main_sizer)
 
     def _build_ranges_section(self):
-        box = wx.StaticBoxSizer(wx.VERTICAL, self, "Number Ranges to Generate")
+        box = wx.StaticBoxSizer(wx.VERTICAL, self, _("Number Ranges to Generate"))
         self.range_panel = wx.Panel(box.GetStaticBox(), style=wx.TAB_TRAVERSAL)
         self.range_sizer = wx.BoxSizer(wx.VERTICAL)
         self.range_panel.SetSizer(self.range_sizer)
         box.Add(self.range_panel, flag=wx.EXPAND)
 
         btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        add_btn = wx.Button(box.GetStaticBox(), label="Add Range")
+        add_btn = wx.Button(box.GetStaticBox(), label=_("Add Range"))
         add_btn.Bind(wx.EVT_BUTTON, self._on_add_range)
         btn_sizer.Add(add_btn)
         box.Add(btn_sizer, flag=wx.TOP, border=UI_SMALL_BORDER)
@@ -810,7 +841,9 @@ class VoiceManagerDialog(wx.Dialog):
         )
         fixed_label.SetForegroundColour(COLOR_DIM_LABEL)
         fixed_row.Add(fixed_label)
-        fixed_note = wx.StaticText(self.range_panel, label="  (always generated)")
+        fixed_note = wx.StaticText(
+            self.range_panel, label="  " + _("(always generated)")
+        )
         fixed_note.SetForegroundColour(COLOR_NOTE_TEXT)
         fixed_row.Add(fixed_note)
         self.range_sizer.Add(fixed_row, flag=wx.BOTTOM, border=6)
@@ -843,7 +876,7 @@ class VoiceManagerDialog(wx.Dialog):
             self._range_end_ctrls.append(end_txt)
             row.Add(end_txt)
             remove_btn = wx.Button(
-                self.range_panel, label="Remove", size=wx.Size(70, -1)
+                self.range_panel, label=_("Remove"), size=wx.Size(70, -1)
             )
             remove_btn.Bind(wx.EVT_BUTTON, partial(self._on_remove_range, i))
             row.Add(remove_btn, flag=wx.LEFT, border=UI_SECTION_BORDER)
@@ -900,7 +933,10 @@ class VoiceManagerDialog(wx.Dialog):
                 e = int(ev)
                 if s < 0 or s > e:
                     raise ValueError(
-                        f"start ({s}) must be >= 0 and less than or equal to end ({e})"
+                        _("start")
+                        + f" ({s}) "
+                        + _("must be >= 0 and less than or equal to end")
+                        + f" ({e})"
                     )
                 parsed.append((s, e, i))
                 parsed_indices.add(i)
@@ -921,12 +957,20 @@ class VoiceManagerDialog(wx.Dialog):
                 for j in range(i + 1, len(all_ranges)):
                     ns, ne, nidx = all_ranges[j]
                     if e >= ns:
-                        label = f"{s}-{e}" if idx == -1 else f"extra range {s}-{e}"
-                        nlabel = (
-                            f"{ns}-{ne}" if nidx == -1 else f"extra range {ns}-{ne}"
+                        label = (
+                            f"{s}-{e}" if idx == -1 else _("extra range") + f" {s}-{e}"
                         )
-                        conflicts.setdefault(idx, []).append(f"overlaps with {nlabel}")
-                        conflicts.setdefault(nidx, []).append(f"overlaps with {label}")
+                        nlabel = (
+                            f"{ns}-{ne}"
+                            if nidx == -1
+                            else _("extra range") + f" {ns}-{ne}"
+                        )
+                        conflicts.setdefault(idx, []).append(
+                            _("overlaps with") + f" {nlabel}"
+                        )
+                        conflicts.setdefault(nidx, []).append(
+                            _("overlaps with") + f" {label}"
+                        )
 
             has_conflicts = bool(conflicts)
             for (s, e, idx), (start_txt, end_txt) in zip(
@@ -983,12 +1027,12 @@ class VoiceManagerDialog(wx.Dialog):
     def _build_filter_bar(self):
         sizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        lang_label = wx.StaticText(self, label="Language:")
+        lang_label = wx.StaticText(self, label=_("Language:"))
         sizer.Add(
             lang_label, flag=wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, border=UI_SMALL_BORDER
         )
         self.lang_combo = wx.ComboBox(
-            self, choices=[FILTER_ALL], value=FILTER_ALL, style=0
+            self, choices=[_(FILTER_ALL)], value=_(FILTER_ALL), style=0
         )
         self.lang_combo.SetMinSize(wx.Size(140, -1))
         sizer.Add(self.lang_combo, flag=wx.RIGHT, border=12)
@@ -997,14 +1041,17 @@ class VoiceManagerDialog(wx.Dialog):
         self.lang_combo.Bind(wx.EVT_KILL_FOCUS, self._on_lang_kill_focus)
         self.lang_combo.Bind(wx.EVT_KEY_DOWN, self._on_lang_key_down)
 
-        gender_label = wx.StaticText(self, label="Gender:")
+        gender_label = wx.StaticText(self, label=_("Gender:"))
         sizer.Add(
             gender_label,
             flag=wx.ALIGN_CENTER_VERTICAL | wx.RIGHT,
             border=UI_SMALL_BORDER,
         )
         self.gender_combo = wx.ComboBox(
-            self, choices=list(GENDER_CHOICES), value=FILTER_ALL, style=wx.CB_READONLY
+            self,
+            choices=[_(label) for _key, label in GENDER_CHOICES],
+            value=_(GENDER_CHOICES[0][1]),
+            style=wx.CB_READONLY,
         )
         sizer.Add(self.gender_combo, flag=wx.RIGHT, border=12)
         self.gender_combo.Bind(wx.EVT_COMBOBOX, self._on_filter)
@@ -1023,14 +1070,14 @@ class VoiceManagerDialog(wx.Dialog):
             )
         refresh_btn = wx.BitmapButton(self, bitmap=refresh_bmp)
         refresh_btn.SetMinSize(wx.Size(-1, combo_h))
-        refresh_btn.SetToolTip(TOOLTIP_REFRESH_EDGE_TTS)
+        refresh_btn.SetToolTip(_(TOOLTIP_REFRESH_EDGE_TTS))
         refresh_btn.Bind(wx.EVT_BUTTON, self._on_refresh)
         sizer.Add(refresh_btn)
 
         return sizer
 
     def _build_discovered_section(self):
-        box = wx.StaticBoxSizer(wx.VERTICAL, self, "Discovered Voices")
+        box = wx.StaticBoxSizer(wx.VERTICAL, self, _("Discovered Voices"))
         self.discovered_list = _DiscoveredVoiceList(
             box.GetStaticBox(),
             self,
@@ -1040,10 +1087,10 @@ class VoiceManagerDialog(wx.Dialog):
         self.discovered_list.AppendColumn("", width=PLAY_COL_WIDTH)
         self.discovered_list.SetColumnImage(0, self.discovered_list._header_icon_idx)
         self.discovered_list.AppendColumn(
-            _COL_HEADER_SHORT_NAME, width=SHORTNAME_COL_WIDTH
+            _(_COL_HEADER_SHORT_NAME), width=SHORTNAME_COL_WIDTH
         )
-        self.discovered_list.AppendColumn(_COL_HEADER_LANGUAGE, width=LANG_COL_WIDTH)
-        self.discovered_list.AppendColumn(_COL_HEADER_GENDER, width=GENDER_COL_WIDTH)
+        self.discovered_list.AppendColumn(_(_COL_HEADER_LANGUAGE), width=LANG_COL_WIDTH)
+        self.discovered_list.AppendColumn(_(_COL_HEADER_GENDER), width=GENDER_COL_WIDTH)
         self.discovered_list.Bind(
             wx.EVT_LIST_ITEM_ACTIVATED, self._on_discovered_activated
         )
@@ -1058,7 +1105,7 @@ class VoiceManagerDialog(wx.Dialog):
         box.Add(self.discovered_list, proportion=1, flag=wx.EXPAND)
 
         self.discovered_empty_label = wx.StaticText(
-            box.GetStaticBox(), label="No voices match the current filters."
+            box.GetStaticBox(), label=_("No voices match the current filters.")
         )
         self.discovered_empty_label.Hide()
         box.Add(
@@ -1069,7 +1116,7 @@ class VoiceManagerDialog(wx.Dialog):
         )
 
         btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.install_btn = wx.Button(box.GetStaticBox(), label="Install Selected")
+        self.install_btn = wx.Button(box.GetStaticBox(), label=_("Install Selected"))
         self.install_btn.Disable()
         self.install_btn.Bind(wx.EVT_BUTTON, self._on_install_selected)
         btn_sizer.Add(self.install_btn)
@@ -1078,7 +1125,7 @@ class VoiceManagerDialog(wx.Dialog):
         return box
 
     def _build_installed_section(self):
-        box = wx.StaticBoxSizer(wx.VERTICAL, self, "Installed Voices")
+        box = wx.StaticBoxSizer(wx.VERTICAL, self, _("Installed Voices"))
         self.installed_list = wx.ListCtrl(
             box.GetStaticBox(),
             style=wx.LC_REPORT | wx.LC_SINGLE_SEL,
@@ -1086,18 +1133,18 @@ class VoiceManagerDialog(wx.Dialog):
         )
         self.installed_list.AppendColumn("", width=PLAY_COL_WIDTH)
         self.installed_list.AppendColumn(
-            _COL_HEADER_SHORT_NAME, width=SHORTNAME_COL_WIDTH
+            _(_COL_HEADER_SHORT_NAME), width=SHORTNAME_COL_WIDTH
         )
-        self.installed_list.AppendColumn(_COL_HEADER_LANGUAGE, width=LANG_COL_WIDTH)
-        self.installed_list.AppendColumn(_COL_HEADER_GENDER, width=GENDER_COL_WIDTH)
+        self.installed_list.AppendColumn(_(_COL_HEADER_LANGUAGE), width=LANG_COL_WIDTH)
+        self.installed_list.AppendColumn(_(_COL_HEADER_GENDER), width=GENDER_COL_WIDTH)
         self.installed_list.AppendColumn(
-            _COL_HEADER_STATUS, width=STATUS_COL_WIDTH, format=wx.LIST_FORMAT_CENTER
-        )
-        self.installed_list.AppendColumn(
-            _COL_HEADER_DEFAULT, width=STAR_COL_WIDTH, format=wx.LIST_FORMAT_CENTER
+            _(_COL_HEADER_STATUS), width=STATUS_COL_WIDTH, format=wx.LIST_FORMAT_CENTER
         )
         self.installed_list.AppendColumn(
-            _COL_HEADER_FALLBACK, width=STAR_COL_WIDTH, format=wx.LIST_FORMAT_CENTER
+            _(_COL_HEADER_DEFAULT), width=STAR_COL_WIDTH, format=wx.LIST_FORMAT_CENTER
+        )
+        self.installed_list.AppendColumn(
+            _(_COL_HEADER_FALLBACK), width=STAR_COL_WIDTH, format=wx.LIST_FORMAT_CENTER
         )
         self._init_installed_images()
         self.installed_list.Bind(
@@ -1114,11 +1161,11 @@ class VoiceManagerDialog(wx.Dialog):
         box.Add(self.installed_list, proportion=1, flag=wx.EXPAND)
 
         btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.repair_btn = wx.Button(box.GetStaticBox(), label="Repair")
+        self.repair_btn = wx.Button(box.GetStaticBox(), label=_("Repair"))
         self.repair_btn.Disable()
         self.repair_btn.Bind(wx.EVT_BUTTON, self._on_repair_installed)
         btn_sizer.Add(self.repair_btn, flag=wx.RIGHT, border=UI_SMALL_BORDER)
-        self.remove_btn = wx.Button(box.GetStaticBox(), label="Remove")
+        self.remove_btn = wx.Button(box.GetStaticBox(), label=_("Remove"))
         self.remove_btn.Disable()
         self.remove_btn.Bind(wx.EVT_BUTTON, self._on_remove_installed)
         btn_sizer.Add(self.remove_btn)
@@ -1166,7 +1213,7 @@ class VoiceManagerDialog(wx.Dialog):
         return sizer
 
     def _build_close_button(self):
-        close_btn = wx.Button(self, label="Close")
+        close_btn = wx.Button(self, label=_("Close"))
         close_btn.Bind(wx.EVT_BUTTON, lambda e: self.Close())
         return close_btn
 
@@ -1174,7 +1221,7 @@ class VoiceManagerDialog(wx.Dialog):
 
     def _load_data(self):
         self._refresh_installed_list()
-        self._update_progress(0, "Loading voices from edge-tts...")
+        self._update_progress(0, _("Loading voices from edge-tts..."))
         wx.CallAfter(self._start_voice_load)
 
     def _populate_language_filter(self):
@@ -1185,7 +1232,7 @@ class VoiceManagerDialog(wx.Dialog):
                 lang_names.add(name)
         self._lang_combo_updating = True
         self.lang_combo.Clear()
-        self.lang_combo.Append(FILTER_ALL)
+        self.lang_combo.Append(_(FILTER_ALL))
         for name in sorted(lang_names):
             self.lang_combo.Append(name)
         self._lang_combo_updating = False
@@ -1214,14 +1261,14 @@ class VoiceManagerDialog(wx.Dialog):
     def _on_voice_load_error(self):
         logger.exception("Failed to fetch voices from edge-tts")
         wx.MessageBox(
-            "Could not fetch voices from edge-tts. Check your internet connection.",
-            "Error",
+            _("Could not fetch voices from edge-tts. Check your internet connection."),
+            _("Error"),
             wx.OK | wx.ICON_ERROR,
         )
         self._update_progress(0, "")
 
     def _refresh_voices(self):
-        self._update_progress(0, "Loading voices from edge-tts...")
+        self._update_progress(0, _("Loading voices from edge-tts..."))
         self._start_voice_load()
 
     def _on_refresh(self, event):
@@ -1236,7 +1283,7 @@ class VoiceManagerDialog(wx.Dialog):
         text = self.lang_combo.GetValue()
         if not text:
             self._lang_combo_updating = True
-            self.lang_combo.SetValue(FILTER_ALL)
+            self.lang_combo.SetValue(_(FILTER_ALL))
             self.lang_combo.SetSelection(0)
             self._lang_combo_updating = False
             self._on_filter(None)
@@ -1281,17 +1328,25 @@ class VoiceManagerDialog(wx.Dialog):
 
     def _refresh_discovered_list(self):
         lang_filter = self.lang_combo.GetValue().lower()
-        gender_filter = self.gender_combo.GetValue().lower()
+        is_lang_all = (
+            self.lang_combo.GetSelection() == 0 or lang_filter == _(FILTER_ALL).lower()
+        )
+        gender_idx = self.gender_combo.GetSelection()
+        gender_filter = (
+            GENDER_CHOICES[gender_idx][0].lower()
+            if gender_idx != wx.NOT_FOUND
+            else _GENDER_ALL.lower()
+        )
 
         self.filtered_voices = []
         for v in self.discovered_voices:
             gender_val = v.get(_VOICE_KEY_GENDER, "").lower()
             locale = v.get(_VOICE_KEY_LOCALE, "").lower()
 
-            if gender_filter != "all" and gender_val != gender_filter:
+            if gender_filter != _GENDER_ALL.lower() and gender_val != gender_filter:
                 continue
 
-            if lang_filter != "all":
+            if not is_lang_all:
                 match = next(
                     (
                         lang
@@ -1331,7 +1386,7 @@ class VoiceManagerDialog(wx.Dialog):
         elif col == COL_DISC_LANGUAGE:
             return _locale_to_language_name(v.get(_VOICE_KEY_LOCALE, ""))
         elif col == COL_DISC_GENDER:
-            return v.get(_VOICE_KEY_GENDER, "")
+            return _(v.get(_VOICE_KEY_GENDER, ""))
         return ""
 
     def _on_discovered_activated(self, event):
@@ -1438,7 +1493,7 @@ class VoiceManagerDialog(wx.Dialog):
             x += col_w
         if in_play_col != self._showing_play_tooltip:
             self.discovered_list.SetToolTip(
-                TOOLTIP_PLAY_SAMPLE if in_play_col else TOOLTIP_DEFAULT
+                _(TOOLTIP_PLAY_SAMPLE) if in_play_col else TOOLTIP_DEFAULT
             )
             self._showing_play_tooltip = in_play_col
         event.Skip()
@@ -1501,7 +1556,7 @@ class VoiceManagerDialog(wx.Dialog):
             )
             self.installed_list.SetItem(idx, COL_INST_SHORTNAME, iv.shortname)
             self.installed_list.SetItem(idx, COL_INST_LANGUAGE, iv.lang)
-            self.installed_list.SetItem(idx, COL_INST_GENDER, iv.gender)
+            self.installed_list.SetItem(idx, COL_INST_GENDER, _(iv.gender))
             self.installed_list.SetItem(
                 idx,
                 COL_INST_STATUS,
@@ -1545,7 +1600,7 @@ class VoiceManagerDialog(wx.Dialog):
 
     def _get_installed_tooltip(self, row: int, col: int) -> str:
         if col == COL_INST_PLAY:
-            return TOOLTIP_PLAY_SAMPLE
+            return _(TOOLTIP_PLAY_SAMPLE)
         if col == COL_INST_STATUS:
             shortname = self.installed_list.GetItemText(row, COL_INST_SHORTNAME)
             extra = parse_extra_ranges(
@@ -1555,16 +1610,16 @@ class VoiceManagerDialog(wx.Dialog):
         if col == COL_INST_DEFAULT:
             shortname = self.installed_list.GetItemText(row, COL_INST_SHORTNAME)
             return (
-                TOOLTIP_IS_DEFAULT
+                _(TOOLTIP_IS_DEFAULT)
                 if _is_default_voice(shortname)
-                else TOOLTIP_SET_DEFAULT
+                else _(TOOLTIP_SET_DEFAULT)
             )
         if col == COL_INST_FALLBACK:
             shortname = self.installed_list.GetItemText(row, COL_INST_SHORTNAME)
             return (
-                TOOLTIP_IS_FALLBACK
+                _(TOOLTIP_IS_FALLBACK)
                 if _is_fallback_voice(shortname)
-                else TOOLTIP_SET_FALLBACK
+                else _(TOOLTIP_SET_FALLBACK)
             )
         return TOOLTIP_DEFAULT
 
@@ -1620,7 +1675,7 @@ class VoiceManagerDialog(wx.Dialog):
         key = (row, col)
         if key != self._installed_tooltip_key:
             if col == COL_INST_PLAY:
-                self.installed_list.SetToolTip(TOOLTIP_PLAY_SAMPLE)
+                self.installed_list.SetToolTip(_(TOOLTIP_PLAY_SAMPLE))
             elif col == COL_INST_STATUS:
                 shortname = self.installed_list.GetItemText(row, COL_INST_SHORTNAME)
                 extra = parse_extra_ranges(
@@ -1680,18 +1735,24 @@ class VoiceManagerDialog(wx.Dialog):
             return
         if _is_default_voice(shortname) or _is_fallback_voice(shortname):
             wx.MessageBox(
-                "Cannot remove the current default or fallback voice. "
-                "Set a different voice as default/fallback first.",
-                "Remove Disabled",
+                _(
+                    "Cannot remove the current default or fallback voice. "
+                    "Set a different voice as default/fallback first."
+                ),
+                _("Remove Disabled"),
                 wx.OK | wx.ICON_WARNING,
             )
             return
         if self.queue_active and shortname == self._current_job_shortname:
             result = wx.MessageBox(
-                "An install or repair is currently in progress.\n\n"
-                f"Removing voice '{shortname}' will cancel the operation.\n\n"
-                "Continue?",
-                "Cancel Operation",
+                _("An install or repair is currently in progress.")
+                + "\n\n"
+                + _("Removing voice '{shortname}' will cancel the operation.").format(
+                    shortname=shortname
+                )
+                + "\n\n"
+                + _("Continue?"),
+                _("Cancel Operation"),
                 wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING,
             )
             if result != wx.YES:
@@ -1701,8 +1762,12 @@ class VoiceManagerDialog(wx.Dialog):
             self._removed_shortnames.add(shortname)
         dlg = wx.MessageDialog(
             self,
-            f"Remove voice '{shortname}'?\n\nAll files under sounds/{shortname}/ will be deleted.",
-            "Confirm Remove",
+            _("Remove voice '{shortname}'?").format(shortname=shortname)
+            + "\n\n"
+            + _("All files under sounds/{shortname}/ will be deleted.").format(
+                shortname=shortname
+            ),
+            _("Confirm Remove"),
             wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION,
         )
         if dlg.ShowModal() == wx.ID_YES:
@@ -1760,7 +1825,7 @@ class VoiceManagerDialog(wx.Dialog):
                     self._removed_shortnames.discard(job.shortname)
                     continue
                 self._current_job_shortname = job.shortname
-                action = "Repairing" if job.repair else "Installing"
+                action = _("Repairing") if job.repair else _("Installing")
 
                 try:
                     _process_job(job, self._update_progress, action)
@@ -1768,7 +1833,9 @@ class VoiceManagerDialog(wx.Dialog):
                     _drain_queue(self.install_queue)
                     break
 
-                wx.CallAfter(self._update_progress, 0, f"Finished {job.shortname}")
+                wx.CallAfter(
+                    self._update_progress, 0, _("Finished") + f" {job.shortname}"
+                )
                 wx.CallAfter(self._refresh_installed_list)
                 wx.CallAfter(self._refresh_discovered_list)
         finally:
@@ -1793,38 +1860,48 @@ class VoiceManagerDialog(wx.Dialog):
         msgs: list[str] = []
         if self.queue_active:
             msgs.append(
-                "An install or repair is currently in progress. "
-                "Closing will cancel the operation."
+                _(
+                    "An install or repair is currently in progress. "
+                    "Closing will cancel the operation."
+                )
             )
         if not all_valid:
             msgs.append(
-                "One or more extra ranges have invalid values. "
-                "These ranges will be discarded when closing."
+                _(
+                    "One or more extra ranges have invalid values. "
+                    "These ranges will be discarded when closing."
+                )
             )
         elif has_conflicts:
             msgs.append(
-                "One or more extra ranges overlap with another range. "
-                "These ranges will still be saved, but may generate "
-                "files that already exist."
+                _(
+                    "One or more extra ranges overlap with another range. "
+                    "These ranges will still be saved, but may generate "
+                    "files that already exist."
+                )
             )
         if incomplete:
             names = ", ".join(iv.shortname for iv in incomplete)
             msgs.append(
-                f"The following installed voices are incomplete: {names}. "
-                "They will not have all required sound files available. "
-                "Some numbers may fall back to the default ding sound "
-                "when announced. Use Repair to generate the missing files."
+                _(
+                    "The following installed voices are incomplete: {names}. "
+                    "They will not have all required sound files available. "
+                    "Some numbers may fall back to the default ding sound "
+                    "when announced. Use Repair to generate the missing files."
+                ).format(names=names)
             )
 
         if msgs:
             content = (
-                "There are issues that may affect voice playback.\n\n"
+                _("There are issues that may affect voice playback.")
+                + "\n\n"
                 + "\n\n".join(f"• {m}" for m in msgs)
-                + "\n\nClose anyway?"
+                + "\n\n"
+                + _("Close anyway?")
             )
             result = wx.MessageBox(
                 content,
-                "Confirm Close",
+                _("Confirm Close"),
                 wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING,
             )
             if result != wx.YES:

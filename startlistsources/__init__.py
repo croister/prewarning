@@ -5,6 +5,7 @@ from startlistsources._base import _StartListSourceBase, _NOT_OVERRIDDEN
 from startlistsources.start_list_source_ola_mysql import StartListSourceOlaMySql
 from utils.config import Config
 from utils.config_definitions import ConfigOptionDefinition
+from utils.i18n import N_
 
 if TYPE_CHECKING:
     _StartListSourceClass = type[_StartListSourceBase]
@@ -97,9 +98,11 @@ def _register_common_source():
     global COMMON_START_LIST_SOURCE
     COMMON_START_LIST_SOURCE = ConfigOptionDefinition(
         name="StartListSource",
-        display_name="Start List Source",
+        display_name=N_("Start List Source"),
         value_type=str,
-        description="Determines the source of the Start List to look up team information from.",
+        description=N_(
+            "Determines the source of the Start List to look up team information from."
+        ),
         default_value=StartListSourceOlaMySql.__qualname__,
         valid_values=list(START_LIST_SOURCES.keys()),
         mandatory=True,

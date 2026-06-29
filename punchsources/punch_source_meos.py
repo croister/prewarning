@@ -10,6 +10,7 @@ from utils.config_definitions import (
     ConfigSelectorDefinition,
 )
 from utils.constants import PUNCH_KEY_CONTROL_CODE
+from utils.i18n import N_
 from utils.meos_info_server import MeosInfoServer, MeosPunchListener, _select_controls
 from validators.regex_validators import is_control_ids
 from ._base import _PunchSourceBase
@@ -25,9 +26,9 @@ class PunchSourceMeos(MeosPunchListener, _PunchSourceBase):
 
     name = __qualname__
 
-    display_name = "MeOS Information Server Punch Source"
+    display_name = N_("MeOS Information Server Punch Source")
 
-    description = (
+    description = N_(
         "Fetches electronic punches from a running "
         '<a href="https://www.melin.nu/meos/">MeOS</a> instance via its '
         "Information Server REST API. "
@@ -38,9 +39,9 @@ class PunchSourceMeos(MeosPunchListener, _PunchSourceBase):
 
     CONFIG_OPTION_CONTROL_CODES = ConfigOptionDefinition(
         name="ControlCodes",
-        display_name="Control Codes",
+        display_name=N_("Control Codes"),
         value_type=str,
-        description=(
+        description=N_(
             "The control codes to use for pre-warning, separated by space. "
             "Use the selector to populate the list from MeOS. "
             "The selector shows controls that MeOS has identified as radio controls "

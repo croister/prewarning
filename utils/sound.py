@@ -28,6 +28,7 @@ from utils.config import (
     Config,
 )
 from utils.config_definitions import Path, VerificationResult
+from utils.i18n import N_
 from utils.constants import AUDIO_EXTENSION, DING_FILENAME
 from utils.singleton import Singleton
 
@@ -199,15 +200,15 @@ class Sound(ConfigConsumer, Singleton, metaclass=_SoundMeta):
 
     CONFIG_OPTION_SOUND_ENABLED = ConfigOptionDefinition(
         name="SoundEnabled",
-        display_name="Enable Sound",
+        display_name=N_("Enable Sound"),
         value_type=bool,
-        description="Enables or disables the playback of sounds.",
+        description=N_("Enables or disables the playback of sounds."),
         default_value=True,
     )
 
     SOUND_CONFIG_SECTION_DEFINITION = ConfigSectionDefinition(
         name=name,
-        display_name=name,
+        display_name=N_("Sound"),
         option_definitions=[
             CONFIG_OPTION_SOUND_ENABLED,
         ],

@@ -43,6 +43,7 @@ class ConfigOptionDefinition:
         enables: List[ConfigSectionDefinition | ConfigOptionDefinition] | None = None,
         validator: Callable | None = None,
         read_only: bool = False,
+        description_format_args: dict[str, Any] | None = None,
     ):
         super().__init__()
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -62,6 +63,7 @@ class ConfigOptionDefinition:
         self.enables = enables
         self.validator = validator
         self.read_only = read_only
+        self.description_format_args = description_format_args
         self.verifier: ConfigVerifierDefinition | None = None
         self.selector: ConfigSelectorDefinition | None = None
 

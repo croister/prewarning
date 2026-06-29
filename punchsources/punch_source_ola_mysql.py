@@ -38,6 +38,7 @@ from utils.ola_mysql import (
 from validators.datetime_validators import is_timestamp
 from validators.regex_validators import is_control_ids, is_punch_id
 from utils.constants import FETCH_INTERVAL_VALID_VALUES, PUNCH_KEY_ID
+from utils.i18n import N_
 from ._base import _PunchSourceBase
 
 
@@ -204,9 +205,9 @@ class PunchSourceOlaMySql(StateSaverMixin, _PunchSourceBase):
 
     name = __qualname__
 
-    display_name = "OLA MySQL Punch Source"
+    display_name = N_("OLA MySQL Punch Source")
 
-    description = (
+    description = N_(
         "Fetches electronic punches from the MySQL database used by the "
         '<a href="https://www.svenskorientering.se/Arrangera/itochtavlings-administration/'
         'OLAtidtagnings-program/">OLA event organizing software</a>. '
@@ -216,30 +217,38 @@ class PunchSourceOlaMySql(StateSaverMixin, _PunchSourceBase):
 
     CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_CONTROL_IDS = ConfigOptionDefinition(
         name="ControlIDs",
-        display_name="Control Ids",
+        display_name=N_("Control Ids"),
         value_type=str,
-        description="The Control IDs to use for Pre-Warning, separated by space."
-        " Use the Control Code (Kodsiffra) from OLA, NOT the punching units (Elektronisk stämplingskod).",
+        description=N_(
+            "The Control IDs to use for Pre-Warning, separated by space."
+            " Use the Control Code (Kodsiffra) from OLA, NOT the punching units (Elektronisk stämplingskod)."
+        ),
         mandatory=True,
         validator=is_control_ids,
     )
 
-    CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_FETCH_INTERVAL_SECONDS = ConfigOptionDefinition(
-        name="FetchIntervalSeconds",
-        display_name="Fetch Interval",
-        value_type=int,
-        description="The number of seconds between calls to the OLA MySQL database.",
-        default_value=10,
-        valid_values=FETCH_INTERVAL_VALID_VALUES,
+    CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_FETCH_INTERVAL_SECONDS = (
+        ConfigOptionDefinition(
+            name="FetchIntervalSeconds",
+            display_name=N_("Fetch Interval"),
+            value_type=int,
+            description=N_(
+                "The number of seconds between calls to the OLA MySQL database."
+            ),
+            default_value=10,
+            valid_values=FETCH_INTERVAL_VALID_VALUES,
+        )
     )
 
     CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_MODIFIED_TIME = RuntimeStateOptionDefinition(
         runtime_state_group=PUNCH_SOURCE_OLA_MYSQL_RUNTIME_STATE,
         name="LastModifiedTime",
-        display_name="Last Modified Time",
+        display_name=N_("Last Modified Time"),
         value_type=str,
-        description="The Modified Time of the last retrieved Punch, used to only fetch Punches that are newer. "
-        'On the format of "YYYY-MM-DD hh:mm:ss.fff".',
+        description=N_(
+            "The Modified Time of the last retrieved Punch, used to only fetch Punches that are newer. "
+            'On the format of "YYYY-MM-DD hh:mm:ss.fff".'
+        ),
         default_value="",
         validator=is_timestamp,
     )
@@ -247,11 +256,13 @@ class PunchSourceOlaMySql(StateSaverMixin, _PunchSourceBase):
     CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_RECEIVED_PUNCH_ID = RuntimeStateOptionDefinition(
         runtime_state_group=PUNCH_SOURCE_OLA_MYSQL_RUNTIME_STATE,
         name="LastReceivedPunchId",
-        display_name="Last Received Punch Id",
+        display_name=N_("Last Received Punch Id"),
         value_type=str,
-        description="The Id of the last received Punch, used to not process it again. "
-        "On the format of `resultRaceIndividualNumber`_`passedCount`_`timingControl` "
-        'from the table `SplitTimes`, example "1_1_1".',
+        description=N_(
+            "The Id of the last received Punch, used to not process it again. "
+            "On the format of `resultRaceIndividualNumber`_`passedCount`_`timingControl` "
+            'from the table `SplitTimes`, example "1_1_1".'
+        ),
         default_value="",
         validator=is_punch_id,
     )

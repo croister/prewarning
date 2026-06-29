@@ -28,6 +28,7 @@ from utils.singleton import Singleton
 from utils.state_saver import StateSaverMixin
 from validators.url_validators import is_http_or_https_url
 from utils.config import ConfigConsumer
+from utils.i18n import N_
 from utils.constants import (
     FETCH_INTERVAL_VALID_VALUES,
     PUNCH_KEY_BIB_NUMBER,
@@ -212,9 +213,11 @@ class MeosInfoServer(
 
     CONFIG_OPTION_URL = ConfigOptionDefinition(
         name="URL",
-        display_name="URL",
+        display_name=N_("URL"),
         value_type=str,
-        description="Base URL of the MeOS Information Server, e.g. http://localhost:2009.",
+        description=N_(
+            "Base URL of the MeOS Information Server, e.g. http://localhost:2009."
+        ),
         default_value="http://localhost:2009",
         mandatory=True,
         validator=is_http_or_https_url,
@@ -222,18 +225,18 @@ class MeosInfoServer(
 
     CONFIG_OPTION_FETCH_INTERVAL = ConfigOptionDefinition(
         name="FetchIntervalSeconds",
-        display_name="Fetch Interval",
+        display_name=N_("Fetch Interval"),
         value_type=int,
-        description="Seconds between polls of the MeOS Information Server.",
+        description=N_("Seconds between polls of the MeOS Information Server."),
         default_value=10,
         valid_values=FETCH_INTERVAL_VALID_VALUES,
     )
 
     CONFIG_OPTION_USE_UDP = ConfigOptionDefinition(
         name="UseUDP",
-        display_name="Use UDP",
+        display_name=N_("Use UDP"),
         value_type=bool,
-        description=(
+        description=N_(
             "Enable UDP listener for real-time punch notifications. "
             "Requires MeOS to be running in a networked setup with "
             "'Send and receive fast advance information' enabled. "
@@ -246,9 +249,9 @@ class MeosInfoServer(
 
     CONFIG_OPTION_UDP_PORT = ConfigOptionDefinition(
         name="UDPPort",
-        display_name="UDP Port",
+        display_name=N_("UDP Port"),
         value_type=int,
-        description=(
+        description=N_(
             "UDP broadcast port for MeOS fast advance information. "
             "Must match the DirectPort setting in MeOS Local Settings (default 21338). "
             "When running multiple competitions on the same network, use a different "
@@ -260,16 +263,16 @@ class MeosInfoServer(
     CONFIG_OPTION_NEXT_DIFFERENCE = RuntimeStateOptionDefinition(
         runtime_state_group=MEOS_INFO_SERVER_RUNTIME_STATE,
         name="NextDifference",
-        display_name="Next Difference",
+        display_name=N_("Next Difference"),
         value_type=str,
-        description="MOP diff token, persisted across restarts.",
+        description=N_("MOP diff token, persisted across restarts."),
         default_value=_INITIAL_DIFF_TOKEN,
         read_only=True,
     )
 
     MEOS_INFO_SERVER_CONFIG_SECTION = ConfigSectionDefinition(
         name=CONFIG_SECTION_MEOS,
-        display_name="MeOS Information Server",
+        display_name=N_("MeOS Information Server"),
         option_definitions=[
             CONFIG_OPTION_URL,
             CONFIG_OPTION_FETCH_INTERVAL,

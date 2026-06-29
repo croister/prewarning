@@ -5,6 +5,7 @@ from typing import Dict, List
 
 from utils.config import Config, ConfigSectionDefinition
 from utils.config_definitions import ConfigSectionEnableType
+from utils.i18n import N_
 from utils.meos_info_server import MeosInfoServer
 from ._base import _StartListSourceBase
 
@@ -20,9 +21,9 @@ class StartListSourceMeos(_StartListSourceBase):
 
     name = __qualname__
 
-    display_name = "MeOS Information Server Start List Source"
+    display_name = N_("MeOS Information Server Start List Source")
 
-    description = (
+    description = N_(
         "Looks up team bib number and relay leg from a running "
         '<a href="https://www.melin.nu/meos/">MeOS</a> instance via its '
         "Information Server REST API. "

@@ -29,6 +29,7 @@ from utils.constants import (
     PUNCH_KEY_IS_LAST_LEG,
     PUNCH_KEY_RELAY_LEG,
 )
+from utils.i18n import N_
 from utils.sound import Sound, verify_sound, get_all_sounds
 from validators.path_validators import file_exists
 from ._base import _StartListSourceBase
@@ -237,9 +238,9 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
 
     name = __qualname__
 
-    display_name = "File Start List Source"
+    display_name = N_("File Start List Source")
 
-    description = (
+    description = N_(
         "Reads a start list file following the "
         '<a href="https://orienteering.sport/iof/it/data-standard-3-0/">IOF 3.0 Data Standard</a> '
         "and uses it to look up the team bib number and relay leg. "
@@ -250,18 +251,22 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
 
     CONFIG_OPTION_START_LIST_FILE = ConfigOptionDefinition(
         name="StartListFile",
-        display_name="Start List File",
+        display_name=N_("Start List File"),
         value_type=Path,
-        description="The path on the file system where the start list file is located.",
+        description=N_(
+            "The path on the file system where the start list file is located."
+        ),
         mandatory=True,
         validator=file_exists,
     )
 
     CONFIG_OPTION_START_LIST_UPDATE_SOUND_FILE = ConfigOptionDefinition(
         name="StartListUpdateSoundFile",
-        display_name="Start List Update Sound",
+        display_name=N_("Start List Update Sound"),
         value_type=Path,
-        description="The path to the sound file to use when the start list is updated.",
+        description=N_(
+            "The path to the sound file to use when the start list is updated."
+        ),
         default_value=Path("half_ding.mp3"),
         valid_values_gen=get_all_sounds,
     )

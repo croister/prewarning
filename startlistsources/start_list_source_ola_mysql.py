@@ -7,6 +7,7 @@ from pymysql import OperationalError
 
 from utils.config import ConfigSectionDefinition, Config
 from utils.config_definitions import ConfigSectionEnableType
+from utils.i18n import N_
 from utils.ola_mysql import OlaMySql
 from ._base import _StartListSourceBase
 
@@ -18,9 +19,9 @@ class StartListSourceOlaMySql(_StartListSourceBase):
 
     name = __qualname__
 
-    display_name = "OLA MySQL Start List Source"
+    display_name = N_("OLA MySQL Start List Source")
 
-    description = (
+    description = N_(
         "Looks up the team bib number and relay leg from the MySQL database used by the "
         '<a href="https://www.svenskorientering.se/Arrangera/itochtavlings-administration/'
         'OLAtidtagnings-program/">OLA event organizing software</a>. '

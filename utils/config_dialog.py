@@ -21,6 +21,7 @@ from utils.config_definitions import (
     SelectionData,
     RuntimeStateOptionDefinition,
 )
+from utils.i18n import _, N_
 
 
 def _default_value(option_definition: ConfigOptionDefinition):
@@ -45,18 +46,17 @@ ERR_UNKNOWN_VALUE_TYPE = 'Unknown value type "{}" for the configuration option {
 ERR_LABEL_NOT_FOUND = "Unable to find the {} label."
 ERR_INPUT_NOT_FOUND = "Unable to find the {} input."
 ERR_PANEL_NOT_FOUND = "Unable to find the {} panel."
-MSG_VERIFY_FAILED = "Verification failed."
-MSG_SUCCESS = "Success"
-MSG_SUCCESS_FMT = "Success: {}"
-DLG_VALID_VALUES_CAPTION = "Valid Values"
-DLG_SELECT_VALUE = "Select a value"
-DLG_SELECT_VALUE_LABEL = "Select a Value:"
-DLG_VALUES = "Values"
-DLG_SELECT_VALUES = "Select value(s)"
+MSG_VERIFY_FAILED = N_("Verification failed.")
+MSG_SUCCESS = N_("Success")
+MSG_SUCCESS_FMT = N_("Success: {}")
+DLG_VALID_VALUES_CAPTION = N_("Valid Values")
+DLG_SELECT_VALUE_LABEL = N_("Select a Value:")
+DLG_VALUES = N_("Values")
+DLG_SELECT_VALUES = N_("Select value(s)")
 ERR_UNKNOWN_SELECT_METHOD = "Unknown select method."
-MSG_NO_OPTIONS_AVAILABLE = "No options available."
-TOOLTIP_DEPENDS_ON = "Depends on: {}"
-FILTER_HINT = "Type to filter..."
+MSG_NO_OPTIONS_AVAILABLE = N_("No options available.")
+TOOLTIP_DEPENDS_ON = N_("Depends on: {}")
+FILTER_HINT = N_("Type to filter...")
 DLG_INITIAL_WIDTH = 400
 DLG_INITIAL_HEIGHT = 500
 DLG_MIN_WIDTH = 300
@@ -100,20 +100,20 @@ def _get_value(control: wx.TextEntry | wx.CheckBox | wx.ListBox) -> str | None:
         return control.GetValue()
 
 
-TOOLTIP_DEFAULT = "Reset to the default value."
-TOOLTIP_VERIFY = "Test the value(s)."
-TOOLTIP_SELECT = "Select a value."
+TOOLTIP_DEFAULT = N_("Reset to the default value.")
+TOOLTIP_VERIFY = N_("Test the value(s).")
+TOOLTIP_SELECT = N_("Select a value.")
 TOOLTIP_ERR_INVALID_FUNCTION = '_default_tooltip: Invalid function "{}".'
-TOOLTIP_WORKING = "Working..."
+TOOLTIP_WORKING = N_("Working...")
 
 
 def _default_tooltip(function: str) -> str:
     if function == "default":
-        return TOOLTIP_DEFAULT
+        return _(TOOLTIP_DEFAULT)
     elif function == "verify":
-        return TOOLTIP_VERIFY
+        return _(TOOLTIP_VERIFY)
     elif function == "select":
-        return TOOLTIP_SELECT
+        return _(TOOLTIP_SELECT)
     else:
         logging.error('_default_tooltip: Invalid function "%s".', function)
         raise ValueError(TOOLTIP_ERR_INVALID_FUNCTION.format(function))
@@ -210,7 +210,7 @@ class FilterableChoiceDialog(wx.Dialog):
         sizer.Add(label, 0, wx.ALL, UI_BORDER)
 
         self._filter_ctrl = wx.TextCtrl(self)
-        self._filter_ctrl.SetHint(FILTER_HINT)
+        self._filter_ctrl.SetHint(_(FILTER_HINT))
         self._filter_ctrl.Bind(wx.EVT_TEXT, self._on_filter)
         sizer.Add(self._filter_ctrl, 0, wx.ALL | wx.EXPAND, UI_BORDER)
 
@@ -395,15 +395,15 @@ class ConfigSectionPanel(wx.Panel):
         assert self.options_sizer is not None
 
         self.section_label = wx.StaticText(
-            self, label=self.config_section_definition.display_name
+            self, label=_(self.config_section_definition.display_name)
         )
         self.section_label.SetFont(self.section_label.GetFont().Bold())
         if len(self.config_section_definition.requires) != 0:
             self.section_label.SetToolTip(
-                TOOLTIP_DEPENDS_ON.format(
+                _(TOOLTIP_DEPENDS_ON).format(
                     ", ".join(
                         [
-                            req.display_name
+                            _(req.display_name)
                             for req in self.config_section_definition.requires
                         ]
                     )
@@ -428,10 +428,15 @@ class ConfigSectionPanel(wx.Panel):
 
             option_label = wx.StaticText(
                 self,
-                label=option_definition.display_name,
+                label=_(option_definition.display_name),
                 name=self._label_name(option_definition.name),
             )
-            option_label.SetToolTip(option_definition.description)
+            description = _(option_definition.description)
+            if option_definition.description_format_args:
+                description = description.format(
+                    **option_definition.description_format_args
+                )
+            option_label.SetToolTip(description)
 
             self.options_sizer.Add(option_label, 0, wx.ALL, UI_BORDER)
 
@@ -571,7 +576,7 @@ class ConfigSectionPanel(wx.Panel):
         self.options_sizer.AddGrowableCol(1, 2)
 
         if len(self.GetChildren()) == 1:
-            option_label = wx.StaticText(self, label=MSG_NO_OPTIONS_AVAILABLE)
+            option_label = wx.StaticText(self, label=_(MSG_NO_OPTIONS_AVAILABLE))
 
             main_sizer.Add(option_label, 0, wx.ALL, UI_BORDER)
         else:
@@ -760,7 +765,7 @@ class ConfigSectionPanel(wx.Panel):
                 button._working = True  # type: ignore[attr-defined]
                 button.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
                 button.SetBackgroundColour(wx.NullColour)
-                button.SetToolTip(TOOLTIP_WORKING)
+                button.SetToolTip(_(TOOLTIP_WORKING))
                 button.Refresh()
 
                 def _do_verify():
@@ -780,7 +785,7 @@ class ConfigSectionPanel(wx.Panel):
                     button._working = True  # type: ignore[attr-defined]
                     button.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
                     button.SetBackgroundColour(wx.NullColour)
-                    button.SetToolTip(TOOLTIP_WORKING)
+                    button.SetToolTip(_(TOOLTIP_WORKING))
                     button.Refresh()
 
                     def _do_select():
@@ -796,7 +801,8 @@ class ConfigSectionPanel(wx.Panel):
                     threading.Thread(target=_do_select, daemon=True).start()
                 elif ConfigSectionPanel._use_selector_for(valid_values):
                     select_result = SelectionResult(
-                        caption=DLG_VALID_VALUES_CAPTION, message=DLG_SELECT_VALUE_LABEL
+                        caption=_(DLG_VALID_VALUES_CAPTION),
+                        message=_(DLG_SELECT_VALUE_LABEL),
                     )
                     for value in valid_values:
                         select_result.add_value(SelectionData(value, value))
@@ -817,16 +823,16 @@ class ConfigSectionPanel(wx.Panel):
         if not result:
             button.SetBackgroundColour(wx.Colour("pink"))
             if isinstance(result, VerificationError):
-                button.SetToolTip(result.message)
+                button.SetToolTip(_(result.message))
             else:
-                button.SetToolTip(MSG_VERIFY_FAILED)
+                button.SetToolTip(_(MSG_VERIFY_FAILED))
             button.SetFocus()
             button.Refresh()
         else:
-            message = MSG_SUCCESS
+            message = _(MSG_SUCCESS)
             if isinstance(result, VerificationResult):
                 if result.message is not None:
-                    message = MSG_SUCCESS_FMT.format(result.message)
+                    message = _(MSG_SUCCESS_FMT).format(result.message)
             button.SetBackgroundColour(wx.GREEN)
             button.SetToolTip(message)
             button.Refresh()
@@ -844,12 +850,12 @@ class ConfigSectionPanel(wx.Panel):
         self, button: wx.Button, name: str, option_definition, select_result
     ) -> None:
         if select_result is None:
-            button.SetToolTip(TOOLTIP_SELECT)
+            button.SetToolTip(_(TOOLTIP_SELECT))
             return
 
         if isinstance(select_result, SelectionError):
             button.SetBackgroundColour(wx.Colour("pink"))
-            button.SetToolTip(select_result.message)
+            button.SetToolTip(_(select_result.message))
             button.SetFocus()
             button.Refresh()
 
@@ -879,8 +885,8 @@ class ConfigSectionPanel(wx.Panel):
 
                     with FilterableChoiceDialog(
                         self.GetParent(),
-                        caption=DLG_VALUES,
-                        message=DLG_SELECT_VALUE_LABEL,
+                        caption=_(DLG_VALUES),
+                        message=_(DLG_SELECT_VALUE_LABEL),
                         choices=value_list,
                         initial_selection=old_selected,
                     ) as dialog:
@@ -901,8 +907,8 @@ class ConfigSectionPanel(wx.Panel):
 
                     with wx.MultiChoiceDialog(
                         self.GetParent(),
-                        DLG_SELECT_VALUES,
-                        DLG_VALUES,
+                        _(DLG_SELECT_VALUES),
+                        _(DLG_VALUES),
                         value_list,
                     ) as dialog:
                         dialog.SetSelections(multi_old_selected)
@@ -925,10 +931,10 @@ class ConfigSectionPanel(wx.Panel):
                 self.update()
 
                 button.SetBackgroundColour(wx.GREEN)
-                button.SetToolTip(MSG_SUCCESS)
+                button.SetToolTip(_(MSG_SUCCESS))
                 button.Refresh()
             else:
-                button.SetToolTip(TOOLTIP_SELECT)
+                button.SetToolTip(_(TOOLTIP_SELECT))
                 self.update()
 
     def Validate(self) -> bool:
@@ -1020,15 +1026,15 @@ class ConfigDialog(wx.Dialog):
             ):
                 self.sections_sizer.Show(config_section_panel, False)
 
-        self.button_ok = wx.Button(self, label="OK")
+        self.button_ok = wx.Button(self, label=_("OK"))
         self.button_ok.Bind(wx.EVT_BUTTON, self.on_ok)
         button_sizer.Add(self.button_ok)
 
-        self.button_save = wx.Button(self, label="Save")
+        self.button_save = wx.Button(self, label=_("Save"))
         self.button_save.Bind(wx.EVT_BUTTON, self.on_save)
         button_sizer.Add(self.button_save)
 
-        self.button_cancel = wx.Button(self, label="Cancel")
+        self.button_cancel = wx.Button(self, label=_("Cancel"))
         self.button_cancel.Bind(wx.EVT_BUTTON, self.on_cancel)
         button_sizer.Add(self.button_cancel)
         button_sizer.Realize()
