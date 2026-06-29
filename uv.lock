@@ -581,7 +581,7 @@ wheels = [
 
 [[package]]
 name = "prewarning"
-version = "2.3.0.dev0"
+version = "2.2.2"
 source = { editable = "." }
 dependencies = [
     { name = "console-menu" },
