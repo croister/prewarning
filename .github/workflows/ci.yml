@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v8.3.1
+      - uses: astral-sh/setup-uv@v8.3.2
       - name: Lint (YAML) - workflow definition
         run: uvx yamllint .github/workflows/ && echo "No YAML issues found."
 
@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v8.3.1
+      - uses: astral-sh/setup-uv@v8.3.2
       - name: Audit (Dependencies)
         run: uv audit --preview-features audit
 
@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v8.3.1
+      - uses: astral-sh/setup-uv@v8.3.2
       - name: Lint (Spelling)
         run: uvx codespell --skip=".git,uv.lock,dist,__pycache__,logs,startlists,test_data,**country_dict_by_ioc*" --ignore-words-list="datas"
 
@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v8.3.1
+      - uses: astral-sh/setup-uv@v8.3.2
       - name: Lint (Python) - check
         run: uvx ruff check .
       - name: Lint (Python) - format
@@ -53,7 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v8.3.1
+      - uses: astral-sh/setup-uv@v8.3.2
         with:
           enable-cache: true
       - uses: actions/setup-python@v6
@@ -70,7 +70,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v8.3.1
+      - uses: astral-sh/setup-uv@v8.3.2
         with:
           enable-cache: true
       - uses: actions/setup-python@v6
@@ -99,7 +99,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v8.3.1
+      - uses: astral-sh/setup-uv@v8.3.2
         with:
           enable-cache: true
       - uses: actions/setup-python@v6
@@ -173,7 +173,7 @@ jobs:
         with:
           ref: master
           fetch-depth: 0
-      - uses: astral-sh/setup-uv@v8.3.1
+      - uses: astral-sh/setup-uv@v8.3.2
       - name: Bump version to next dev (minor)
         id: bump
         shell: bash
