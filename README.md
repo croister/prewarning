@@ -89,6 +89,8 @@ This project uses [uv](https://docs.astral.sh/uv/) for dependency management and
 | Clean build artifacts | `uv run scripts/clean.py` |
 | Run all CI checks locally | `uv run scripts/precommit.py` |
 | Update translations | `uv run scripts/update_translations.py` |
+| Check for dependency updates | `uv run scripts/check_updates.py` |
+| Upgrade all dependencies | `uv run scripts/upgrade_dependencies.py` |
 
 ### Test structure
 
