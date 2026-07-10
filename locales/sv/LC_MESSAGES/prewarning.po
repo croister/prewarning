@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PreWarning 2.3.0\n"
 "Report-Msgid-Bugs-To: croister@croister.se\n"
-"POT-Creation-Date: 2026-07-10 22:02+0200\n"
+"POT-Creation-Date: 2026-07-10 23:52+0200\n"
 "PO-Revision-Date: 2026-06-30 20:16+0200\n"
 "Last-Translator: Christian Lindblom <croister@croister.se>\n"
 "Language: sv\n"
@@ -943,8 +943,8 @@ msgid ""
 "Invalid extra ranges format. Expected comma-separated ranges like "
 "'1000-1999, 2000-2999'."
 msgstr ""
-"Ogiltigt format för extra nummerintervall. Ange kommaseparerade intervall, "
-"exempelvis '1000-1999, 2000-2999'."
+"Ogiltigt format för extra nummerintervall. Ange kommaseparerade "
+"intervall, exempelvis '1000-1999, 2000-2999'."
 
 #: utils/voice_manager_dialog.py:132
 #, python-brace-format
@@ -1024,7 +1024,9 @@ msgstr "Extra intervall"
 #: utils/voice_manager_dialog.py:336
 #, python-brace-format
 msgid "Comma-separated list of extra number ranges (e.g. {default_extra_range})."
-msgstr "Kommaseparerad lista med extra nummerintervall (t.ex. {default_extra_range})."
+msgstr ""
+"Kommaseparerad lista med extra nummerintervall (t.ex. "
+"{default_extra_range})."
 
 #: utils/voice_manager_dialog.py:458
 msgid "Voice directory not found"
@@ -1236,5 +1238,4 @@ msgstr "Stäng ändå?"
 #: utils/voice_manager_dialog.py:1904
 msgid "Confirm Close"
 msgstr "Bekräfta stängning"
-
 

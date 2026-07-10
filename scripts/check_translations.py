@@ -49,8 +49,9 @@ def check_pot_freshness() -> list[str]:
     try:
         result = subprocess.run(
             [
-                "uv",
-                "run",
+                "uvx",
+                "--from",
+                "babel",
                 "pybabel",
                 "extract",
                 "-F",

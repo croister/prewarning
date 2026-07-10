@@ -54,14 +54,8 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v8.2.0
-        with:
-          enable-cache: true
-      - uses: actions/setup-python@v6
-        with:
-          python-version-file: .python-version
-      - run: uv sync --group dev
       - name: Check for untranslated strings
-        run: uv run python scripts/check_translations.py
+        run: uv run --no-project python scripts/check_translations.py
 
   test:
     name: Tests
