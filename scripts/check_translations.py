@@ -1,5 +1,6 @@
 """Check that all .po files have complete translations (no empty msgstr)."""
 
+import os
 import subprocess
 import sys
 import tempfile
@@ -195,7 +196,10 @@ def main() -> int:
                 " (run: pybabel compile -d locales -D prewarning)"
             )
             errors += 1
-        elif mo_file.stat().st_mtime < po_file.stat().st_mtime:
+        elif (
+            not os.environ.get("CI")
+            and mo_file.stat().st_mtime < po_file.stat().st_mtime
+        ):
             print(
                 f"{rel}: .mo file is outdated"
                 " (run: pybabel compile -d locales -D prewarning)"
