@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PreWarning 2.3.0\n"
 "Report-Msgid-Bugs-To: croister@croister.se\n"
-"POT-Creation-Date: 2026-07-11 03:28+0200\n"
+"POT-Creation-Date: 2026-07-11 04:45+0200\n"
 "PO-Revision-Date: 2026-06-30 20:16+0200\n"
 "Last-Translator: Christian Lindblom <croister@croister.se>\n"
 "Language: sv\n"
@@ -18,21 +18,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: prewarning.py:158 utils/voice_manager_dialog.py:87
+#: prewarning.py:184 utils/voice_manager_dialog.py:87
 msgid "Language"
 msgstr "Språk"
 
-#: prewarning.py:161
-msgid "The language used for the application UI. Requires restart to take effect."
-msgstr ""
-"Språket som används för programmets gränssnitt. Kräver omstart för att "
-"träda i kraft."
+#: prewarning.py:186
+msgid "The language used for the application UI."
+msgstr "Språket som används för programmets gränssnitt."
 
-#: prewarning.py:169
+#: prewarning.py:196
 msgid "Interactive Mode"
 msgstr "Interaktivt läge"
 
-#: prewarning.py:172
+#: prewarning.py:199
 msgid ""
 "Enables or disables the interactive mode. If this is enabled the default "
 "method of configuration is via the GUI and if errors are detected in the "
@@ -47,21 +45,21 @@ msgstr ""
 "förväntas konfigurationsfilen användas för att ändra konfigurationen och "
 "om fel upptäcks skrivs de till loggen och programmet avslutas."
 
-#: prewarning.py:184
+#: prewarning.py:211
 msgid "Announce IP on Startup"
 msgstr "Läs upp IP vid start"
 
-#: prewarning.py:187
+#: prewarning.py:214
 msgid "Enables or disables the readout of the current IP address at startup."
 msgstr ""
 "Aktiverar eller inaktiverar uppläsning av aktuell IP-adress vid "
 "programmets start."
 
-#: prewarning.py:194
+#: prewarning.py:221
 msgid "Enable Intro Sound"
 msgstr "Aktivera introljud"
 
-#: prewarning.py:197
+#: prewarning.py:224
 msgid ""
 "Enable or disable the intro sound played before the first team number is "
 "read after a timeout."
@@ -69,11 +67,11 @@ msgstr ""
 "Aktivera eller inaktivera introljudet som spelas innan det första "
 "lagnumret läses upp efter en timeout."
 
-#: prewarning.py:204
+#: prewarning.py:231
 msgid "Intro Sound Timeout"
 msgstr "Timeout för introljud"
 
-#: prewarning.py:207
+#: prewarning.py:234
 msgid ""
 "The timeout in seconds after the last announcement before the intro sound"
 " is played again before the next announcement."
@@ -81,37 +79,37 @@ msgstr ""
 "Timeout i sekunder efter det senaste meddelandet innan introljudet spelas"
 " igen före nästa meddelande."
 
-#: prewarning.py:217
+#: prewarning.py:244
 msgid "Intro Sound"
 msgstr "Introljud"
 
-#: prewarning.py:220
+#: prewarning.py:247
 msgid "The path to the sound file to use as the intro sound before announcements."
 msgstr "Sökvägen till ljudfilen som används som introljud före meddelanden."
 
-#: prewarning.py:234
+#: prewarning.py:261
 msgid "Test Sound"
 msgstr "Testljud"
 
-#: prewarning.py:236
+#: prewarning.py:263
 msgid "The path to the sound file to use as the test sound."
 msgstr "Sökvägen till ljudfilen som används som testljud."
 
-#: prewarning.py:243
+#: prewarning.py:270
 msgid "Add Pre-Warnings to Bottom"
 msgstr "Lägg till förvarningar nederst"
 
-#: prewarning.py:246
+#: prewarning.py:273
 msgid ""
 "Set to True if new Pre-Warnings should be added to the bottom of the "
 "screen."
 msgstr "Sätt till sant om nya förvarningar ska läggas till längst ner på skärmen."
 
-#: prewarning.py:253
+#: prewarning.py:280
 msgid "Announce Last Leg"
 msgstr "Meddela sista sträckan"
 
-#: prewarning.py:256
+#: prewarning.py:283
 msgid ""
 "If disabled, pre-warnings for the last leg are suppressed (not displayed "
 "or announced)."
@@ -119,11 +117,11 @@ msgstr ""
 "Om inaktiverat skippas förvarningar för sista sträckans löpare (visas "
 "eller meddelas inte)."
 
-#: prewarning.py:264
+#: prewarning.py:291
 msgid "Deduplicate by Card + Control"
 msgstr "Deduplicera efter bricknummer + kodsiffra"
 
-#: prewarning.py:267
+#: prewarning.py:294
 msgid ""
 "Skip re-announcement when the same SI card punches the same control code "
 "again."
@@ -131,11 +129,11 @@ msgstr ""
 "Hoppa över nytt meddelande när samma SI-bricka stämplar samma kontroll "
 "igen."
 
-#: prewarning.py:274
+#: prewarning.py:301
 msgid "Deduplicate by Bib + Leg"
 msgstr "Deduplicera efter nummerlapp + sträcka"
 
-#: prewarning.py:277
+#: prewarning.py:304
 msgid ""
 "Skip re-announcement when the same team bib number appears on the same "
 "relay leg again."
@@ -143,236 +141,224 @@ msgstr ""
 "Hoppa över nytt meddelande när samma lagnummer dyker upp på samma sträcka"
 " igen."
 
-#: prewarning.py:284
+#: prewarning.py:311
 msgid "Dedup Timeout (seconds)"
 msgstr "Dedup-timeout (sekunder)"
 
-#: prewarning.py:286
+#: prewarning.py:313
 msgid "How long a dedup key remains active. 0 = forever (session)."
 msgstr "Hur länge en dedup-nyckel förblir aktiv. 0 = för alltid (session)."
 
-#: prewarning.py:293
+#: prewarning.py:320
 msgid "Common"
 msgstr "Allmänt"
 
-#: prewarning.py:310
+#: prewarning.py:337
 msgid "Deduplication"
 msgstr "Deduplicering"
 
-#: prewarning.py:321
+#: prewarning.py:348
 msgid "Data Sources"
 msgstr "Datakällor"
 
-#: prewarning.py:412 prewarning.py:1041
+#: prewarning.py:439 prewarning.py:1093 utils/config_dialog.py:1148
 msgid "Settings"
 msgstr "Inställningar"
 
-#: prewarning.py:415
+#: prewarning.py:442
 msgid "Opens the Settings Dialog"
 msgstr "Öppnar inställningsdialogen"
 
-#: prewarning.py:419 utils/voice_manager_dialog.py:346
+#: prewarning.py:446 utils/voice_manager_dialog.py:346
 #: utils/voice_manager_dialog.py:748
 msgid "Voice Manager"
 msgstr "Rösthanterare"
 
-#: prewarning.py:422
+#: prewarning.py:449
 msgid "Opens the Voice Manager dialog"
 msgstr "Öppnar rösthanterarens dialog"
 
-#: prewarning.py:426 utils/help_dialog.py:23
+#: prewarning.py:453 utils/help_dialog.py:23
 msgid "Help"
 msgstr "Hjälp"
 
-#: prewarning.py:429
+#: prewarning.py:456
 msgid "Opens the Help Dialog"
 msgstr "Öppnar hjälpdialogen"
 
-#: prewarning.py:436 utils/about_dialog.py:16
+#: prewarning.py:463 utils/about_dialog.py:16
 msgid "About"
 msgstr "Om"
 
-#: prewarning.py:439
+#: prewarning.py:466
 msgid "Opens the About Dialog"
 msgstr "Öppnar om-dialogen"
 
-#: prewarning.py:443
+#: prewarning.py:470
 msgid "Full Screen"
 msgstr "Helskärm"
 
-#: prewarning.py:446
+#: prewarning.py:473
 msgid "Switches full screen on and off"
 msgstr "Växlar helskärmsläge av och på"
 
-#: prewarning.py:450
+#: prewarning.py:477
 msgid "Fake Punch"
 msgstr "Simulerad stämpling"
 
-#: prewarning.py:453
+#: prewarning.py:480
 msgid "Simulates a pre-warning"
 msgstr "Simulerar en förvarning"
 
-#: prewarning.py:460
+#: prewarning.py:487
 msgid "Refresh Display"
 msgstr "Uppdatera display"
 
-#: prewarning.py:463
+#: prewarning.py:490
 msgid "Refreshes the display"
 msgstr "Uppdaterar displayen"
 
-#: prewarning.py:470
+#: prewarning.py:497
 msgid "Clear Display"
 msgstr "Rensa display"
 
-#: prewarning.py:473
+#: prewarning.py:500
 msgid "Clears the display from pre-warning entries"
 msgstr "Rensar displayen från förvarningsposter"
 
-#: prewarning.py:477
+#: prewarning.py:504
 msgid "Play Testing Sound"
 msgstr "Spela testljud"
 
-#: prewarning.py:480
+#: prewarning.py:507
 msgid "Plays a test sound"
 msgstr "Spelar ett testljud"
 
-#: prewarning.py:484
+#: prewarning.py:511
 msgid "Announce IP Address"
 msgstr "Läs upp IP-adress"
 
-#: prewarning.py:487
+#: prewarning.py:514
 msgid "Reads the IP (v4) address aloud section for section"
 msgstr "Läser upp IP (v4)-adressen högt sektion för sektion"
 
-#: prewarning.py:499
+#: prewarning.py:526
 msgid "Increase Font Size"
 msgstr "Öka textstorlek"
 
-#: prewarning.py:502
+#: prewarning.py:529
 msgid "Increases the font size"
 msgstr "Ökar textstorleken"
 
-#: prewarning.py:509
+#: prewarning.py:536
 msgid "Decrease Font Size"
 msgstr "Minska textstorlek"
 
-#: prewarning.py:512
+#: prewarning.py:539
 msgid "Decreases the font size"
 msgstr "Minskar textstorleken"
 
-#: prewarning.py:519
+#: prewarning.py:546
 msgid "Restore Font Size"
 msgstr "Återställ textstorlek"
 
-#: prewarning.py:522
+#: prewarning.py:549
 msgid "Restores the font size to default"
 msgstr "Återställer textstorleken till standard"
 
-#: prewarning.py:529
+#: prewarning.py:556
 msgid "Exit"
 msgstr "Avsluta"
 
-#: prewarning.py:532
+#: prewarning.py:559
 msgid "Exits the application"
 msgstr "Avslutar applikationen"
 
-#: prewarning.py:698
+#: prewarning.py:725 prewarning.py:1056
 msgid "Pre-Warning"
 msgstr "Förvarning"
 
-#: prewarning.py:709 prewarning.py:1226
+#: prewarning.py:736 prewarning.py:1275
 msgid "All systems OK"
 msgstr "Allt OK"
 
-#: prewarning.py:749
+#: prewarning.py:776 prewarning.py:1058
 msgid "Time"
 msgstr "Tid"
 
-#: prewarning.py:750
+#: prewarning.py:777 prewarning.py:1059
 msgid "Team"
 msgstr "Lag"
 
-#: prewarning.py:751
+#: prewarning.py:778 prewarning.py:1060
 msgid "Leg"
 msgstr "Sträcka"
 
-#: prewarning.py:1065
-msgid ""
-"The language has been changed. Please restart the application for the "
-"change to take effect."
-msgstr ""
-"Språket har ändrats. Starta om applikationen för att ändringen ska träda "
-"i kraft."
-
-#: prewarning.py:1067
-msgid "Restart Required"
-msgstr "Omstart krävs"
-
-#: prewarning.py:1079
+#: prewarning.py:1128
 msgid "No punch source configured."
 msgstr "Ingen stämplingskälla konfigurerad."
 
-#: prewarning.py:1087
+#: prewarning.py:1136
 msgid "Punch source is not running."
 msgstr "Stämplingskällan körs inte."
 
-#: prewarning.py:1099
+#: prewarning.py:1148
 msgid "No start list source configured."
 msgstr "Ingen startlistkälla konfigurerad."
 
-#: prewarning.py:1107
+#: prewarning.py:1156
 msgid "Start list source is not running."
 msgstr "Startlistkällan körs inte."
 
-#: prewarning.py:1132
+#: prewarning.py:1181
 msgid "No voices installed."
 msgstr "Inga röster installerade."
 
-#: prewarning.py:1145
+#: prewarning.py:1194
 #, python-brace-format
 msgid "Incomplete voices: {names}"
 msgstr "Ofullständiga röster: {names}"
 
-#: prewarning.py:1171
+#: prewarning.py:1220
 #, python-brace-format
 msgid "Bib number range ({min} - {max}) not fully covered by voice number ranges."
 msgstr ""
 "Nummerlappsserie ({min} - {max}) täcks inte helt av rösternas "
 "nummerintervall."
 
-#: prewarning.py:1190 prewarning.py:1200
+#: prewarning.py:1239 prewarning.py:1249
 msgid "Running"
 msgstr "Körs"
 
-#: prewarning.py:1192 prewarning.py:1202
+#: prewarning.py:1241 prewarning.py:1251
 msgid "Stopped"
 msgstr "Stoppad"
 
-#: prewarning.py:1194
+#: prewarning.py:1243
 msgid "Punch source"
 msgstr "Stämplingskälla"
 
-#: prewarning.py:1204
+#: prewarning.py:1253
 msgid "Start list source"
 msgstr "Startlistkälla"
 
-#: prewarning.py:1210
+#: prewarning.py:1259
 msgid "Bib range"
 msgstr "Nummerlappsserie"
 
-#: prewarning.py:1216
+#: prewarning.py:1265
 msgid "Installed voices"
 msgstr "Installerade röster"
 
-#: prewarning.py:1219
+#: prewarning.py:1268
 msgid "Punches received"
 msgstr "Stämplingar mottagna"
 
-#: prewarning.py:1220
+#: prewarning.py:1269
 msgid "Punches matched"
 msgstr "Stämplingar matchade"
 
-#: prewarning.py:1221
+#: prewarning.py:1270
 msgid "Announcements"
 msgstr "Utrop"
 
@@ -728,15 +714,15 @@ msgstr "Välj ett värde."
 msgid "Working..."
 msgstr "Arbetar..."
 
-#: utils/config_dialog.py:1029
+#: utils/config_dialog.py:1090 utils/config_dialog.py:1149
 msgid "OK"
 msgstr "OK"
 
-#: utils/config_dialog.py:1033
+#: utils/config_dialog.py:1094 utils/config_dialog.py:1150
 msgid "Save"
 msgstr "Spara"
 
-#: utils/config_dialog.py:1037
+#: utils/config_dialog.py:1098 utils/config_dialog.py:1151
 msgid "Cancel"
 msgstr "Avbryt"
 

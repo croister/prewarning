@@ -4,7 +4,7 @@ import logging
 import threading
 from configparser import SectionProxy
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Callable, Dict, List
 
 import wx
 import wx.lib.scrolledpanel
@@ -154,6 +154,11 @@ class ConfigOptionValidator(wx.Validator):
         control = self.GetWindow()
         value = _get_value(control)
 
+        display_map = self.config_option_definition.valid_values_display
+        if display_map and value is not None:
+            reverse_map = {v: k for k, v in display_map.items()}
+            value = reverse_map.get(value, value)
+
         validation_errors = self.config_option_definition.validate(value)
 
         if len(validation_errors) > 0:
@@ -174,12 +179,21 @@ class ConfigOptionValidator(wx.Validator):
             return True
         control = self.GetWindow()
         value = _value(self.config_option_definition, self.config_section)
+        display_map = self.config_option_definition.valid_values_display
+        if display_map and value in display_map:
+            value = display_map[value]
         _set_value(control, value)
         return True
 
     def TransferFromWindow(self):
         control = self.GetWindow()
         value = _get_value(control)
+        display_map = self.config_option_definition.valid_values_display
+        if display_map and value is not None:
+            # Reverse lookup: display name -> stored value
+            reverse_map = {v: k for k, v in display_map.items()}
+            if value in reverse_map:
+                value = reverse_map[value]
         self.config_section[self.config_option_definition.name] = str(value)
         return True
 
@@ -446,11 +460,16 @@ class ConfigSectionPanel(wx.Panel):
 
             valid_values = option_definition.get_valid_values()
             if ConfigSectionPanel._use_combo_box_for(valid_values):
+                display_map = option_definition.valid_values_display
+                if display_map:
+                    choices = [display_map.get(val, str(val)) for val in valid_values]
+                else:
+                    choices = [str(val) for val in valid_values]
                 option_input = wx.ComboBox(
                     self,
                     validator=validator,
                     size=wx.DefaultSize,
-                    choices=[str(val) for val in valid_values],
+                    choices=choices,
                     style=wx.CB_DROPDOWN | wx.CB_READONLY,
                     name=option_definition_name,
                 )
@@ -704,9 +723,34 @@ class ConfigSectionPanel(wx.Panel):
         if option_name in self._tracking_controls:
             self._tracking_dirty[option_name] = True
 
+    def refresh_translations(self):
+        """Re-translate section and option labels after a language change."""
+        self.section_label.SetLabel(  # type: ignore[has-type]
+            _(self.config_section_definition.display_name)
+        )
+
+        for option_name in self.config_section_definition.option_definitions:
+            option_definition = self.config_section_definition.option_definitions[
+                option_name
+            ]
+            option_label = wx.FindWindowByName(
+                self._label_name(option_name), parent=self
+            )
+            if option_label is not None:
+                option_label.SetLabel(_(option_definition.display_name))
+                description = _(option_definition.description)
+                if option_definition.description_format_args:
+                    description = description.format(
+                        **option_definition.description_format_args
+                    )
+                option_label.SetToolTip(description)
+
+        self.Layout()
+
     def on_combo_box_changed(self, event: wx.CommandEvent):
         self.logger.debug("on_combo_box_changed: %s", event)
         self._mark_dirty_if_tracking(event)
+        self._fire_on_change(event)
         self.update()
 
     def on_list_box_changed(self, event: wx.CommandEvent):
@@ -723,6 +767,21 @@ class ConfigSectionPanel(wx.Panel):
         self.logger.debug("on_check_box_changed: %s", event)
         self._mark_dirty_if_tracking(event)
         self.update()
+
+    def _fire_on_change(self, event: wx.CommandEvent):
+        """Fire the on_change callback for the option that triggered the event."""
+        window = event.GetEventObject()
+        if window is None:
+            return
+        option_name = window.GetName()
+        option_def = self.config_section_definition.option_definitions.get(option_name)
+        if option_def is not None and option_def.on_change is not None:
+            value = _get_value(window)
+            display_map = option_def.valid_values_display
+            if display_map and value is not None:
+                reverse_map = {v: k for k, v in display_map.items()}
+                value = reverse_map.get(value, value)
+            option_def.on_change(value)
 
     def on_button(self, event: wx.CommandEvent):
         if self._dialog is not None:
@@ -958,6 +1017,7 @@ class ConfigDialog(wx.Dialog):
         config: Config,
         *args,
         state_providers: Dict[str, Any] | None = None,
+        on_save: Callable[[], None] | None = None,
         **kwargs,
     ):
         wx.Dialog.__init__(
@@ -968,6 +1028,7 @@ class ConfigDialog(wx.Dialog):
 
         self.config = config
         self.state_providers = state_providers if state_providers is not None else {}
+        self._on_save_callback = on_save
 
         self.sections_sizer = None
         self._panels: list[ConfigSectionPanel] = []
@@ -1082,6 +1143,16 @@ class ConfigDialog(wx.Dialog):
         self.Layout()
         self.Fit()
 
+    def refresh_translations(self):
+        """Re-translate all labels in the dialog after a language change."""
+        self.SetTitle(_("Settings"))
+        self.button_ok.SetLabel(_("OK"))  # type: ignore[has-type]
+        self.button_save.SetLabel(_("Save"))  # type: ignore[has-type]
+        self.button_cancel.SetLabel(_("Cancel"))  # type: ignore[has-type]
+        for panel in self._panels:
+            panel.refresh_translations()
+        self.Layout()
+
     def on_ok(self, e):
         self.logger.debug("on_ok: %s", e)
 
@@ -1090,6 +1161,8 @@ class ConfigDialog(wx.Dialog):
         if self.Validate():
             self.config.write()
             self._save_runtime_state()
+            if self._on_save_callback:
+                self._on_save_callback()
 
             if self.IsModal():
                 self.EndModal(wx.ID_OK)
@@ -1105,6 +1178,8 @@ class ConfigDialog(wx.Dialog):
         if self.Validate():
             self.config.write()
             self._save_runtime_state()
+            if self._on_save_callback:
+                self._on_save_callback()
 
     def _save_runtime_state(self):
         for panel in self._panels:

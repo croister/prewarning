@@ -38,12 +38,14 @@ class ConfigOptionDefinition:
         mandatory: bool = False,
         default_value: Any = None,
         valid_values: List[Any] | None = None,
+        valid_values_display: dict[Any, str] | None = None,
         valid_values_gen: Callable | None = None,
         enabled_by: ConfigOptionDefinition | None = None,
         enables: List[ConfigSectionDefinition | ConfigOptionDefinition] | None = None,
         validator: Callable | None = None,
         read_only: bool = False,
         description_format_args: dict[str, Any] | None = None,
+        on_change: Callable[[Any], None] | None = None,
     ):
         super().__init__()
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -58,12 +60,14 @@ class ConfigOptionDefinition:
         self.mandatory = mandatory
         self.default_value = default_value
         self.valid_values = valid_values
+        self.valid_values_display = valid_values_display
         self.valid_values_gen = valid_values_gen
         self.enabled_by = enabled_by
         self.enables = enables
         self.validator = validator
         self.read_only = read_only
         self.description_format_args = description_format_args
+        self.on_change = on_change
         self.verifier: ConfigVerifierDefinition | None = None
         self.selector: ConfigSelectorDefinition | None = None
 

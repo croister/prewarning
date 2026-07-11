@@ -18,6 +18,8 @@ from time import strftime, time
 from typing import List, Dict
 
 from ruamel.yaml import YAML
+from babel import Locale
+import pycountry
 from watchdog.events import LoggingEventHandler, DirModifiedEvent, FileModifiedEvent
 from watchdog.observers import Observer
 import wx
@@ -59,7 +61,7 @@ from utils.hotkey_bindings import (
     HotKeyDefinition,
     key_event_to_str,
 )
-from utils.i18n import _, N_
+from utils.i18n import _, N_, set_language
 from utils.sound import Sound, verify_sound, get_all_sounds
 from utils.version import __version__
 from utils.voice_manager_dialog import VoiceManagerDialog
@@ -138,6 +140,30 @@ _ANNOUNCE_KEY_VOICE = "voice"
 _ANNOUNCE_KEY_SOUND = "sound"
 
 
+def _get_supported_languages() -> list[str]:
+    """Discover supported languages from the locales directory, plus 'en' (source)."""
+    locales_dir = Path(__file__).resolve().parent / "locales"
+    languages = ["en"]
+    if locales_dir.is_dir():
+        for entry in sorted(locales_dir.iterdir()):
+            if entry.is_dir() and entry.name != "__pycache__":
+                languages.append(entry.name)
+    return languages
+
+
+_SUPPORTED_LANGUAGES = _get_supported_languages()
+
+
+def _language_display_name(code: str) -> str:
+    """Return a display name for a language code, e.g. 'Svenska (Swedish)'."""
+    native = Locale(code).get_display_name(code)
+    lang = pycountry.languages.get(alpha_2=code)
+    english = lang.name if lang else code
+    if native and native.lower() != english.lower():
+        return f"{native.title()} ({english})"
+    return english
+
+
 class PreWarningMeta(type(wx.Frame), type(ConfigConsumer)):  # type: ignore[misc]
     pass
 
@@ -157,11 +183,12 @@ class PreWarning(
         name="Language",
         display_name=N_("Language"),
         value_type=str,
-        description=N_(
-            "The language used for the application UI. Requires restart to take effect."
-        ),
+        description=N_("The language used for the application UI."),
         default_value="en",
-        valid_values=["en", "sv"],
+        valid_values=_SUPPORTED_LANGUAGES,
+        valid_values_display={
+            code: _language_display_name(code) for code in _SUPPORTED_LANGUAGES
+        },
     )
 
     CONFIG_OPTION_INTERACTIVE_MODE = ConfigOptionDefinition(
@@ -409,82 +436,82 @@ class PreWarning(
         # Hotkey binding definitions
         self.hotkey_bindings = [
             HotKeyBindingDefinition(
-                name=_("Settings"),
+                name=N_("Settings"),
                 hotkey=HotKeyDefinition(key_code=ord("S")).with_ctrl(),
                 handler=self._config_dialog,
-                description=_("Opens the Settings Dialog"),
+                description=N_("Opens the Settings Dialog"),
                 bitmap_name=wx.ART_EXECUTABLE_FILE,
             ),
             HotKeyBindingDefinition(
-                name=_("Voice Manager"),
+                name=N_("Voice Manager"),
                 hotkey=HotKeyDefinition(key_code=ord("M")).with_ctrl().with_shift(),
                 handler=self._open_voice_manager,
-                description=_("Opens the Voice Manager dialog"),
+                description=N_("Opens the Voice Manager dialog"),
                 bitmap_name=wx.ART_CDROM,
             ),
             HotKeyBindingDefinition(
-                name=_("Help"),
+                name=N_("Help"),
                 hotkey=HotKeyDefinition(key_code=wx.WXK_F1),
                 handler=self._help_dialog,
-                description=_("Opens the Help Dialog"),
+                description=N_("Opens the Help Dialog"),
                 alternate_hotkeys=[
                     HotKeyDefinition(key_code=ord("H")).with_ctrl(),
                 ],
                 bitmap_name=wx.ART_HELP,
             ),
             HotKeyBindingDefinition(
-                name=_("About"),
+                name=N_("About"),
                 hotkey=HotKeyDefinition(key_code=ord("A")).with_ctrl(),
                 handler=self._about_dialog,
-                description=_("Opens the About Dialog"),
+                description=N_("Opens the About Dialog"),
                 bitmap_name=wx.ART_INFORMATION,
             ),
             HotKeyBindingDefinition(
-                name=_("Full Screen"),
+                name=N_("Full Screen"),
                 hotkey=HotKeyDefinition(key_code=wx.WXK_F11),
                 handler=self._toggle_full_screen,
-                description=_("Switches full screen on and off"),
+                description=N_("Switches full screen on and off"),
                 bitmap_name=wx.ART_FIND,
             ),
             HotKeyBindingDefinition(
-                name=_("Fake Punch"),
+                name=N_("Fake Punch"),
                 hotkey=HotKeyDefinition(key_code=wx.WXK_SPACE).with_ctrl(),
                 handler=self._simulate_punch,
-                description=_("Simulates a pre-warning"),
+                description=N_("Simulates a pre-warning"),
                 alternate_hotkeys=[
                     HotKeyDefinition(key_code=ord("P")).with_ctrl(),
                 ],
                 bitmap_name=wx.ART_GO_DOWN,
             ),
             HotKeyBindingDefinition(
-                name=_("Refresh Display"),
+                name=N_("Refresh Display"),
                 hotkey=HotKeyDefinition(key_code=wx.WXK_F5),
                 handler=self._refresh,
-                description=_("Refreshes the display"),
+                description=N_("Refreshes the display"),
                 alternate_hotkeys=[
                     HotKeyDefinition(key_code=ord("R")).with_ctrl(),
                 ],
                 bitmap_name=wx.ART_LIST_VIEW,
             ),
             HotKeyBindingDefinition(
-                name=_("Clear Display"),
+                name=N_("Clear Display"),
                 hotkey=HotKeyDefinition(key_code=ord("C")).with_ctrl(),
                 handler=self._clear,
-                description=_("Clears the display from pre-warning entries"),
+                description=N_("Clears the display from pre-warning entries"),
                 bitmap_name=wx.ART_DELETE,
             ),
             HotKeyBindingDefinition(
-                name=_("Play Testing Sound"),
+                name=N_("Play Testing Sound"),
                 hotkey=HotKeyDefinition(key_code=ord("T")).with_ctrl(),
                 handler=self._play_test_sound,
-                description=_("Plays a test sound"),
+                description=N_("Plays a test sound"),
                 bitmap_name=wx.ART_QUESTION,
             ),
             HotKeyBindingDefinition(
-                name=_("Announce IP Address"),
+                name=N_("Announce IP Address"),
                 hotkey=HotKeyDefinition(key_code=ord("I")).with_ctrl(),
                 handler=self._notify_ip,
-                description=_("Reads the IP (v4) address aloud section for section"),
+                description=N_("Reads the IP (v4) address aloud section for section"),
                 bitmap_name=wx.ART_INFORMATION,
             ),
             HotKeyBindingDefinition(
@@ -496,40 +523,40 @@ class PreWarning(
                 bitmap_name=wx.ART_TIP,
             ),
             HotKeyBindingDefinition(
-                name=_("Increase Font Size"),
+                name=N_("Increase Font Size"),
                 hotkey=HotKeyDefinition(key_code=wx.WXK_NUMPAD_ADD).with_ctrl(),
                 handler=self._increase_font_size,
-                description=_("Increases the font size"),
+                description=N_("Increases the font size"),
                 alternate_hotkeys=[
                     HotKeyDefinition(key_code=ord("+")).with_ctrl(),
                 ],
                 bitmap_name=wx.ART_PLUS,
             ),
             HotKeyBindingDefinition(
-                name=_("Decrease Font Size"),
+                name=N_("Decrease Font Size"),
                 hotkey=HotKeyDefinition(key_code=wx.WXK_NUMPAD_SUBTRACT).with_ctrl(),
                 handler=self._decrease_font_size,
-                description=_("Decreases the font size"),
+                description=N_("Decreases the font size"),
                 alternate_hotkeys=[
                     HotKeyDefinition(key_code=ord("-")).with_ctrl(),
                 ],
                 bitmap_name=wx.ART_MINUS,
             ),
             HotKeyBindingDefinition(
-                name=_("Restore Font Size"),
+                name=N_("Restore Font Size"),
                 hotkey=HotKeyDefinition(key_code=wx.WXK_NUMPAD0).with_ctrl(),
                 handler=self._restore_font_size,
-                description=_("Restores the font size to default"),
+                description=N_("Restores the font size to default"),
                 alternate_hotkeys=[
                     HotKeyDefinition(key_code=ord("0")).with_ctrl(),
                 ],
                 bitmap_name=wx.ART_UNDO,
             ),
             HotKeyBindingDefinition(
-                name=_("Exit"),
+                name=N_("Exit"),
                 hotkey=HotKeyDefinition(key_code=ord("X")).with_ctrl(),
                 handler=self.Close,
-                description=_("Exits the application"),
+                description=N_("Exits the application"),
                 alternate_hotkeys=[
                     HotKeyDefinition(key_code=ord("Q")).with_ctrl(),
                     HotKeyDefinition(key_code=ord("D")).with_ctrl(),
@@ -803,8 +830,8 @@ class PreWarning(
                 continue
             menu_item = wx.MenuItem(
                 id=hotkey_binding.window_id,
-                text=hotkey_binding.name,
-                helpString=hotkey_binding.description,
+                text=_(hotkey_binding.name),
+                helpString=_(hotkey_binding.description),
             )
             if hotkey_binding.bitmap_name is not None:
                 menu_item.SetBitmap(
@@ -1024,6 +1051,14 @@ class PreWarning(
         )
         help_dialog.Show()
 
+    def _update_labels(self):
+        """Refresh all translated labels on the main window."""
+        self.header_label.SetLabel(_("Pre-Warning"))
+        self.header_panel.Layout()
+        self.prewarning_grid.SetColLabelValue(COL_NR_TIME, _("Time"))
+        self.prewarning_grid.SetColLabelValue(COL_NR_TEAM, _("Team"))
+        self.prewarning_grid.SetColLabelValue(COL_NR_LEG, _("Leg"))
+
     def _config_dialog(self, perform_validation: bool = False):
         start = time()
         state_providers = {}
@@ -1036,9 +1071,28 @@ class PreWarning(
             self.CONFIG_OPTION_LANGUAGE.name,
             self.CONFIG_OPTION_LANGUAGE.default_value,
         )
+        saved_lang = [old_lang]  # mutable so the save callback can update it
+
+        def _on_language_changed(value):
+            set_language(value)
+            self._update_labels()
+            if settings_dialog:
+                settings_dialog.refresh_translations()
+
+        def _on_save():
+            saved_lang[0] = self.config.get_section(Config.SECTION_COMMON).get(
+                self.CONFIG_OPTION_LANGUAGE.name,
+                self.CONFIG_OPTION_LANGUAGE.default_value,
+            )
+
+        self.CONFIG_OPTION_LANGUAGE.on_change = _on_language_changed
 
         settings_dialog = ConfigDialog(
-            self.config, self, title=_("Settings"), state_providers=state_providers
+            self.config,
+            self,
+            title=_("Settings"),
+            state_providers=state_providers,
+            on_save=_on_save,
         )
         created = time()
         self.logger.debug("Config Dialog created: %d seconds", created - start)
@@ -1053,20 +1107,15 @@ class PreWarning(
         if res == wx.ID_CANCEL and perform_validation:
             sys.exit(1)
         settings_dialog.Destroy()
+        self.CONFIG_OPTION_LANGUAGE.on_change = None
 
-        if res == wx.ID_OK:
-            new_lang = self.config.get_section(Config.SECTION_COMMON).get(
-                self.CONFIG_OPTION_LANGUAGE.name,
-                self.CONFIG_OPTION_LANGUAGE.default_value,
-            )
-            if new_lang != old_lang:
-                wx.MessageBox(
-                    _(
-                        "The language has been changed. Please restart the application for the change to take effect."
-                    ),
-                    _("Restart Required"),
-                    wx.OK | wx.ICON_INFORMATION,
-                )
+        if res == wx.ID_CANCEL:
+            # Revert to the last saved language (initial or after Save was clicked)
+            set_language(saved_lang[0])
+            self._update_labels()
+            self.config.get_section(Config.SECTION_COMMON)[
+                self.CONFIG_OPTION_LANGUAGE.name
+            ] = saved_lang[0]
         self._refresh_health()
 
     # -- Health indicator --------------------------------------------------
@@ -1634,8 +1683,6 @@ class PreWarning(
 def _init_language():
     """Read the language setting from the config file and activate i18n."""
     from configparser import ConfigParser
-
-    from utils.i18n import set_language
 
     config = ConfigParser()
     config.read(CONFIGURATION_FILE)

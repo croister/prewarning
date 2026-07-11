@@ -150,7 +150,7 @@ class HelpDialog(wx.Frame):
                         )
                     )
                 contents += "</td><td>{description}</td></tr>".format(
-                    description=key_binding.description
+                    description=_(key_binding.description)
                 )
 
             contents += "</table>"
