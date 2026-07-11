@@ -62,6 +62,7 @@ from utils.hotkey_bindings import (
     key_event_to_str,
 )
 from utils.i18n import _, N_, set_language
+from utils.screen_sleep import ScreenSleepInhibitor
 from utils.sound import Sound, verify_sound, get_all_sounds
 from utils.version import __version__
 from utils.voice_manager_dialog import VoiceManagerDialog
@@ -286,6 +287,17 @@ class PreWarning(
         default_value=False,
     )
 
+    CONFIG_OPTION_PREVENT_SCREEN_SLEEP = ConfigOptionDefinition(
+        name="PreventScreenSleep",
+        display_name=N_("Prevent Screen Sleep"),
+        value_type=bool,
+        description=N_(
+            "Prevents the display from turning off and the screensaver from "
+            "activating while the application is running."
+        ),
+        default_value=True,
+    )
+
     CONFIG_OPTION_DEDUP_CARD_CONTROL = ConfigOptionDefinition(
         name="DedupCardControl",
         display_name=N_("Deduplicate by Card + Control"),
@@ -328,6 +340,7 @@ class PreWarning(
             CONFIG_OPTION_TEST_SOUND_FILE,
             CONFIG_OPTION_ADD_PRE_WARNINGS_TO_BOTTOM,
             CONFIG_OPTION_ANNOUNCE_LAST_LEG,
+            CONFIG_OPTION_PREVENT_SCREEN_SLEEP,
         ],
         sort_key_prefix=0,
     )
@@ -603,6 +616,10 @@ class PreWarning(
         # Init the sound util
         self.sound = Sound()
 
+        # Init the screen sleep inhibitor
+        self._screen_sleep_inhibitor = ScreenSleepInhibitor()
+        self._apply_screen_sleep_setting()
+
         # Set up the queues used for punches and announcements
         self.punch_queue: Queue = Queue()
         self.announcement_queue: Queue = Queue()
@@ -654,6 +671,7 @@ class PreWarning(
             self.punch_source.stop()
         if self.start_list_source is not None:
             self.start_list_source.stop()
+        self._screen_sleep_inhibitor.uninhibit()
 
     @staticmethod
     def _get_portrait_screen() -> wx.Display | None:
@@ -1269,6 +1287,12 @@ class PreWarning(
         stats_lines.append(f"{_('Punches matched')}: {self._stats_punches_matched}")
         stats_lines.append(f"{_('Announcements')}: {self._stats_announcements}")
 
+        # Screen sleep status
+        if self._screen_sleep_inhibitor.is_active:
+            stats_lines.append(f"{_('Screen sleep')}: {_('Prevented')}")
+        else:
+            stats_lines.append(f"{_('Screen sleep')}: {_('Normal')}")
+
         # Build tooltip
         if status == HealthStatus.OK:
             self.health_indicator.SetForegroundColour(wx.Colour(0, 180, 0))
@@ -1294,6 +1318,15 @@ class PreWarning(
         elif action == HealthAction.SETTINGS:
             self._config_dialog()
         # If no action or OK, do nothing
+
+    def _apply_screen_sleep_setting(self) -> None:
+        """Enable or disable screen sleep prevention based on config."""
+        config_section = self.config.get_section(Config.SECTION_COMMON)
+        prevent = self.CONFIG_OPTION_PREVENT_SCREEN_SLEEP.get_value(config_section)
+        if prevent:
+            self._screen_sleep_inhibitor.inhibit()
+        else:
+            self._screen_sleep_inhibitor.uninhibit()
 
     def _toggle_full_screen(self):
         self.logger.debug("Toggle Full Screen")
@@ -1397,6 +1430,7 @@ class PreWarning(
         )
         if start_not_running and self.start_list_source is not None:
             self.start_list_source.start()
+        self._apply_screen_sleep_setting()
         self._refresh_health()
 
     def update_sources(self):

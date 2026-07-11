@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-07-11 04:45+0200\n"
+"POT-Creation-Date: 2026-07-11 05:15+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,19 +17,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: prewarning.py:184 utils/voice_manager_dialog.py:87
+#: prewarning.py:185 utils/voice_manager_dialog.py:87
 msgid "Language"
 msgstr ""
 
-#: prewarning.py:186
+#: prewarning.py:187
 msgid "The language used for the application UI."
 msgstr ""
 
-#: prewarning.py:196
+#: prewarning.py:197
 msgid "Interactive Mode"
 msgstr ""
 
-#: prewarning.py:199
+#: prewarning.py:200
 msgid ""
 "Enables or disables the interactive mode. If this is enabled the default "
 "method of configuration is via the GUI and if errors are detected in the "
@@ -39,307 +39,329 @@ msgid ""
 "written to the log and the program exits."
 msgstr ""
 
-#: prewarning.py:211
+#: prewarning.py:212
 msgid "Announce IP on Startup"
 msgstr ""
 
-#: prewarning.py:214
+#: prewarning.py:215
 msgid "Enables or disables the readout of the current IP address at startup."
 msgstr ""
 
-#: prewarning.py:221
+#: prewarning.py:222
 msgid "Enable Intro Sound"
 msgstr ""
 
-#: prewarning.py:224
+#: prewarning.py:225
 msgid ""
 "Enable or disable the intro sound played before the first team number is "
 "read after a timeout."
 msgstr ""
 
-#: prewarning.py:231
+#: prewarning.py:232
 msgid "Intro Sound Timeout"
 msgstr ""
 
-#: prewarning.py:234
+#: prewarning.py:235
 msgid ""
 "The timeout in seconds after the last announcement before the intro sound"
 " is played again before the next announcement."
 msgstr ""
 
-#: prewarning.py:244
+#: prewarning.py:245
 msgid "Intro Sound"
 msgstr ""
 
-#: prewarning.py:247
+#: prewarning.py:248
 msgid "The path to the sound file to use as the intro sound before announcements."
 msgstr ""
 
-#: prewarning.py:261
+#: prewarning.py:262
 msgid "Test Sound"
 msgstr ""
 
-#: prewarning.py:263
+#: prewarning.py:264
 msgid "The path to the sound file to use as the test sound."
 msgstr ""
 
-#: prewarning.py:270
+#: prewarning.py:271
 msgid "Add Pre-Warnings to Bottom"
 msgstr ""
 
-#: prewarning.py:273
+#: prewarning.py:274
 msgid ""
 "Set to True if new Pre-Warnings should be added to the bottom of the "
 "screen."
 msgstr ""
 
-#: prewarning.py:280
+#: prewarning.py:281
 msgid "Announce Last Leg"
 msgstr ""
 
-#: prewarning.py:283
+#: prewarning.py:284
 msgid ""
 "If disabled, pre-warnings for the last leg are suppressed (not displayed "
 "or announced)."
 msgstr ""
 
-#: prewarning.py:291
+#: prewarning.py:292
+msgid "Prevent Screen Sleep"
+msgstr ""
+
+#: prewarning.py:295
+msgid ""
+"Prevents the display from turning off and the screensaver from activating"
+" while the application is running."
+msgstr ""
+
+#: prewarning.py:303
 msgid "Deduplicate by Card + Control"
 msgstr ""
 
-#: prewarning.py:294
+#: prewarning.py:306
 msgid ""
 "Skip re-announcement when the same SI card punches the same control code "
 "again."
 msgstr ""
 
-#: prewarning.py:301
+#: prewarning.py:313
 msgid "Deduplicate by Bib + Leg"
 msgstr ""
 
-#: prewarning.py:304
+#: prewarning.py:316
 msgid ""
 "Skip re-announcement when the same team bib number appears on the same "
 "relay leg again."
 msgstr ""
 
-#: prewarning.py:311
+#: prewarning.py:323
 msgid "Dedup Timeout (seconds)"
 msgstr ""
 
-#: prewarning.py:313
+#: prewarning.py:325
 msgid "How long a dedup key remains active. 0 = forever (session)."
 msgstr ""
 
-#: prewarning.py:320
+#: prewarning.py:332
 msgid "Common"
 msgstr ""
 
-#: prewarning.py:337
+#: prewarning.py:350
 msgid "Deduplication"
 msgstr ""
 
-#: prewarning.py:348
+#: prewarning.py:361
 msgid "Data Sources"
 msgstr ""
 
-#: prewarning.py:439 prewarning.py:1093 utils/config_dialog.py:1148
+#: prewarning.py:452 prewarning.py:1111 utils/config_dialog.py:1148
 msgid "Settings"
 msgstr ""
 
-#: prewarning.py:442
+#: prewarning.py:455
 msgid "Opens the Settings Dialog"
 msgstr ""
 
-#: prewarning.py:446 utils/voice_manager_dialog.py:346
+#: prewarning.py:459 utils/voice_manager_dialog.py:346
 #: utils/voice_manager_dialog.py:748
 msgid "Voice Manager"
 msgstr ""
 
-#: prewarning.py:449
+#: prewarning.py:462
 msgid "Opens the Voice Manager dialog"
 msgstr ""
 
-#: prewarning.py:453 utils/help_dialog.py:23
+#: prewarning.py:466 utils/help_dialog.py:23
 msgid "Help"
 msgstr ""
 
-#: prewarning.py:456
+#: prewarning.py:469
 msgid "Opens the Help Dialog"
 msgstr ""
 
-#: prewarning.py:463 utils/about_dialog.py:16
+#: prewarning.py:476 utils/about_dialog.py:16
 msgid "About"
 msgstr ""
 
-#: prewarning.py:466
+#: prewarning.py:479
 msgid "Opens the About Dialog"
 msgstr ""
 
-#: prewarning.py:470
+#: prewarning.py:483
 msgid "Full Screen"
 msgstr ""
 
-#: prewarning.py:473
+#: prewarning.py:486
 msgid "Switches full screen on and off"
 msgstr ""
 
-#: prewarning.py:477
+#: prewarning.py:490
 msgid "Fake Punch"
 msgstr ""
 
-#: prewarning.py:480
+#: prewarning.py:493
 msgid "Simulates a pre-warning"
 msgstr ""
 
-#: prewarning.py:487
+#: prewarning.py:500
 msgid "Refresh Display"
 msgstr ""
 
-#: prewarning.py:490
+#: prewarning.py:503
 msgid "Refreshes the display"
 msgstr ""
 
-#: prewarning.py:497
+#: prewarning.py:510
 msgid "Clear Display"
 msgstr ""
 
-#: prewarning.py:500
+#: prewarning.py:513
 msgid "Clears the display from pre-warning entries"
 msgstr ""
 
-#: prewarning.py:504
+#: prewarning.py:517
 msgid "Play Testing Sound"
 msgstr ""
 
-#: prewarning.py:507
+#: prewarning.py:520
 msgid "Plays a test sound"
 msgstr ""
 
-#: prewarning.py:511
+#: prewarning.py:524
 msgid "Announce IP Address"
 msgstr ""
 
-#: prewarning.py:514
+#: prewarning.py:527
 msgid "Reads the IP (v4) address aloud section for section"
 msgstr ""
 
-#: prewarning.py:526
+#: prewarning.py:539
 msgid "Increase Font Size"
 msgstr ""
 
-#: prewarning.py:529
+#: prewarning.py:542
 msgid "Increases the font size"
 msgstr ""
 
-#: prewarning.py:536
+#: prewarning.py:549
 msgid "Decrease Font Size"
 msgstr ""
 
-#: prewarning.py:539
+#: prewarning.py:552
 msgid "Decreases the font size"
 msgstr ""
 
-#: prewarning.py:546
+#: prewarning.py:559
 msgid "Restore Font Size"
 msgstr ""
 
-#: prewarning.py:549
+#: prewarning.py:562
 msgid "Restores the font size to default"
 msgstr ""
 
-#: prewarning.py:556
+#: prewarning.py:569
 msgid "Exit"
 msgstr ""
 
-#: prewarning.py:559
+#: prewarning.py:572
 msgid "Exits the application"
 msgstr ""
 
-#: prewarning.py:725 prewarning.py:1056
+#: prewarning.py:743 prewarning.py:1074
 msgid "Pre-Warning"
 msgstr ""
 
-#: prewarning.py:736 prewarning.py:1275
+#: prewarning.py:754 prewarning.py:1299
 msgid "All systems OK"
 msgstr ""
 
-#: prewarning.py:776 prewarning.py:1058
+#: prewarning.py:794 prewarning.py:1076
 msgid "Time"
 msgstr ""
 
-#: prewarning.py:777 prewarning.py:1059
+#: prewarning.py:795 prewarning.py:1077
 msgid "Team"
 msgstr ""
 
-#: prewarning.py:778 prewarning.py:1060
+#: prewarning.py:796 prewarning.py:1078
 msgid "Leg"
 msgstr ""
 
-#: prewarning.py:1128
+#: prewarning.py:1146
 msgid "No punch source configured."
 msgstr ""
 
-#: prewarning.py:1136
+#: prewarning.py:1154
 msgid "Punch source is not running."
 msgstr ""
 
-#: prewarning.py:1148
+#: prewarning.py:1166
 msgid "No start list source configured."
 msgstr ""
 
-#: prewarning.py:1156
+#: prewarning.py:1174
 msgid "Start list source is not running."
 msgstr ""
 
-#: prewarning.py:1181
+#: prewarning.py:1199
 msgid "No voices installed."
 msgstr ""
 
-#: prewarning.py:1194
+#: prewarning.py:1212
 #, python-brace-format
 msgid "Incomplete voices: {names}"
 msgstr ""
 
-#: prewarning.py:1220
+#: prewarning.py:1238
 #, python-brace-format
 msgid "Bib number range ({min} - {max}) not fully covered by voice number ranges."
 msgstr ""
 
-#: prewarning.py:1239 prewarning.py:1249
+#: prewarning.py:1257 prewarning.py:1267
 msgid "Running"
 msgstr ""
 
-#: prewarning.py:1241 prewarning.py:1251
+#: prewarning.py:1259 prewarning.py:1269
 msgid "Stopped"
 msgstr ""
 
-#: prewarning.py:1243
+#: prewarning.py:1261
 msgid "Punch source"
 msgstr ""
 
-#: prewarning.py:1253
+#: prewarning.py:1271
 msgid "Start list source"
 msgstr ""
 
-#: prewarning.py:1259
+#: prewarning.py:1277
 msgid "Bib range"
 msgstr ""
 
-#: prewarning.py:1265
+#: prewarning.py:1283
 msgid "Installed voices"
 msgstr ""
 
-#: prewarning.py:1268
+#: prewarning.py:1286
 msgid "Punches received"
 msgstr ""
 
-#: prewarning.py:1269
+#: prewarning.py:1287
 msgid "Punches matched"
 msgstr ""
 
-#: prewarning.py:1270
+#: prewarning.py:1288
 msgid "Announcements"
+msgstr ""
+
+#: prewarning.py:1292 prewarning.py:1294
+msgid "Screen sleep"
+msgstr ""
+
+#: prewarning.py:1292
+msgid "Prevented"
+msgstr ""
+
+#: prewarning.py:1294
+msgid "Normal"
 msgstr ""
 
 #: punchsources/__init__.py:101
