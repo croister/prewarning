@@ -52,6 +52,7 @@ from utils.constants import (
     TESTING_FILENAME,
 )
 from utils.about_dialog import AboutDialog
+from utils.health import HealthAction, HealthIssue, HealthMonitor, HealthStatus
 from utils.help_dialog import HelpDialog
 from utils.hotkey_bindings import (
     HotKeyBindingDefinition,
@@ -594,6 +595,16 @@ class PreWarning(
 
         self.update_sources()
 
+        # Init the health monitor
+        self._health_tick_counter = 0
+        self._stats_punches_received = 0
+        self._stats_punches_matched = 0
+        self._stats_announcements = 0
+        self.health_monitor = HealthMonitor()
+        self.health_monitor.register_check(self._check_punch_source_health)
+        self.health_monitor.register_check(self._check_start_list_source_health)
+        self.health_monitor.register_check(self._check_voice_health)
+
         self.observer = Observer()
         self.observer.name = "LoggingConfFileObserverThread"
         self.observer.start()
@@ -684,12 +695,29 @@ class PreWarning(
         self.header_panel_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
         # Create the header label
-        self.header_label = wx.StaticText(
-            self.header_panel, label=_("Pre-Warning"), style=wx.ALIGN_CENTER
-        )
+        self.header_label = wx.StaticText(self.header_panel, label=_("Pre-Warning"))
         self.header_label.SetBackgroundColour(self.header_color)
 
-        self.header_panel_sizer.Add(self.header_label, proportion=1, flag=wx.EXPAND)
+        self.header_panel_sizer.Add(
+            self.header_label, proportion=0, flag=wx.ALIGN_CENTER_VERTICAL
+        )
+
+        # Create the health indicator
+        self.health_indicator = wx.StaticText(self.header_panel, label=" \u2b24 ")
+        self.health_indicator.SetBackgroundColour(self.header_color)
+        self.health_indicator.SetForegroundColour(wx.Colour(0, 180, 0))
+        self.health_indicator.SetToolTip(_("All systems OK"))
+        self.health_indicator.Bind(wx.EVT_LEFT_DOWN, self._on_health_indicator_click)
+        self.health_indicator.SetCursor(wx.Cursor(wx.CURSOR_HAND))
+
+        self.header_panel_sizer.Add(
+            self.health_indicator,
+            proportion=0,
+            flag=wx.ALIGN_CENTER_VERTICAL,
+        )
+
+        # Spacer to push clock to the right
+        self.header_panel_sizer.AddStretchSpacer()
 
         # Create the clock/time label
         self.time_label = wx.lib.stattext.GenStaticText(
@@ -757,6 +785,12 @@ class PreWarning(
     def _on_timer(self, evt: wx.TimerEvent):
         new_time = strftime("%H:%M:%S")
         self.time_label.SetLabel(new_time)
+
+        # Refresh health every 30 seconds (150 ticks * 200ms)
+        self._health_tick_counter += 1
+        if self._health_tick_counter >= 150:
+            self._health_tick_counter = 0
+            self._refresh_health()
 
     def _on_context_menu(self, event: wx.ContextMenuEvent):
         position = self.ScreenToClient(event.GetPosition())
@@ -907,6 +941,8 @@ class PreWarning(
         header_font = header_font.Bold()
         self.header_label.SetFont(header_font)
 
+        self.health_indicator.SetFont(header_font)
+
         self.time_label.SetFont(header_font)
 
         label_font = self.prewarning_grid.GetLabelFont()
@@ -1031,6 +1067,184 @@ class PreWarning(
                     _("Restart Required"),
                     wx.OK | wx.ICON_INFORMATION,
                 )
+        self._refresh_health()
+
+    # -- Health indicator --------------------------------------------------
+
+    def _check_punch_source_health(self) -> list[HealthIssue]:
+        issues: list[HealthIssue] = []
+        if self.punch_source is None:
+            issues.append(
+                HealthIssue(
+                    message=_("No punch source configured."),
+                    status=HealthStatus.ERROR,
+                    action=HealthAction.SETTINGS,
+                )
+            )
+        elif not self.punch_source.is_running():
+            issues.append(
+                HealthIssue(
+                    message=_("Punch source is not running."),
+                    status=HealthStatus.ERROR,
+                    action=HealthAction.SETTINGS,
+                )
+            )
+        return issues
+
+    def _check_start_list_source_health(self) -> list[HealthIssue]:
+        issues: list[HealthIssue] = []
+        if self.start_list_source is None:
+            issues.append(
+                HealthIssue(
+                    message=_("No start list source configured."),
+                    status=HealthStatus.ERROR,
+                    action=HealthAction.SETTINGS,
+                )
+            )
+        elif not self.start_list_source.is_running():
+            issues.append(
+                HealthIssue(
+                    message=_("Start list source is not running."),
+                    status=HealthStatus.ERROR,
+                    action=HealthAction.SETTINGS,
+                )
+            )
+        return issues
+
+    def _check_voice_health(self) -> list[HealthIssue]:
+        from utils.voice_manager_dialog import (
+            get_installed_voice_shortnames,
+            _list_installed_voices,
+            parse_extra_ranges,
+            CONFIG_OPTION_EXTRA_RANGES,
+            DEFAULT_RANGE_START,
+            DEFAULT_RANGE_END,
+            VOICEMANAGER_SECTION_NAME,
+        )
+
+        issues: list[HealthIssue] = []
+
+        # Check if any voices are installed
+        voices = get_installed_voice_shortnames()
+        if not voices:
+            issues.append(
+                HealthIssue(
+                    message=_("No voices installed."),
+                    status=HealthStatus.WARNING,
+                    action=HealthAction.VOICE_MANAGER,
+                )
+            )
+        else:
+            # Check if installed voices are complete
+            installed = _list_installed_voices()
+            incomplete = [iv for iv in installed if not iv.complete]
+            if incomplete:
+                names = ", ".join(iv.shortname for iv in incomplete)
+                issues.append(
+                    HealthIssue(
+                        message=_("Incomplete voices: {names}").format(names=names),
+                        status=HealthStatus.WARNING,
+                        action=HealthAction.VOICE_MANAGER,
+                    )
+                )
+
+        # Check bib range coverage
+        if self.start_list_source is not None:
+            bib_range = self.start_list_source.get_bib_range()
+            if bib_range is not None:
+                bib_min, bib_max = bib_range
+                vm_section = Config().get_section(VOICEMANAGER_SECTION_NAME)
+                ranges = [(DEFAULT_RANGE_START, DEFAULT_RANGE_END)]
+                extra = parse_extra_ranges(
+                    vm_section.get(CONFIG_OPTION_EXTRA_RANGES.name, "")
+                )
+                ranges.extend(extra)
+
+                uncovered: set[int] = set(range(bib_min, bib_max + 1))
+                for r_start, r_end in ranges:
+                    uncovered -= set(range(r_start, r_end + 1))
+
+                if uncovered:
+                    issues.append(
+                        HealthIssue(
+                            message=_(
+                                "Bib number range ({min} - {max}) not fully covered by voice number ranges."
+                            ).format(min=bib_min, max=bib_max),
+                            status=HealthStatus.WARNING,
+                            action=HealthAction.VOICE_MANAGER,
+                        )
+                    )
+
+        return issues
+
+    def _refresh_health(self) -> None:
+        """Re-evaluate health and update the indicator."""
+        status, issues = self.health_monitor.evaluate()
+
+        # Build stats section
+        stats_lines: list[str] = []
+
+        # Source info
+        ps_name = type(self.punch_source).display_name if self.punch_source else "-"
+        ps_status = (
+            _("Running")
+            if self.punch_source and self.punch_source.is_running()
+            else _("Stopped")
+        )
+        stats_lines.append(f"{_('Punch source')}: {ps_name} ({ps_status})")
+
+        sls_name = (
+            type(self.start_list_source).display_name if self.start_list_source else "-"
+        )
+        sls_status = (
+            _("Running")
+            if self.start_list_source and self.start_list_source.is_running()
+            else _("Stopped")
+        )
+        stats_lines.append(f"{_('Start list source')}: {sls_name} ({sls_status})")
+
+        # Bib range
+        if self.start_list_source is not None:
+            bib_range = self.start_list_source.get_bib_range()
+            if bib_range is not None:
+                stats_lines.append(f"{_('Bib range')}: {bib_range[0]} - {bib_range[1]}")
+
+        # Voices
+        from utils.voice_manager_dialog import get_installed_voice_shortnames
+
+        voice_count = len(get_installed_voice_shortnames())
+        stats_lines.append(f"{_('Installed voices')}: {voice_count}")
+
+        # Session stats
+        stats_lines.append(f"{_('Punches received')}: {self._stats_punches_received}")
+        stats_lines.append(f"{_('Punches matched')}: {self._stats_punches_matched}")
+        stats_lines.append(f"{_('Announcements')}: {self._stats_announcements}")
+
+        # Build tooltip
+        if status == HealthStatus.OK:
+            self.health_indicator.SetForegroundColour(wx.Colour(0, 180, 0))
+            tooltip = _("All systems OK") + "\n\n" + "\n".join(stats_lines)
+        elif status == HealthStatus.WARNING:
+            self.health_indicator.SetForegroundColour(wx.Colour(220, 160, 0))
+            issue_lines = "\n".join(f"\u2022 {i.message}" for i in issues)
+            tooltip = issue_lines + "\n\n" + "\n".join(stats_lines)
+        else:
+            self.health_indicator.SetForegroundColour(wx.Colour(220, 0, 0))
+            issue_lines = "\n".join(f"\u2022 {i.message}" for i in issues)
+            tooltip = issue_lines + "\n\n" + "\n".join(stats_lines)
+
+        self.health_indicator.SetToolTip(tooltip)
+        self.health_indicator.Refresh()
+
+    def _on_health_indicator_click(self, event: wx.MouseEvent) -> None:
+        """Open the relevant dialog based on current health issues."""
+        _, issues = self.health_monitor.evaluate()
+        action = self.health_monitor.get_primary_action(issues)
+        if action == HealthAction.VOICE_MANAGER:
+            self._open_voice_manager()
+        elif action == HealthAction.SETTINGS:
+            self._config_dialog()
+        # If no action or OK, do nothing
 
     def _toggle_full_screen(self):
         self.logger.debug("Toggle Full Screen")
@@ -1071,6 +1285,7 @@ class PreWarning(
         dlg = VoiceManagerDialog(self, bib_range=bib_range)
         dlg.ShowModal()
         dlg.Destroy()
+        self._refresh_health()
 
     def _notify_ip(self):
         self.logger.debug("Notify IP")
@@ -1133,6 +1348,7 @@ class PreWarning(
         )
         if start_not_running and self.start_list_source is not None:
             self.start_list_source.start()
+        self._refresh_health()
 
     def update_sources(self):
         if self.punch_source_name not in PUNCH_SOURCES:
@@ -1246,6 +1462,7 @@ class PreWarning(
             self.punch_source.start()
         if self.start_list_source is not None:
             self.start_list_source.start()
+        wx.CallLater(1000, self._refresh_health)
 
     def punch_received(self, punch: Dict[str, str]):
         self.logger.debug("punch_received: %s", punch)
@@ -1276,6 +1493,7 @@ class PreWarning(
     def _process_punches(self):
         while True:
             punch = self.punch_queue.get()
+            self._stats_punches_received += 1
             self.logger.debug(
                 "Processing: %s from: %s",
                 punch[PUNCH_KEY_CARD_NUMBER],
@@ -1312,9 +1530,10 @@ class PreWarning(
             )
 
             if has_all_fields:
-                pass  # All data already present, skip lookup
+                self._stats_punches_matched += 1
             elif PUNCH_KEY_BIB_NUMBER in punch:
                 # Partial data - enrich via lookup
+                self._stats_punches_matched += 1
                 pre_warn_data = source.lookup_from_card_number(
                     punch[PUNCH_KEY_CARD_NUMBER]
                 )
@@ -1336,6 +1555,7 @@ class PreWarning(
                     )
                     continue
                 else:
+                    self._stats_punches_matched += 1
                     punch.update(pre_warn_data)
 
             if not self._announce_last_leg and punch.get(PUNCH_KEY_IS_LAST_LEG):
@@ -1357,6 +1577,7 @@ class PreWarning(
 
             country = punch.get(PUNCH_KEY_COUNTRY)
             voice = self.sound.resolve_voice(country)
+            self._stats_announcements += 1
             self.announcement_queue.put(
                 {_ANNOUNCE_KEY_VOICE: voice, _ANNOUNCE_KEY_SOUND: bib_number}
             )

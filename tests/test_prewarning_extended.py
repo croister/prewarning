@@ -150,6 +150,7 @@ class TestOnTimer:
 
         pw = MagicMock()
         pw.time_label = MagicMock()
+        pw._health_tick_counter = 0
         PreWarning._on_timer(pw, None)
         pw.time_label.SetLabel.assert_called_once_with(strftime("%H:%M:%S"))
 
