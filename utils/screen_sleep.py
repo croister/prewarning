@@ -68,7 +68,7 @@ class ScreenSleepInhibitor:
         ES_DISPLAY_REQUIRED = 0x00000002
         ES_SYSTEM_REQUIRED = 0x00000001
 
-        ctypes.windll.kernel32.SetThreadExecutionState(
+        ctypes.windll.kernel32.SetThreadExecutionState(  # type: ignore[attr-defined]
             ES_CONTINUOUS | ES_DISPLAY_REQUIRED | ES_SYSTEM_REQUIRED
         )
 
@@ -76,7 +76,7 @@ class ScreenSleepInhibitor:
         import ctypes
 
         ES_CONTINUOUS = 0x80000000
-        ctypes.windll.kernel32.SetThreadExecutionState(ES_CONTINUOUS)
+        ctypes.windll.kernel32.SetThreadExecutionState(ES_CONTINUOUS)  # type: ignore[attr-defined]
 
     # -- macOS -----------------------------------------------------------------
 
