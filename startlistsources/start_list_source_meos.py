@@ -82,3 +82,9 @@ class StartListSourceMeos(_StartListSourceBase):
             self.logger.debug("NOT started, ignoring request!")
             return None
         return MeosInfoServer().lookup_card(card_number)
+
+    def get_bib_range(self) -> tuple[int, int] | None:
+        """Returns the range of bib numbers from MeOS."""
+        if not self._running:
+            return None
+        return MeosInfoServer().get_bib_range()

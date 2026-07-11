@@ -1065,7 +1065,10 @@ class PreWarning(
 
     def _open_voice_manager(self):
         self.logger.debug("Open Voice Manager")
-        dlg = VoiceManagerDialog(self)
+        bib_range = None
+        if self.start_list_source is not None:
+            bib_range = self.start_list_source.get_bib_range()
+        dlg = VoiceManagerDialog(self, bib_range=bib_range)
         dlg.ShowModal()
         dlg.Destroy()
 

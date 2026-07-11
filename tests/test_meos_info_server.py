@@ -444,3 +444,24 @@ class TestStartListSourceMeos:
 
         result = source.lookup_from_card_number("506576")
         assert result is None
+
+
+class TestMeosInfoServerGetBibRange:
+    def test_returns_none_when_no_teams(self, server):
+        assert server.get_bib_range() is None
+
+    def test_returns_range_with_teams(self, server):
+        server._team_bib = {1: "10", 2: "50", 3: "200"}
+        assert server.get_bib_range() == (10, 200)
+
+    def test_returns_range_with_single_team(self, server):
+        server._team_bib = {1: "42"}
+        assert server.get_bib_range() == (42, 42)
+
+    def test_skips_non_numeric_bibs(self, server):
+        server._team_bib = {1: "10", 2: "abc", 3: "200"}
+        assert server.get_bib_range() == (10, 200)
+
+    def test_returns_none_when_all_bibs_non_numeric(self, server):
+        server._team_bib = {1: "abc", 2: "def"}
+        assert server.get_bib_range() is None

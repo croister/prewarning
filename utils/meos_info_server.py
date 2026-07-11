@@ -866,6 +866,20 @@ class MeosInfoServer(
             self.logger.error("lookup_card error: %s", e)
         return None
 
+    def get_bib_range(self) -> tuple[int, int] | None:
+        """Returns the min and max bib numbers from the cached team data."""
+        if not self._team_bib:
+            return None
+        bibs: list[int] = []
+        for bib_str in self._team_bib.values():
+            try:
+                bibs.append(int(bib_str))
+            except ValueError, TypeError:
+                continue
+        if not bibs:
+            return None
+        return (min(bibs), max(bibs))
+
     # -- StateSaverMixin -------------------------------------------------------
 
     def register_tracking_listener(self, callback):

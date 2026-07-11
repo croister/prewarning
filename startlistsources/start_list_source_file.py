@@ -608,3 +608,13 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
             else:
                 self.logger.warning("Not found: %s", card_number)
                 return None
+
+    def get_bib_range(self) -> tuple[int, int] | None:
+        """Returns the range of bib numbers in the start list."""
+        with self._data_lock:
+            if not self.team_names:
+                return None
+            bibs = [b for b in self.team_names.keys() if isinstance(b, int)]
+            if not bibs:
+                return None
+            return (min(bibs), max(bibs))

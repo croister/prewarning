@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PreWarning 2.3.0\n"
 "Report-Msgid-Bugs-To: croister@croister.se\n"
-"POT-Creation-Date: 2026-07-10 23:52+0200\n"
+"POT-Creation-Date: 2026-07-11 01:53+0200\n"
 "PO-Revision-Date: 2026-06-30 20:16+0200\n"
 "Last-Translator: Christian Lindblom <croister@croister.se>\n"
 "Language: sv\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: prewarning.py:157 utils/voice_manager_dialog.py:86
+#: prewarning.py:157 utils/voice_manager_dialog.py:87
 msgid "Language"
 msgstr "Språk"
 
@@ -171,8 +171,8 @@ msgstr "Inställningar"
 msgid "Opens the Settings Dialog"
 msgstr "Öppnar inställningsdialogen"
 
-#: prewarning.py:418 utils/voice_manager_dialog.py:345
-#: utils/voice_manager_dialog.py:743
+#: prewarning.py:418 utils/voice_manager_dialog.py:346
+#: utils/voice_manager_dialog.py:748
 msgid "Voice Manager"
 msgstr "Rösthanterare"
 
@@ -890,55 +890,55 @@ msgstr "Aktiverar eller inaktiverar uppspelning av ljud."
 msgid "Sound"
 msgstr "Ljud"
 
-#: utils/voice_manager_dialog.py:85
+#: utils/voice_manager_dialog.py:86
 msgid "Short Name"
 msgstr "Kortnamn"
 
-#: utils/voice_manager_dialog.py:87
+#: utils/voice_manager_dialog.py:88
 msgid "Gender"
 msgstr "Kön"
 
-#: utils/voice_manager_dialog.py:88
+#: utils/voice_manager_dialog.py:89
 msgid "Status"
 msgstr "Status"
 
-#: utils/voice_manager_dialog.py:89
+#: utils/voice_manager_dialog.py:90
 msgid "Default"
 msgstr "Standardröst"
 
-#: utils/voice_manager_dialog.py:90
+#: utils/voice_manager_dialog.py:91
 msgid "Fallback"
 msgstr "Reservröst"
 
-#: utils/voice_manager_dialog.py:121
+#: utils/voice_manager_dialog.py:122
 msgid "Select Default Country"
 msgstr "Välj standardland"
 
-#: utils/voice_manager_dialog.py:122
+#: utils/voice_manager_dialog.py:123
 msgid "Select a country:"
 msgstr "Välj ett land:"
 
-#: utils/voice_manager_dialog.py:123
+#: utils/voice_manager_dialog.py:124
 msgid "Select a country code."
 msgstr "Välj en landskod."
 
-#: utils/voice_manager_dialog.py:124
+#: utils/voice_manager_dialog.py:125
 msgid "The selected country code is not a valid IOC code."
 msgstr "Den valda landskoden är inte en giltlig IOK landskod."
 
-#: utils/voice_manager_dialog.py:125
+#: utils/voice_manager_dialog.py:126
 msgid "The default voice is not installed."
 msgstr "Standardrösten är inte installerad."
 
-#: utils/voice_manager_dialog.py:126
+#: utils/voice_manager_dialog.py:127
 msgid "The fallback voice is not installed."
 msgstr "Reservrösten är inte installerad."
 
-#: utils/voice_manager_dialog.py:127
+#: utils/voice_manager_dialog.py:128
 msgid "The extra ranges format is invalid."
 msgstr "Formatet på det extra nummerintervallet är ogiltigt."
 
-#: utils/voice_manager_dialog.py:129
+#: utils/voice_manager_dialog.py:130
 msgid ""
 "Invalid extra ranges format. Expected comma-separated ranges like "
 "'1000-1999, 2000-2999'."
@@ -946,107 +946,107 @@ msgstr ""
 "Ogiltigt format för extra nummerintervall. Ange kommaseparerade "
 "intervall, exempelvis '1000-1999, 2000-2999'."
 
-#: utils/voice_manager_dialog.py:132
+#: utils/voice_manager_dialog.py:133
 #, python-brace-format
 msgid "Extra ranges must not overlap with the default range ({start}-{end})."
 msgstr ""
 "Extra nummerintervall får inte överlappa med standardintervallet "
 "({start}-{end})."
 
-#: utils/voice_manager_dialog.py:134
+#: utils/voice_manager_dialog.py:135
 msgid "Start of a range must not be greater than its end."
 msgstr "Början på nummerintervallet får inte vara högre än slutet."
 
-#: utils/voice_manager_dialog.py:240
+#: utils/voice_manager_dialog.py:241
 msgid "Play sample"
 msgstr "Spela exempel"
 
-#: utils/voice_manager_dialog.py:242
+#: utils/voice_manager_dialog.py:243
 msgid "Refresh from edge-tts"
 msgstr "Laddar om röster från edge-tts"
 
-#: utils/voice_manager_dialog.py:244 utils/voice_manager_dialog.py:249
+#: utils/voice_manager_dialog.py:245 utils/voice_manager_dialog.py:250
 msgid "All"
 msgstr "Alla"
 
-#: utils/voice_manager_dialog.py:250
+#: utils/voice_manager_dialog.py:251
 msgid "Male"
 msgstr "Manlig"
 
-#: utils/voice_manager_dialog.py:251
+#: utils/voice_manager_dialog.py:252
 msgid "Female"
 msgstr "Kvinnlig"
 
-#: utils/voice_manager_dialog.py:254
+#: utils/voice_manager_dialog.py:255
 msgid "Current default voice"
 msgstr "Nuvarande standardröst"
 
-#: utils/voice_manager_dialog.py:255
+#: utils/voice_manager_dialog.py:256
 msgid "Set as Default"
 msgstr "Gör till standardröst"
 
-#: utils/voice_manager_dialog.py:256
+#: utils/voice_manager_dialog.py:257
 msgid "Current fallback voice"
 msgstr "Nuvarande reservröst"
 
-#: utils/voice_manager_dialog.py:257
+#: utils/voice_manager_dialog.py:258
 msgid "Set as Fallback"
 msgstr "Gör till reservröst"
 
-#: utils/voice_manager_dialog.py:306
+#: utils/voice_manager_dialog.py:307
 msgid "Default Country"
 msgstr "Standardland"
 
-#: utils/voice_manager_dialog.py:308
+#: utils/voice_manager_dialog.py:309
 msgid "IOC 3-letter code for the home nation."
 msgstr "IOK 3-bokstavskod för hemlandet."
 
-#: utils/voice_manager_dialog.py:315
+#: utils/voice_manager_dialog.py:316
 msgid "Default Voice"
 msgstr "Standardröst"
 
-#: utils/voice_manager_dialog.py:317
+#: utils/voice_manager_dialog.py:318
 msgid "ShortName of the voice for home-country runners."
 msgstr "Kortnamn för rösten som används för hemmalandets löpare."
 
-#: utils/voice_manager_dialog.py:324
+#: utils/voice_manager_dialog.py:325
 msgid "Fallback Voice"
 msgstr "Reservröst"
 
-#: utils/voice_manager_dialog.py:326
+#: utils/voice_manager_dialog.py:327
 msgid "ShortName of the voice for foreign runners."
 msgstr "Kortnamn för rösten som används för utländska löpare."
 
-#: utils/voice_manager_dialog.py:333
+#: utils/voice_manager_dialog.py:334
 msgid "Extra Ranges"
 msgstr "Extra intervall"
 
-#: utils/voice_manager_dialog.py:336
+#: utils/voice_manager_dialog.py:337
 #, python-brace-format
 msgid "Comma-separated list of extra number ranges (e.g. {default_extra_range})."
 msgstr ""
 "Kommaseparerad lista med extra nummerintervall (t.ex. "
 "{default_extra_range})."
 
-#: utils/voice_manager_dialog.py:458
+#: utils/voice_manager_dialog.py:459
 msgid "Voice directory not found"
 msgstr "Mappen med röster hittades inte"
 
-#: utils/voice_manager_dialog.py:462
+#: utils/voice_manager_dialog.py:463
 msgid "Could not read voice directory"
 msgstr "Kunde inte läsa mappen med röster"
 
-#: utils/voice_manager_dialog.py:478
+#: utils/voice_manager_dialog.py:479
 #, python-brace-format
 msgid "Complete: {present} files present"
 msgstr "Komplett: {present} filer på plats"
 
-#: utils/voice_manager_dialog.py:481
+#: utils/voice_manager_dialog.py:482
 #, python-brace-format
 msgid "Incomplete: {present}/{expected} files present, missing {missing_files}"
 msgstr "Ofullständig: {present}/{expected} filer på plats, saknar {missing_files}"
 
-#: utils/voice_manager_dialog.py:488
+#: utils/voice_manager_dialog.py:489
 #, python-brace-format
 msgid ""
 "Incomplete: {present}/{expected} files present, missing {missing_count} "
@@ -1055,87 +1055,108 @@ msgstr ""
 "Ofullständig: {present}/{expected} filer på plats, saknar {missing_count}"
 " filer (t.ex. {examples}...)"
 
-#: utils/voice_manager_dialog.py:526
+#: utils/voice_manager_dialog.py:527
 msgid "Unknown"
 msgstr "Okänt"
 
-#: utils/voice_manager_dialog.py:816
+#: utils/voice_manager_dialog.py:831
 msgid "Number Ranges to Generate"
 msgstr "Nummerintervall att generera"
 
-#: utils/voice_manager_dialog.py:823
+#: utils/voice_manager_dialog.py:841 utils/voice_manager_dialog.py:950
 msgid "Add Range"
 msgstr "Lägg till intervall"
 
-#: utils/voice_manager_dialog.py:845
+#: utils/voice_manager_dialog.py:863
 msgid "(always generated)"
 msgstr "(genereras alltid)"
 
-#: utils/voice_manager_dialog.py:879 utils/voice_manager_dialog.py:1168
+#: utils/voice_manager_dialog.py:897 utils/voice_manager_dialog.py:1362
 msgid "Remove"
 msgstr "Ta bort"
 
-#: utils/voice_manager_dialog.py:936
+#: utils/voice_manager_dialog.py:937
+#, python-brace-format
+msgid "Start list bibs: {min} - {max}"
+msgstr "Nummerlappsserie: {min} - {max}"
+
+#: utils/voice_manager_dialog.py:988 utils/voice_manager_dialog.py:1001
+msgid "Covered by:"
+msgstr "Täcks av:"
+
+#: utils/voice_manager_dialog.py:994
+msgid "Not covered:"
+msgstr "Täcks inte:"
+
+#: utils/voice_manager_dialog.py:1006
+msgid "Covered"
+msgstr "Täcks"
+
+#: utils/voice_manager_dialog.py:1011
+msgid "Not fully covered"
+msgstr "Täcks inte helt"
+
+#: utils/voice_manager_dialog.py:1130
 msgid "start"
 msgstr "start"
 
-#: utils/voice_manager_dialog.py:938
+#: utils/voice_manager_dialog.py:1132
 msgid "must be >= 0 and less than or equal to end"
 msgstr "måste vara >= 0 och mindre än eller lika med slutet"
 
-#: utils/voice_manager_dialog.py:961 utils/voice_manager_dialog.py:966
+#: utils/voice_manager_dialog.py:1155 utils/voice_manager_dialog.py:1160
 msgid "extra range"
 msgstr "extra nummerintervall"
 
-#: utils/voice_manager_dialog.py:969 utils/voice_manager_dialog.py:972
+#: utils/voice_manager_dialog.py:1163 utils/voice_manager_dialog.py:1166
 msgid "overlaps with"
 msgstr "överlappar med"
 
-#: utils/voice_manager_dialog.py:1030
+#: utils/voice_manager_dialog.py:1224
 msgid "Language:"
 msgstr "Språk:"
 
-#: utils/voice_manager_dialog.py:1044
+#: utils/voice_manager_dialog.py:1238
 msgid "Gender:"
 msgstr "Kön:"
 
-#: utils/voice_manager_dialog.py:1080
+#: utils/voice_manager_dialog.py:1274
 msgid "Discovered Voices"
 msgstr "Upptäckta röster"
 
-#: utils/voice_manager_dialog.py:1108
+#: utils/voice_manager_dialog.py:1302
 msgid "No voices match the current filters."
 msgstr "Inga röster matchar de aktuella filtren."
 
-#: utils/voice_manager_dialog.py:1119
+#: utils/voice_manager_dialog.py:1313
 msgid "Install Selected"
 msgstr "Installera vald"
 
-#: utils/voice_manager_dialog.py:1128
+#: utils/voice_manager_dialog.py:1322
 msgid "Installed Voices"
 msgstr "Installerade röster"
 
-#: utils/voice_manager_dialog.py:1164
+#: utils/voice_manager_dialog.py:1358
 msgid "Repair"
 msgstr "Reparera"
 
-#: utils/voice_manager_dialog.py:1216
+#: utils/voice_manager_dialog.py:1410
 msgid "Close"
 msgstr "Stäng"
 
-#: utils/voice_manager_dialog.py:1224 utils/voice_manager_dialog.py:1271
+#: utils/voice_manager_dialog.py:1418 utils/voice_manager_dialog.py:1465
 msgid "Loading voices from edge-tts..."
 msgstr "Laddar röster från edge-tts..."
 
-#: utils/voice_manager_dialog.py:1264
+#: utils/voice_manager_dialog.py:1458
 msgid "Could not fetch voices from edge-tts. Check your internet connection."
 msgstr "Kunde inte hämta röster från edge-tts. Kontrollera din internetanslutning."
 
-#: utils/voice_manager_dialog.py:1265
+#: utils/voice_manager_dialog.py:1459
 msgid "Error"
 msgstr "Fel"
 
-#: utils/voice_manager_dialog.py:1739
+#: utils/voice_manager_dialog.py:1933
 msgid ""
 "Cannot remove the current default or fallback voice. Set a different "
 "voice as default/fallback first."
@@ -1143,54 +1164,54 @@ msgstr ""
 "Kan inte ta bort den nuvarande standard- eller reservrösten. Välj en "
 "annan röst som standard/reserv först."
 
-#: utils/voice_manager_dialog.py:1742
+#: utils/voice_manager_dialog.py:1936
 msgid "Remove Disabled"
 msgstr "Borttagning inaktiverad"
 
-#: utils/voice_manager_dialog.py:1748
+#: utils/voice_manager_dialog.py:1942
 msgid "An install or repair is currently in progress."
 msgstr "En installation eller reparation pågår."
 
-#: utils/voice_manager_dialog.py:1750
+#: utils/voice_manager_dialog.py:1944
 #, python-brace-format
 msgid "Removing voice '{shortname}' will cancel the operation."
 msgstr "Borttagning av rösten '{shortname}' kommer avbryta operationen."
 
-#: utils/voice_manager_dialog.py:1754
+#: utils/voice_manager_dialog.py:1948
 msgid "Continue?"
 msgstr "Fortsätt?"
 
-#: utils/voice_manager_dialog.py:1755
+#: utils/voice_manager_dialog.py:1949
 msgid "Cancel Operation"
 msgstr "Avbryt operation"
 
-#: utils/voice_manager_dialog.py:1765
+#: utils/voice_manager_dialog.py:1959
 #, python-brace-format
 msgid "Remove voice '{shortname}'?"
 msgstr "Ta bort rösten '{shortname}'?"
 
-#: utils/voice_manager_dialog.py:1767
+#: utils/voice_manager_dialog.py:1961
 #, python-brace-format
 msgid "All files under sounds/{shortname}/ will be deleted."
 msgstr "Alla filer under sounds/{shortname}/ kommer att raderas."
 
-#: utils/voice_manager_dialog.py:1770
+#: utils/voice_manager_dialog.py:1964
 msgid "Confirm Remove"
 msgstr "Bekräfta borttagning"
 
-#: utils/voice_manager_dialog.py:1828
+#: utils/voice_manager_dialog.py:2022
 msgid "Repairing"
 msgstr "Reparerar"
 
-#: utils/voice_manager_dialog.py:1828
+#: utils/voice_manager_dialog.py:2022
 msgid "Installing"
 msgstr "Installerar"
 
-#: utils/voice_manager_dialog.py:1837
+#: utils/voice_manager_dialog.py:2031
 msgid "Finished"
 msgstr "Klara"
 
-#: utils/voice_manager_dialog.py:1864
+#: utils/voice_manager_dialog.py:2058
 msgid ""
 "An install or repair is currently in progress. Closing will cancel the "
 "operation."
@@ -1198,7 +1219,7 @@ msgstr ""
 "En installation eller reparation pågår. Stängning kommer avbryta "
 "operationen."
 
-#: utils/voice_manager_dialog.py:1871
+#: utils/voice_manager_dialog.py:2065
 msgid ""
 "One or more extra ranges have invalid values. These ranges will be "
 "discarded when closing."
@@ -1206,7 +1227,7 @@ msgstr ""
 "Ett eller flera extra intervall har ogiltiga värden. Dessa intervall "
 "kommer att tas bort vid stängning."
 
-#: utils/voice_manager_dialog.py:1878
+#: utils/voice_manager_dialog.py:2072
 msgid ""
 "One or more extra ranges overlap with another range. These ranges will "
 "still be saved, but may generate files that already exist."
@@ -1214,7 +1235,7 @@ msgstr ""
 "Ett eller flera extra intervall överlappar med ett annat intervall. Dessa"
 " intervall sparas ändå, men kan generera filer som redan finns."
 
-#: utils/voice_manager_dialog.py:1887
+#: utils/voice_manager_dialog.py:2081
 #, python-brace-format
 msgid ""
 "The following installed voices are incomplete: {names}. They will not "
@@ -1227,15 +1248,26 @@ msgstr ""
 "till standardljudet vid uppläsning. Använd Reparera för att generera de "
 "saknade filerna."
 
-#: utils/voice_manager_dialog.py:1896
+#: utils/voice_manager_dialog.py:2091
+#, python-brace-format
+msgid ""
+"The start list bib number range ({min} - {max}) is not fully covered by "
+"the configured number ranges. Some bib numbers will not have voice files "
+"and will fall back to the default ding sound when announced."
+msgstr ""
+"Startlistans nummerlappsserie ({min} - {max}) täcks inte helt av de "
+"konfigurerade nummerintervallen. Vissa nummerlappsnummer kommer inte att "
+"ha röstfiler och faller tillbaka till standardljudet vid uppläsning."
+
+#: utils/voice_manager_dialog.py:2100
 msgid "There are issues that may affect voice playback."
 msgstr "Det finns problem som kan påverka röstuppspelning."
 
-#: utils/voice_manager_dialog.py:1900
+#: utils/voice_manager_dialog.py:2104
 msgid "Close anyway?"
 msgstr "Stäng ändå?"
 
-#: utils/voice_manager_dialog.py:1904
+#: utils/voice_manager_dialog.py:2108
 msgid "Confirm Close"
 msgstr "Bekräfta stängning"
 

@@ -203,3 +203,31 @@ class TestVerifyStartListFile:
             )
             assert result.status is False
             assert "bad file" in result.message
+
+
+class TestGetBibRange:
+    @pytest.fixture
+    def source(self, wx_app):
+        with patch("watchdog.observers.Observer") as mock_obs:
+            mock_obs.return_value.is_alive.return_value = False
+            mock_obs.return_value.name = "MockedObserver"
+            with patch.object(
+                __import__("utils.config", fromlist=["Config"]).Config,
+                "register_config_section_listener",
+            ):
+                from startlistsources.start_list_source_file import (
+                    StartListSourceFile,
+                )
+
+                return StartListSourceFile()
+
+    def test_returns_none_when_no_data(self, source):
+        assert source.get_bib_range() is None
+
+    def test_returns_range_with_single_team(self, source):
+        source.team_names = {101: "Team Alpha"}
+        assert source.get_bib_range() == (101, 101)
+
+    def test_returns_range_with_multiple_teams(self, source):
+        source.team_names = {50: "Team A", 101: "Team B", 200: "Team C"}
+        assert source.get_bib_range() == (50, 200)

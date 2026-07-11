@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-07-10 23:52+0200\n"
+"POT-Creation-Date: 2026-07-11 01:53+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: prewarning.py:157 utils/voice_manager_dialog.py:86
+#: prewarning.py:157 utils/voice_manager_dialog.py:87
 msgid "Language"
 msgstr ""
 
@@ -151,8 +151,8 @@ msgstr ""
 msgid "Opens the Settings Dialog"
 msgstr ""
 
-#: prewarning.py:418 utils/voice_manager_dialog.py:345
-#: utils/voice_manager_dialog.py:743
+#: prewarning.py:418 utils/voice_manager_dialog.py:346
+#: utils/voice_manager_dialog.py:748
 msgid "Voice Manager"
 msgstr ""
 
@@ -784,315 +784,336 @@ msgstr ""
 msgid "Sound"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:85
+#: utils/voice_manager_dialog.py:86
 msgid "Short Name"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:87
+#: utils/voice_manager_dialog.py:88
 msgid "Gender"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:88
+#: utils/voice_manager_dialog.py:89
 msgid "Status"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:89
+#: utils/voice_manager_dialog.py:90
 msgid "Default"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:90
+#: utils/voice_manager_dialog.py:91
 msgid "Fallback"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:121
+#: utils/voice_manager_dialog.py:122
 msgid "Select Default Country"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:122
+#: utils/voice_manager_dialog.py:123
 msgid "Select a country:"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:123
+#: utils/voice_manager_dialog.py:124
 msgid "Select a country code."
 msgstr ""
 
-#: utils/voice_manager_dialog.py:124
+#: utils/voice_manager_dialog.py:125
 msgid "The selected country code is not a valid IOC code."
 msgstr ""
 
-#: utils/voice_manager_dialog.py:125
+#: utils/voice_manager_dialog.py:126
 msgid "The default voice is not installed."
 msgstr ""
 
-#: utils/voice_manager_dialog.py:126
+#: utils/voice_manager_dialog.py:127
 msgid "The fallback voice is not installed."
 msgstr ""
 
-#: utils/voice_manager_dialog.py:127
+#: utils/voice_manager_dialog.py:128
 msgid "The extra ranges format is invalid."
 msgstr ""
 
-#: utils/voice_manager_dialog.py:129
+#: utils/voice_manager_dialog.py:130
 msgid ""
 "Invalid extra ranges format. Expected comma-separated ranges like "
 "'1000-1999, 2000-2999'."
 msgstr ""
 
-#: utils/voice_manager_dialog.py:132
+#: utils/voice_manager_dialog.py:133
 #, python-brace-format
 msgid "Extra ranges must not overlap with the default range ({start}-{end})."
 msgstr ""
 
-#: utils/voice_manager_dialog.py:134
+#: utils/voice_manager_dialog.py:135
 msgid "Start of a range must not be greater than its end."
 msgstr ""
 
-#: utils/voice_manager_dialog.py:240
+#: utils/voice_manager_dialog.py:241
 msgid "Play sample"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:242
+#: utils/voice_manager_dialog.py:243
 msgid "Refresh from edge-tts"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:244 utils/voice_manager_dialog.py:249
+#: utils/voice_manager_dialog.py:245 utils/voice_manager_dialog.py:250
 msgid "All"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:250
+#: utils/voice_manager_dialog.py:251
 msgid "Male"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:251
+#: utils/voice_manager_dialog.py:252
 msgid "Female"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:254
+#: utils/voice_manager_dialog.py:255
 msgid "Current default voice"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:255
+#: utils/voice_manager_dialog.py:256
 msgid "Set as Default"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:256
+#: utils/voice_manager_dialog.py:257
 msgid "Current fallback voice"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:257
+#: utils/voice_manager_dialog.py:258
 msgid "Set as Fallback"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:306
+#: utils/voice_manager_dialog.py:307
 msgid "Default Country"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:308
+#: utils/voice_manager_dialog.py:309
 msgid "IOC 3-letter code for the home nation."
 msgstr ""
 
-#: utils/voice_manager_dialog.py:315
+#: utils/voice_manager_dialog.py:316
 msgid "Default Voice"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:317
+#: utils/voice_manager_dialog.py:318
 msgid "ShortName of the voice for home-country runners."
 msgstr ""
 
-#: utils/voice_manager_dialog.py:324
+#: utils/voice_manager_dialog.py:325
 msgid "Fallback Voice"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:326
+#: utils/voice_manager_dialog.py:327
 msgid "ShortName of the voice for foreign runners."
 msgstr ""
 
-#: utils/voice_manager_dialog.py:333
+#: utils/voice_manager_dialog.py:334
 msgid "Extra Ranges"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:336
+#: utils/voice_manager_dialog.py:337
 #, python-brace-format
 msgid "Comma-separated list of extra number ranges (e.g. {default_extra_range})."
 msgstr ""
 
-#: utils/voice_manager_dialog.py:458
+#: utils/voice_manager_dialog.py:459
 msgid "Voice directory not found"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:462
+#: utils/voice_manager_dialog.py:463
 msgid "Could not read voice directory"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:478
+#: utils/voice_manager_dialog.py:479
 #, python-brace-format
 msgid "Complete: {present} files present"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:481
+#: utils/voice_manager_dialog.py:482
 #, python-brace-format
 msgid "Incomplete: {present}/{expected} files present, missing {missing_files}"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:488
+#: utils/voice_manager_dialog.py:489
 #, python-brace-format
 msgid ""
 "Incomplete: {present}/{expected} files present, missing {missing_count} "
 "files (e.g. {examples}...)"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:526
+#: utils/voice_manager_dialog.py:527
 msgid "Unknown"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:816
+#: utils/voice_manager_dialog.py:831
 msgid "Number Ranges to Generate"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:823
+#: utils/voice_manager_dialog.py:841 utils/voice_manager_dialog.py:950
 msgid "Add Range"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:845
+#: utils/voice_manager_dialog.py:863
 msgid "(always generated)"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:879 utils/voice_manager_dialog.py:1168
+#: utils/voice_manager_dialog.py:897 utils/voice_manager_dialog.py:1362
 msgid "Remove"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:936
+#: utils/voice_manager_dialog.py:937
+#, python-brace-format
+msgid "Start list bibs: {min} - {max}"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:988 utils/voice_manager_dialog.py:1001
+msgid "Covered by:"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:994
+msgid "Not covered:"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:1006
+msgid "Covered"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:1011
+msgid "Not fully covered"
+msgstr ""
+
+#: utils/voice_manager_dialog.py:1130
 msgid "start"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:938
+#: utils/voice_manager_dialog.py:1132
 msgid "must be >= 0 and less than or equal to end"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:961 utils/voice_manager_dialog.py:966
+#: utils/voice_manager_dialog.py:1155 utils/voice_manager_dialog.py:1160
 msgid "extra range"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:969 utils/voice_manager_dialog.py:972
+#: utils/voice_manager_dialog.py:1163 utils/voice_manager_dialog.py:1166
 msgid "overlaps with"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1030
+#: utils/voice_manager_dialog.py:1224
 msgid "Language:"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1044
+#: utils/voice_manager_dialog.py:1238
 msgid "Gender:"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1080
+#: utils/voice_manager_dialog.py:1274
 msgid "Discovered Voices"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1108
+#: utils/voice_manager_dialog.py:1302
 msgid "No voices match the current filters."
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1119
+#: utils/voice_manager_dialog.py:1313
 msgid "Install Selected"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1128
+#: utils/voice_manager_dialog.py:1322
 msgid "Installed Voices"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1164
+#: utils/voice_manager_dialog.py:1358
 msgid "Repair"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1216
+#: utils/voice_manager_dialog.py:1410
 msgid "Close"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1224 utils/voice_manager_dialog.py:1271
+#: utils/voice_manager_dialog.py:1418 utils/voice_manager_dialog.py:1465
 msgid "Loading voices from edge-tts..."
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1264
+#: utils/voice_manager_dialog.py:1458
 msgid "Could not fetch voices from edge-tts. Check your internet connection."
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1265
+#: utils/voice_manager_dialog.py:1459
 msgid "Error"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1739
+#: utils/voice_manager_dialog.py:1933
 msgid ""
 "Cannot remove the current default or fallback voice. Set a different "
 "voice as default/fallback first."
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1742
+#: utils/voice_manager_dialog.py:1936
 msgid "Remove Disabled"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1748
+#: utils/voice_manager_dialog.py:1942
 msgid "An install or repair is currently in progress."
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1750
+#: utils/voice_manager_dialog.py:1944
 #, python-brace-format
 msgid "Removing voice '{shortname}' will cancel the operation."
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1754
+#: utils/voice_manager_dialog.py:1948
 msgid "Continue?"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1755
+#: utils/voice_manager_dialog.py:1949
 msgid "Cancel Operation"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1765
+#: utils/voice_manager_dialog.py:1959
 #, python-brace-format
 msgid "Remove voice '{shortname}'?"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1767
+#: utils/voice_manager_dialog.py:1961
 #, python-brace-format
 msgid "All files under sounds/{shortname}/ will be deleted."
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1770
+#: utils/voice_manager_dialog.py:1964
 msgid "Confirm Remove"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1828
+#: utils/voice_manager_dialog.py:2022
 msgid "Repairing"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1828
+#: utils/voice_manager_dialog.py:2022
 msgid "Installing"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1837
+#: utils/voice_manager_dialog.py:2031
 msgid "Finished"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1864
+#: utils/voice_manager_dialog.py:2058
 msgid ""
 "An install or repair is currently in progress. Closing will cancel the "
 "operation."
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1871
+#: utils/voice_manager_dialog.py:2065
 msgid ""
 "One or more extra ranges have invalid values. These ranges will be "
 "discarded when closing."
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1878
+#: utils/voice_manager_dialog.py:2072
 msgid ""
 "One or more extra ranges overlap with another range. These ranges will "
 "still be saved, but may generate files that already exist."
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1887
+#: utils/voice_manager_dialog.py:2081
 #, python-brace-format
 msgid ""
 "The following installed voices are incomplete: {names}. They will not "
@@ -1101,15 +1122,23 @@ msgid ""
 " files."
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1896
+#: utils/voice_manager_dialog.py:2091
+#, python-brace-format
+msgid ""
+"The start list bib number range ({min} - {max}) is not fully covered by "
+"the configured number ranges. Some bib numbers will not have voice files "
+"and will fall back to the default ding sound when announced."
+msgstr ""
+
+#: utils/voice_manager_dialog.py:2100
 msgid "There are issues that may affect voice playback."
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1900
+#: utils/voice_manager_dialog.py:2104
 msgid "Close anyway?"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1904
+#: utils/voice_manager_dialog.py:2108
 msgid "Confirm Close"
 msgstr ""
 

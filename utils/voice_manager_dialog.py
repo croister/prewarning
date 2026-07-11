@@ -11,6 +11,7 @@ from typing import Any, Final
 
 import pycountry
 import wx
+import wx.lib.scrolledpanel
 from edge_tts.typing import Voice
 from gpytranslate import Translator as GpyTranslator
 
@@ -739,8 +740,12 @@ class _DiscoveredVoiceList(wx.ListCtrl):
 
 
 class VoiceManagerDialog(wx.Dialog):
-    def __init__(self, parent: wx.Window | None = None):
-        super().__init__(parent, title=_("Voice Manager"), size=wx.Size(800, 700))
+    def __init__(
+        self,
+        parent: wx.Window | None = None,
+        bib_range: tuple[int, int] | None = None,
+    ):
+        super().__init__(parent, title=_("Voice Manager"), size=wx.Size(800, 850))
         icon = wx.Icon()
         icon.CopyFromBitmap(
             wx.ArtProvider.GetBitmap(
@@ -750,6 +755,8 @@ class VoiceManagerDialog(wx.Dialog):
             )
         )
         self.SetIcon(icon)
+
+        self._bib_range = bib_range
 
         self.discovered_voices: list[Voice] = []
         self.filtered_voices: list[Voice] = []
@@ -776,6 +783,14 @@ class VoiceManagerDialog(wx.Dialog):
 
     def _build_ui(self):
         main_sizer = wx.BoxSizer(wx.VERTICAL)
+
+        self._bib_range_sizer = self._build_bib_range_section()
+        if self._bib_range_sizer is not None:
+            main_sizer.Add(
+                self._bib_range_sizer,
+                flag=wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP,
+                border=UI_SECTION_BORDER,
+            )
 
         main_sizer.Add(
             self._build_ranges_section(),
@@ -814,7 +829,11 @@ class VoiceManagerDialog(wx.Dialog):
 
     def _build_ranges_section(self):
         box = wx.StaticBoxSizer(wx.VERTICAL, self, _("Number Ranges to Generate"))
-        self.range_panel = wx.Panel(box.GetStaticBox(), style=wx.TAB_TRAVERSAL)
+        self.range_panel = wx.lib.scrolledpanel.ScrolledPanel(
+            box.GetStaticBox(), style=wx.TAB_TRAVERSAL
+        )
+        self.range_panel.SetMinSize(wx.Size(-1, 80))
+        self.range_panel.SetMaxSize(wx.Size(-1, 200))
         self.range_sizer = wx.BoxSizer(wx.VERTICAL)
         self.range_panel.SetSizer(self.range_sizer)
         box.Add(self.range_panel, flag=wx.EXPAND)
@@ -883,7 +902,181 @@ class VoiceManagerDialog(wx.Dialog):
             self.range_sizer.Add(row, flag=wx.BOTTOM, border=UI_SMALL_BORDER)
 
         self.range_panel.Layout()
+        self.range_panel.SetupScrolling(scroll_x=False)
         self._validate_all_range_rows()
+        self._update_bib_range_status()
+
+    def _is_bib_range_covered(self) -> bool:
+        """Check if the bib range is fully covered by the configured ranges."""
+        if self._bib_range is None:
+            return True
+        bib_min, bib_max = self._bib_range
+        ranges = [(DEFAULT_RANGE_START, DEFAULT_RANGE_END)]
+        extra = parse_extra_ranges(
+            self._vm_section.get(CONFIG_OPTION_EXTRA_RANGES.name, "")
+        )
+        ranges.extend(extra)
+        for r_start, r_end in ranges:
+            if r_start <= bib_min and r_end >= bib_max:
+                return True
+        # Check if combined ranges cover the full bib range
+        covered = set()
+        for r_start, r_end in ranges:
+            for n in range(max(r_start, bib_min), min(r_end, bib_max) + 1):
+                covered.add(n)
+        return len(covered) >= (bib_max - bib_min + 1)
+
+    def _build_bib_range_section(self) -> wx.BoxSizer | None:
+        """Build the bib range info section shown above the ranges section."""
+        if self._bib_range is None:
+            return None
+
+        bib_min, bib_max = self._bib_range
+
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+
+        label_text = _("Start list bibs: {min} - {max}").format(
+            min=bib_min, max=bib_max
+        )
+        label = wx.StaticText(self, label=label_text)
+        sizer.Add(label, flag=wx.ALIGN_CENTER_VERTICAL)
+
+        self._bib_status_label = wx.StaticText(self, label="")
+        sizer.Add(
+            self._bib_status_label,
+            flag=wx.ALIGN_CENTER_VERTICAL | wx.LEFT,
+            border=UI_SECTION_BORDER,
+        )
+
+        self._bib_add_range_btn = wx.Button(self, label=_("Add Range"))
+        self._bib_add_range_btn.Bind(wx.EVT_BUTTON, self._on_add_bib_range)
+        sizer.Add(
+            self._bib_add_range_btn,
+            flag=wx.ALIGN_CENTER_VERTICAL | wx.LEFT,
+            border=UI_SECTION_BORDER,
+        )
+
+        self._update_bib_range_status()
+        return sizer
+
+    def _update_bib_range_status(self) -> None:
+        """Update the bib range coverage status label, tooltip, and button state."""
+        if self._bib_range is None:
+            return
+
+        bib_min, bib_max = self._bib_range
+        ranges = [(DEFAULT_RANGE_START, DEFAULT_RANGE_END)]
+        extra = parse_extra_ranges(
+            self._vm_section.get(CONFIG_OPTION_EXTRA_RANGES.name, "")
+        )
+        ranges.extend(extra)
+
+        # Determine which parts of the bib range are covered and uncovered
+        covered_parts: list[str] = []
+        uncovered_numbers: set[int] = set(range(bib_min, bib_max + 1))
+
+        for r_start, r_end in ranges:
+            overlap_start = max(r_start, bib_min)
+            overlap_end = min(r_end, bib_max)
+            if overlap_start <= overlap_end:
+                covered_parts.append(f"{overlap_start} - {overlap_end}")
+                uncovered_numbers -= set(range(overlap_start, overlap_end + 1))
+
+        fully_covered = len(uncovered_numbers) == 0
+
+        # Build tooltip
+        if fully_covered:
+            tooltip = _("Covered by:") + "\n"
+            for part in covered_parts:
+                tooltip += f"  {part}\n"
+        else:
+            # Collapse uncovered numbers into ranges for display
+            uncovered_ranges = self._numbers_to_ranges(sorted(uncovered_numbers))
+            tooltip = _("Not covered:") + "\n"
+            for r_start, r_end in uncovered_ranges:
+                if r_start == r_end:
+                    tooltip += f"  {r_start}\n"
+                else:
+                    tooltip += f"  {r_start} - {r_end}\n"
+            if covered_parts:
+                tooltip += _("Covered by:") + "\n"
+                for part in covered_parts:
+                    tooltip += f"  {part}\n"
+
+        if fully_covered:
+            self._bib_status_label.SetLabel(STATUS_COMPLETE + " " + _("Covered"))
+            self._bib_status_label.SetForegroundColour(wx.Colour(0, 128, 0))
+            self._bib_add_range_btn.Disable()
+        else:
+            self._bib_status_label.SetLabel(
+                STATUS_INCOMPLETE + " " + _("Not fully covered")
+            )
+            self._bib_status_label.SetForegroundColour(wx.Colour(200, 120, 0))
+            self._bib_add_range_btn.Enable()
+
+        self._bib_status_label.SetToolTip(tooltip.strip())
+        self._bib_status_label.Refresh()
+        self._bib_status_label.GetParent().Layout()
+
+    @staticmethod
+    def _numbers_to_ranges(numbers: list[int]) -> list[tuple[int, int]]:
+        """Collapse a sorted list of numbers into consecutive ranges."""
+        if not numbers:
+            return []
+        ranges: list[tuple[int, int]] = []
+        start = numbers[0]
+        end = numbers[0]
+        for n in numbers[1:]:
+            if n == end + 1:
+                end = n
+            else:
+                ranges.append((start, end))
+                start = n
+                end = n
+        ranges.append((start, end))
+        return ranges
+
+    def _on_add_bib_range(self, event) -> None:
+        """Add extra ranges that cover only the bib numbers not yet covered."""
+        if self._bib_range is None:
+            return
+
+        bib_min, bib_max = self._bib_range
+
+        # Find uncovered numbers
+        ranges = [(DEFAULT_RANGE_START, DEFAULT_RANGE_END)]
+        extra = parse_extra_ranges(
+            self._vm_section.get(CONFIG_OPTION_EXTRA_RANGES.name, "")
+        )
+        ranges.extend(extra)
+
+        uncovered_numbers: set[int] = set(range(bib_min, bib_max + 1))
+        for r_start, r_end in ranges:
+            uncovered_numbers -= set(range(r_start, r_end + 1))
+
+        if not uncovered_numbers:
+            return
+
+        # Collapse uncovered numbers into ranges
+        uncovered_ranges = self._numbers_to_ranges(sorted(uncovered_numbers))
+
+        # Add each uncovered range as a new extra range
+        current = self._vm_section.get(CONFIG_OPTION_EXTRA_RANGES.name, "")
+        new_parts = [f"{s}-{e}" for s, e in uncovered_ranges]
+        if current:
+            current = current.rstrip(",") + "," + ",".join(new_parts)
+        else:
+            current = ",".join(new_parts)
+        # Re-parse and sort all extra ranges
+        all_extra = parse_extra_ranges(current)
+        all_extra.sort()
+        self._vm_section[CONFIG_OPTION_EXTRA_RANGES.name] = ", ".join(
+            f"{s}-{e}" for s, e in all_extra
+        )
+        Config().write()
+        self._rebuild_range_rows()
+        self.Layout()
+        wx.CallLater(200, self._refresh_installed_list)
 
     def _on_add_range(self, event):
         current = self._vm_section.get(CONFIG_OPTION_EXTRA_RANGES.name, "")
@@ -896,18 +1089,20 @@ class VoiceManagerDialog(wx.Dialog):
         Config().write()
         self._rebuild_range_rows()
         self.Layout()
-        self._refresh_installed_list()
+        wx.CallLater(200, self._refresh_installed_list)
 
     def _on_range_value_changed(self, event):
         self._validate_all_range_rows()
         event.Skip()
         self._save_range_values()
-        wx.CallAfter(self._refresh_installed_list)
+        self._update_bib_range_status()
+        wx.CallLater(200, self._refresh_installed_list)
 
     def _on_range_enter(self, event):
         self._validate_all_range_rows()
         self._save_range_values()
-        wx.CallAfter(self._refresh_installed_list)
+        self._update_bib_range_status()
+        wx.CallLater(200, self._refresh_installed_list)
 
     def _on_range_text(self, event):
         ctrl = event.GetEventObject()
@@ -1022,7 +1217,7 @@ class VoiceManagerDialog(wx.Dialog):
             Config().write()
         self._rebuild_range_rows()
         self.Layout()
-        self._refresh_installed_list()
+        wx.CallLater(200, self._refresh_installed_list)
 
     def _build_filter_bar(self):
         sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -1889,6 +2084,16 @@ class VoiceManagerDialog(wx.Dialog):
                     "Some numbers may fall back to the default ding sound "
                     "when announced. Use Repair to generate the missing files."
                 ).format(names=names)
+            )
+        if self._bib_range is not None and not self._is_bib_range_covered():
+            bib_min, bib_max = self._bib_range
+            msgs.append(
+                _(
+                    "The start list bib number range ({min} - {max}) is not fully "
+                    "covered by the configured number ranges. Some bib numbers "
+                    "will not have voice files and will fall back to the default "
+                    "ding sound when announced."
+                ).format(min=bib_min, max=bib_max)
             )
 
         if msgs:

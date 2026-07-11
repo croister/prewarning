@@ -110,3 +110,13 @@ class StartListSourceOlaMySql(_StartListSourceBase):
             self.logger.error(oe)
 
         return None
+
+    def get_bib_range(self) -> tuple[int, int] | None:
+        """Returns the range of bib numbers from the OLA MySQL database."""
+        if not self._running:
+            return None
+        try:
+            return self.ola_mysql.get_bib_range()
+        except OperationalError as oe:
+            self.logger.error(oe)
+            return None

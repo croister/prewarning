@@ -108,3 +108,30 @@ class TestStartListSourceOlaMySql:
         result = source.lookup_from_card_number("12345")
         assert result is None
         mock_ola.get_event_race_pre_warning_data.assert_not_called()
+
+    def test_get_bib_range_returns_none_when_not_running(self, source):
+        result = source.get_bib_range()
+        assert result is None
+
+    def test_get_bib_range_delegates_to_ola_mysql(self, _patch_deps, source):
+        mock_ola = _patch_deps
+        mock_ola.get_bib_range.return_value = (1, 150)
+        source._running = True
+        result = source.get_bib_range()
+        assert result == (1, 150)
+        mock_ola.get_bib_range.assert_called_once()
+
+    def test_get_bib_range_returns_none_on_operational_error(self, _patch_deps, source):
+        mock_ola = _patch_deps
+        mock_ola.get_bib_range.side_effect = OperationalError("connection lost")
+        source._running = True
+        result = source.get_bib_range()
+        assert result is None
+
+    def test_get_bib_range_does_not_call_ola_when_not_running(
+        self, _patch_deps, source
+    ):
+        mock_ola = _patch_deps
+        result = source.get_bib_range()
+        assert result is None
+        mock_ola.get_bib_range.assert_not_called()

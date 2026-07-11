@@ -1380,3 +1380,32 @@ class OlaMySql(ConfigConsumer, Singleton, metaclass=_OlaMySqlMeta):
                 else:
                     self.logger.debug("Too many matches, skipping!")
                     return None
+
+    def get_bib_range(self) -> tuple[int, int] | None:
+        """Returns the min and max bib numbers for the current event race."""
+        self.logger.debug("get_bib_range")
+        if self.event is None or self.event_race is None:
+            return None
+        connection = self._connect()
+        with connection:
+            with connection.cursor(DictCursor) as cursor:
+                sql = (
+                    "SELECT"
+                    "  MIN(`Results`.`bibNumber`) AS min_bib,"
+                    "  MAX(`Results`.`bibNumber`) AS max_bib"
+                    " FROM `Results`"
+                    "  LEFT JOIN `RaceClasses`"
+                    "         ON `Results`.`raceClassId` = `RaceClasses`.`raceClassId`"
+                    "  LEFT JOIN `EventRaces`"
+                    "         ON `RaceClasses`.`eventRaceId` = `EventRaces`.`eventRaceId`"
+                    " WHERE `EventRaces`.`eventId` = %s"
+                    "   AND `EventRaces`.`eventRaceId` = %s"
+                    "   AND `Results`.`bibNumber` IS NOT NULL"
+                    ";"
+                )
+                args = [self.event, self.event_race]
+                cursor.execute(sql, args)
+                row = cursor.fetchone()
+                if row and row["min_bib"] is not None:
+                    return (int(row["min_bib"]), int(row["max_bib"]))
+                return None

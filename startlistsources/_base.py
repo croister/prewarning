@@ -63,3 +63,11 @@ class _StartListSourceBase(ConfigConsumer):
         :rtype: Dict[str, str] or None
         """
         return dict()
+
+    def get_bib_range(self) -> tuple[int, int] | None:
+        """Returns the range of bib numbers in the start list.
+
+        :return: A tuple (min_bib, max_bib), or None if no data is available.
+        :rtype: tuple[int, int] or None
+        """
+        return None
