@@ -1377,3 +1377,58 @@ class OlaMySql(ConfigConsumer, Singleton, metaclass=_OlaMySqlMeta):
             if row and row["min_bib"] is not None:
                 return (int(row["min_bib"]), int(row["max_bib"]))
             return None
+
+    def get_team_count(self) -> int | None:
+        """Returns the number of teams (distinct bib numbers) for the current event race."""
+        self.logger.debug("get_team_count")
+        if self.event is None or self.event_race is None:
+            return None
+        connection = self._connect()
+        with connection, connection.cursor(DictCursor) as cursor:
+            sql = (
+                "SELECT COUNT(DISTINCT `Results`.`bibNumber`) AS team_count"
+                " FROM `Results`"
+                "  LEFT JOIN `RaceClasses`"
+                "         ON `Results`.`raceClassId` = `RaceClasses`.`raceClassId`"
+                "  LEFT JOIN `EventRaces`"
+                "         ON `RaceClasses`.`eventRaceId` = `EventRaces`.`eventRaceId`"
+                " WHERE `EventRaces`.`eventId` = %s"
+                "   AND `EventRaces`.`eventRaceId` = %s"
+                "   AND `Results`.`bibNumber` IS NOT NULL"
+                ";"
+            )
+            args = [self.event, self.event_race]
+            cursor.execute(sql, args)
+            row = cursor.fetchone()
+            if row and row["team_count"] is not None:
+                return int(row["team_count"])
+            return None
+
+    def get_runner_count(self) -> int | None:
+        """Returns the number of runners with SI cards for the current event race."""
+        self.logger.debug("get_runner_count")
+        if self.event is None or self.event_race is None:
+            return None
+        connection = self._connect()
+        with connection, connection.cursor(DictCursor) as cursor:
+            sql = (
+                "SELECT COUNT(*) AS runner_count"
+                " FROM `Results`"
+                "  INNER JOIN `RaceClasses`"
+                "         ON `Results`.`raceClassId` = `RaceClasses`.`raceClassId`"
+                "  INNER JOIN `EventRaces`"
+                "         ON `RaceClasses`.`eventRaceId` = `EventRaces`.`eventRaceId`"
+                "  INNER JOIN `ElectronicPunchingCards`"
+                "         ON `Results`.`resultRaceIndividualNumber`"
+                "          = `ElectronicPunchingCards`.`raceIndividualNumber`"
+                " WHERE `EventRaces`.`eventId` = %s"
+                "   AND `EventRaces`.`eventRaceId` = %s"
+                "   AND `ElectronicPunchingCards`.`cardNumber` IS NOT NULL"
+                ";"
+            )
+            args = [self.event, self.event_race]
+            cursor.execute(sql, args)
+            row = cursor.fetchone()
+            if row and row["runner_count"] is not None:
+                return int(row["runner_count"])
+            return None

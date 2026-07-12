@@ -118,3 +118,23 @@ class StartListSourceOlaMySql(_StartListSourceBase):
         except OperationalError as oe:
             self.logger.error(oe)
             return None
+
+    def get_team_count(self) -> int | None:
+        """Returns the number of teams from the OLA MySQL database."""
+        if not self._running:
+            return None
+        try:
+            return self.ola_mysql.get_team_count()
+        except OperationalError as oe:
+            self.logger.error(oe)
+            return None
+
+    def get_runner_count(self) -> int | None:
+        """Returns the number of runners from the OLA MySQL database."""
+        if not self._running:
+            return None
+        try:
+            return self.ola_mysql.get_runner_count()
+        except OperationalError as oe:
+            self.logger.error(oe)
+            return None

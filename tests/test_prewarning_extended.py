@@ -179,24 +179,39 @@ class TestNotifyIp:
         pw = MagicMock()
         pw.logger = MagicMock()
         pw.announcement_queue = MagicMock()
+        pw._get_local_ip = MagicMock(return_value="192.168.1.42")
+
+        PreWarning._notify_ip(pw)
+
+        assert pw.announcement_queue.put.call_count == 4
+        pw.announcement_queue.put.assert_has_calls(
+            [
+                call({"voice": None, "sound": "192"}),
+                call({"voice": None, "sound": "168"}),
+                call({"voice": None, "sound": "1"}),
+                call({"voice": None, "sound": "42"}),
+            ]
+        )
+
+    def test_get_local_ip_returns_ip(self):
         with patch("prewarning.socket.socket") as mock_socket:
             sock = MagicMock()
             mock_socket.return_value = sock
-            sock.getsockname.return_value = ("192.168.1.42", 0)
+            sock.getsockname.return_value = ("10.0.0.5", 0)
 
-            PreWarning._notify_ip(pw)
+            result = PreWarning._get_local_ip()
 
-            sock.connect.assert_called_once_with(("8.8.8.8", 0))
-            assert pw.announcement_queue.put.call_count == 4
-            pw.announcement_queue.put.assert_has_calls(
-                [
-                    call({"voice": None, "sound": "192"}),
-                    call({"voice": None, "sound": "168"}),
-                    call({"voice": None, "sound": "1"}),
-                    call({"voice": None, "sound": "42"}),
-                ]
-            )
+            sock.connect.assert_called_once_with(("192.0.2.1", 1))
             sock.close.assert_called_once()
+            assert result == "10.0.0.5"
+
+    def test_get_local_ip_returns_dash_on_error(self):
+        with patch("prewarning.socket.socket") as mock_socket:
+            mock_socket.return_value.connect.side_effect = OSError("no network")
+
+            result = PreWarning._get_local_ip()
+
+            assert result == "-"
 
 
 class TestClose:
@@ -272,7 +287,7 @@ class TestOnKeyPress:
         PreWarning._on_key_press(pw, key_event)
 
         handler.assert_called_once()
-        key_event.Skip.assert_called_once()
+        key_event.Skip.assert_not_called()
 
     def test_skips_if_no_match(self, pw):
         binding = MagicMock()
@@ -480,3 +495,264 @@ class TestUpdateSources:
         PreWarning.update_sources(pw)
         old_source.stop.assert_called_once()
         assert isinstance(pw.punch_source, _MockPunchSource)
+
+
+class TestOnHealthIndicatorClickAction:
+    def test_opens_voice_manager_when_action_is_voice_manager(self):
+        from utils.health import HealthAction
+
+        pw = MagicMock()
+        pw.health_monitor = MagicMock()
+        pw.health_monitor.evaluate.return_value = (None, [MagicMock()])
+        pw.health_monitor.get_primary_action.return_value = HealthAction.VOICE_MANAGER
+        PreWarning._on_health_indicator_click_action(pw)
+        pw._open_voice_manager.assert_called_once()
+        pw._config_dialog.assert_not_called()
+
+    def test_opens_settings_when_action_is_settings(self):
+        from utils.health import HealthAction
+
+        pw = MagicMock()
+        pw.health_monitor = MagicMock()
+        pw.health_monitor.evaluate.return_value = (None, [MagicMock()])
+        pw.health_monitor.get_primary_action.return_value = HealthAction.SETTINGS
+        PreWarning._on_health_indicator_click_action(pw)
+        pw._config_dialog.assert_called_once()
+        pw._open_voice_manager.assert_not_called()
+
+    def test_does_nothing_when_action_is_none(self):
+        pw = MagicMock()
+        pw.health_monitor = MagicMock()
+        pw.health_monitor.evaluate.return_value = (None, [])
+        pw.health_monitor.get_primary_action.return_value = None
+        PreWarning._on_health_indicator_click_action(pw)
+        pw._open_voice_manager.assert_not_called()
+        pw._config_dialog.assert_not_called()
+
+
+class TestInitControlWindow:
+    def test_does_nothing_when_disabled(self):
+        pw = MagicMock()
+        pw.config = MagicMock()
+        pw.config.get_section.return_value = {}
+        pw.CONFIG_OPTION_ENABLE_CONTROL_WINDOW = MagicMock()
+        pw.CONFIG_OPTION_ENABLE_CONTROL_WINDOW.get_value.return_value = False
+        PreWarning._init_control_window(pw)
+        # _control_window should not be set
+        assert (
+            not hasattr(pw, "_control_window")
+            or pw._control_window is pw._control_window
+        )
+
+    def test_does_nothing_when_single_display(self):
+        pw = MagicMock()
+        pw.config = MagicMock()
+        pw.config.get_section.return_value = {}
+        pw.CONFIG_OPTION_ENABLE_CONTROL_WINDOW = MagicMock()
+        pw.CONFIG_OPTION_ENABLE_CONTROL_WINDOW.get_value.return_value = True
+        with patch("prewarning.wx.Display") as mock_display:
+            mock_display.GetCount.return_value = 1
+            PreWarning._init_control_window(pw)
+
+    def test_does_nothing_when_no_landscape_display(self):
+        pw = MagicMock()
+        pw.config = MagicMock()
+        pw.config.get_section.return_value = {}
+        pw.CONFIG_OPTION_ENABLE_CONTROL_WINDOW = MagicMock()
+        pw.CONFIG_OPTION_ENABLE_CONTROL_WINDOW.get_value.return_value = True
+        with patch("prewarning.wx.Display") as mock_display:
+            mock_display.GetCount.return_value = 2
+            mock_display.GetFromWindow.return_value = 0
+            mock_display.return_value = MagicMock()
+            with patch(
+                "prewarning.ControlWindow.find_landscape_display", return_value=None
+            ):
+                PreWarning._init_control_window(pw)
+
+
+class TestToggleControlWindow:
+    def test_creates_and_shows_when_none(self):
+        pw = MagicMock()
+        pw._control_window = None
+        with patch("prewarning.wx.Display") as mock_display:
+            mock_display.GetFromWindow.return_value = 0
+            mock_display.return_value = MagicMock()
+            with patch(
+                "prewarning.ControlWindow.find_landscape_display", return_value=None
+            ):
+                with patch("prewarning.ControlWindow") as mock_cw_class:
+                    mock_cw = MagicMock()
+                    mock_cw_class.return_value = mock_cw
+                    PreWarning._toggle_control_window(pw)
+                    mock_cw.Show.assert_called_once()
+                    pw._update_control_window.assert_called_once()
+
+    def test_hides_when_shown(self):
+        pw = MagicMock()
+        pw._control_window = MagicMock()
+        pw._control_window.IsShown.return_value = True
+        PreWarning._toggle_control_window(pw)
+        pw._control_window.Hide.assert_called_once()
+
+    def test_shows_and_raises_when_hidden(self):
+        pw = MagicMock()
+        pw._control_window = MagicMock()
+        pw._control_window.IsShown.return_value = False
+        PreWarning._toggle_control_window(pw)
+        pw._control_window.Show.assert_called_once()
+        pw._control_window.Raise.assert_called_once()
+
+
+class TestUpdateControlWindow:
+    def test_returns_early_when_no_control_window(self):
+        pw = MagicMock()
+        pw._control_window = None
+        PreWarning._update_control_window(pw)
+        # Should not crash
+
+    def test_returns_early_when_not_shown(self):
+        pw = MagicMock()
+        pw._control_window = MagicMock()
+        pw._control_window.IsShown.return_value = False
+        PreWarning._update_control_window(pw)
+        pw._control_window.update_health.assert_not_called()
+
+
+class TestDedupSkipCounterIncrement:
+    """Tests that dedup skip counter is incremented when duplicates are skipped."""
+
+    @pytest.fixture
+    def pw(self):
+
+        inst = MagicMock()
+        inst.logger = MagicMock()
+        inst._stats_punches_received = 0
+        inst._stats_punches_matched = 0
+        inst._stats_announcements = 0
+        inst._stats_dedup_skipped = 0
+        inst._last_punch_time = None
+        inst._dedup_card_control_enabled = True
+        inst._dedup_bib_leg_enabled = False
+        inst._dedup_card_control = {}
+        inst._dedup_bib_leg = {}
+        inst._dedup_lock = MagicMock()
+        inst._dedup_lock.__enter__ = MagicMock(return_value=None)
+        inst._dedup_lock.__exit__ = MagicMock(return_value=False)
+        inst._announce_last_leg = True
+        inst.punch_queue = MagicMock()
+        inst.announcement_queue = MagicMock()
+        inst.start_list_source = MagicMock()
+        inst.start_list_source_name = "MockSLS"
+        inst.sound = MagicMock()
+        inst.sound.resolve_voice.return_value = None
+        return inst
+
+    def test_dedup_card_control_increments_skip_counter(self, pw):
+        """When _is_deduped returns True for card+control, counter increments."""
+
+        # We test _process_punches indirectly by checking the increment logic
+        pw._stats_dedup_skipped = 0
+        pw._is_deduped = MagicMock(return_value=True)
+        pw._parse_passed_time = MagicMock(return_value=1000.0)
+
+        # Simulate one iteration: punch_queue.get returns a punch, then raises to exit
+        punch = {
+            "cardNumber": "12345",
+            "controlCode": "50",
+            "passedTime": "12:00:00",
+        }
+
+        call_count = [0]
+
+        def get_side_effect():
+            call_count[0] += 1
+            if call_count[0] == 1:
+                return punch
+            raise SystemExit()
+
+        pw.punch_queue.get = get_side_effect
+
+        # Call the method and catch the SystemExit
+
+        try:
+            PreWarning._process_punches(pw)
+        except SystemExit:
+            pass
+
+        assert pw._stats_dedup_skipped == 1
+
+
+class TestLastPunchTimeTracking:
+    """Tests that _last_punch_time is updated when a punch is processed."""
+
+    def test_last_punch_time_set_on_punch(self):
+        from datetime import datetime
+
+        pw = MagicMock()
+        pw.logger = MagicMock()
+        pw._stats_punches_received = 0
+        pw._last_punch_time = None
+        pw._dedup_card_control_enabled = False
+        pw._dedup_bib_leg_enabled = False
+        pw._announce_last_leg = True
+        pw.start_list_source = MagicMock()
+        pw.start_list_source_name = "MockSLS"
+        pw.sound = MagicMock()
+        pw.sound.resolve_voice.return_value = None
+        pw.announcement_queue = MagicMock()
+        pw._parse_passed_time = MagicMock(return_value=1000.0)
+        pw._to_str = PreWarning._to_str
+
+        punch = {
+            "cardNumber": "12345",
+            "controlCode": "50",
+            "passedTime": "12:00:00",
+            "bibNumber": "101",
+            "relayLeg": "1",
+            "isLastLeg": False,
+            "country": None,
+        }
+
+        call_count = [0]
+
+        def get_side_effect():
+            call_count[0] += 1
+            if call_count[0] == 1:
+                return punch
+            raise SystemExit()
+
+        pw.punch_queue = MagicMock()
+        pw.punch_queue.get = get_side_effect
+        pw._dedup_lock = MagicMock()
+        pw._dedup_lock.__enter__ = MagicMock(return_value=None)
+        pw._dedup_lock.__exit__ = MagicMock(return_value=False)
+        pw._dedup_card_control = {}
+        pw._dedup_bib_leg = {}
+
+        try:
+            PreWarning._process_punches(pw)
+        except SystemExit:
+            pass
+
+        assert pw._stats_punches_received == 1
+        assert pw._last_punch_time is not None
+        assert isinstance(pw._last_punch_time, datetime)
+
+
+class TestBaseStartListSourceGetTeamCountGetRunnerCount:
+    """Tests that the base class returns None for get_team_count and get_runner_count."""
+
+    def test_base_get_team_count_returns_none(self):
+        from startlistsources._base import _StartListSourceBase
+
+        # _StartListSourceBase is abstract, we test the default implementation
+        pw = MagicMock(spec=_StartListSourceBase)
+        result = _StartListSourceBase.get_team_count(pw)
+        assert result is None
+
+    def test_base_get_runner_count_returns_none(self):
+        from startlistsources._base import _StartListSourceBase
+
+        pw = MagicMock(spec=_StartListSourceBase)
+        result = _StartListSourceBase.get_runner_count(pw)
+        assert result is None

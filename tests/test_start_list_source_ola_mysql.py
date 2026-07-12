@@ -136,3 +136,61 @@ class TestStartListSourceOlaMySql:
         result = source.get_bib_range()
         assert result is None
         mock_ola.get_bib_range.assert_not_called()
+
+    def test_get_team_count_returns_none_when_not_running(self, source):
+        result = source.get_team_count()
+        assert result is None
+
+    def test_get_team_count_delegates_to_ola_mysql(self, _patch_deps, source):
+        mock_ola = _patch_deps
+        mock_ola.get_team_count.return_value = 42
+        source._running = True
+        result = source.get_team_count()
+        assert result == 42
+        mock_ola.get_team_count.assert_called_once()
+
+    def test_get_team_count_returns_none_on_operational_error(
+        self, _patch_deps, source
+    ):
+        mock_ola = _patch_deps
+        mock_ola.get_team_count.side_effect = OperationalError("connection lost")
+        source._running = True
+        result = source.get_team_count()
+        assert result is None
+
+    def test_get_team_count_does_not_call_ola_when_not_running(
+        self, _patch_deps, source
+    ):
+        mock_ola = _patch_deps
+        result = source.get_team_count()
+        assert result is None
+        mock_ola.get_team_count.assert_not_called()
+
+    def test_get_runner_count_returns_none_when_not_running(self, source):
+        result = source.get_runner_count()
+        assert result is None
+
+    def test_get_runner_count_delegates_to_ola_mysql(self, _patch_deps, source):
+        mock_ola = _patch_deps
+        mock_ola.get_runner_count.return_value = 126
+        source._running = True
+        result = source.get_runner_count()
+        assert result == 126
+        mock_ola.get_runner_count.assert_called_once()
+
+    def test_get_runner_count_returns_none_on_operational_error(
+        self, _patch_deps, source
+    ):
+        mock_ola = _patch_deps
+        mock_ola.get_runner_count.side_effect = OperationalError("connection lost")
+        source._running = True
+        result = source.get_runner_count()
+        assert result is None
+
+    def test_get_runner_count_does_not_call_ola_when_not_running(
+        self, _patch_deps, source
+    ):
+        mock_ola = _patch_deps
+        result = source.get_runner_count()
+        assert result is None
+        mock_ola.get_runner_count.assert_not_called()

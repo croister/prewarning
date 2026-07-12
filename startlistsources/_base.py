@@ -67,3 +67,11 @@ class _StartListSourceBase(ConfigConsumer):
         :rtype: tuple[int, int] or None
         """
         return None
+
+    def get_team_count(self) -> int | None:
+        """Returns the number of teams in the start list, or None if unavailable."""
+        return None
+
+    def get_runner_count(self) -> int | None:
+        """Returns the number of runners (SI cards) in the start list, or None if unavailable."""
+        return None

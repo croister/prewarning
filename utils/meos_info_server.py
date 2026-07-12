@@ -881,6 +881,18 @@ class MeosInfoServer(
             return None
         return (min(bibs), max(bibs))
 
+    def get_team_count(self) -> int | None:
+        """Returns the number of teams from the cached data."""
+        if not self._team_bib:
+            return None
+        return len(self._team_bib)
+
+    def get_runner_count(self) -> int | None:
+        """Returns the number of competitors with SI cards from the cached data."""
+        if not self._cmp_info:
+            return None
+        return sum(1 for info in self._cmp_info.values() if info.get(_CMP_KEY_CARD))
+
     # -- StateSaverMixin -------------------------------------------------------
 
     def register_tracking_listener(self, callback):
