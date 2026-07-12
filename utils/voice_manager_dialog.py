@@ -1737,6 +1737,8 @@ class VoiceManagerDialog(wx.Dialog):
     # -- Installed voices ------------------------------------------
 
     def _refresh_installed_list(self):
+        if not self:
+            return
         self.installed_voices = _list_installed_voices(self.discovered_voices)
         self.installed_list.DeleteAllItems()
         self._update_repair_btn_state()

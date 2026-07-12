@@ -464,3 +464,96 @@ class TestMeosInfoServerGetBibRange:
     def test_returns_none_when_all_bibs_non_numeric(self, server):
         server._team_bib = {1: "abc", 2: "def"}
         assert server.get_bib_range() is None
+
+
+class TestMeosInfoServerGetTeamCount:
+    def test_returns_none_when_no_teams(self, server):
+        assert server.get_team_count() is None
+
+    def test_returns_count_with_teams(self, server):
+        server._team_bib = {1: "10", 2: "50", 3: "200"}
+        assert server.get_team_count() == 3
+
+    def test_returns_one_with_single_team(self, server):
+        server._team_bib = {1: "42"}
+        assert server.get_team_count() == 1
+
+    def test_returns_none_when_empty_dict(self, server):
+        server._team_bib = {}
+        assert server.get_team_count() is None
+
+
+class TestMeosInfoServerGetRunnerCount:
+    def test_returns_none_when_no_competitors(self, server):
+        assert server.get_runner_count() is None
+
+    def test_returns_none_when_empty_dict(self, server):
+        server._cmp_info = {}
+        assert server.get_runner_count() is None
+
+    def test_counts_only_competitors_with_cards(self, server):
+        server._cmp_info = {
+            67: {"card": "506576", "team_id": 23, "leg": 1},
+            68: {"team_id": 23, "leg": 2},  # no card
+            69: {"card": "111111", "team_id": 23, "leg": 3},
+        }
+        assert server.get_runner_count() == 2
+
+    def test_counts_all_when_all_have_cards(self, server):
+        server._cmp_info = {
+            67: {"card": "506576", "team_id": 23, "leg": 1},
+            68: {"card": "222222", "team_id": 23, "leg": 2},
+            69: {"card": "333333", "team_id": 23, "leg": 3},
+        }
+        assert server.get_runner_count() == 3
+
+    def test_returns_zero_when_no_cards(self, server):
+        server._cmp_info = {
+            67: {"team_id": 23, "leg": 1},
+            68: {"team_id": 23, "leg": 2},
+        }
+        assert server.get_runner_count() == 0
+
+    def test_empty_card_not_counted(self, server):
+        server._cmp_info = {
+            67: {"card": "", "team_id": 23, "leg": 1},
+            68: {"card": "111111", "team_id": 23, "leg": 2},
+        }
+        assert server.get_runner_count() == 1
+
+
+class TestStartListSourceMeosGetTeamCount:
+    def test_returns_none_when_not_running(self):
+        from startlistsources.start_list_source_meos import StartListSourceMeos
+
+        source = StartListSourceMeos()
+        source._running = False
+        assert source.get_team_count() is None
+
+    def test_delegates_to_meos_info_server(self, server):
+        from startlistsources.start_list_source_meos import StartListSourceMeos
+
+        source = StartListSourceMeos()
+        source._running = True
+        server._team_bib = {1: "10", 2: "50"}
+        assert source.get_team_count() == 2
+
+
+class TestStartListSourceMeosGetRunnerCount:
+    def test_returns_none_when_not_running(self):
+        from startlistsources.start_list_source_meos import StartListSourceMeos
+
+        source = StartListSourceMeos()
+        source._running = False
+        assert source.get_runner_count() is None
+
+    def test_delegates_to_meos_info_server(self, server):
+        from startlistsources.start_list_source_meos import StartListSourceMeos
+
+        source = StartListSourceMeos()
+        source._running = True
+        server._cmp_info = {
+            67: {"card": "506576", "team_id": 23, "leg": 1},
+            68: {"card": "222222", "team_id": 23, "leg": 2},
+        }
+        assert source.get_runner_count() == 2

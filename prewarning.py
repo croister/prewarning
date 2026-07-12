@@ -57,6 +57,7 @@ from utils.hotkey_bindings import (
     HotKeyDefinition,
     key_event_to_str,
 )
+from utils.control_window import ControlWindow
 from utils.i18n import N_, _, set_language
 from utils.meos_info_server import MeosInfoServer
 from utils.screen_sleep import ScreenSleepInhibitor
@@ -297,6 +298,17 @@ class PreWarning(
         default_value=True,
     )
 
+    CONFIG_OPTION_ENABLE_CONTROL_WINDOW = ConfigOptionDefinition(
+        name="EnableControlWindow",
+        display_name=N_("Control Window"),
+        value_type=bool,
+        description=N_(
+            "Open a control window on the secondary landscape display for "
+            "monitoring and configuration."
+        ),
+        default_value=True,
+    )
+
     CONFIG_OPTION_DEDUP_CARD_CONTROL = ConfigOptionDefinition(
         name="DedupCardControl",
         display_name=N_("Deduplicate by Card + Control"),
@@ -340,6 +352,7 @@ class PreWarning(
             CONFIG_OPTION_ADD_PRE_WARNINGS_TO_BOTTOM,
             CONFIG_OPTION_ANNOUNCE_LAST_LEG,
             CONFIG_OPTION_PREVENT_SCREEN_SLEEP,
+            CONFIG_OPTION_ENABLE_CONTROL_WINDOW,
         ],
         sort_key_prefix=0,
     )
@@ -460,6 +473,13 @@ class PreWarning(
                 handler=self._open_voice_manager,
                 description=N_("Opens the Voice Manager dialog"),
                 bitmap_name=wx.ART_CDROM,
+            ),
+            HotKeyBindingDefinition(
+                name=N_("Control Window"),
+                hotkey=HotKeyDefinition(key_code=ord("W")).with_ctrl(),
+                handler=self._toggle_control_window,
+                description=N_("Shows or hides the control window"),
+                bitmap_name=wx.ART_REPORT_VIEW,
             ),
             HotKeyBindingDefinition(
                 name=N_("Help"),
@@ -617,6 +637,11 @@ class PreWarning(
 
         # Init the screen sleep inhibitor
         self._screen_sleep_inhibitor = ScreenSleepInhibitor()
+
+        # Init the control window
+        self._control_window: ControlWindow | None = None
+        self._init_control_window()
+
         self._apply_screen_sleep_setting()
 
         # Set up the queues used for punches and announcements
@@ -643,6 +668,8 @@ class PreWarning(
         self._stats_punches_received = 0
         self._stats_punches_matched = 0
         self._stats_announcements = 0
+        self._stats_dedup_skipped = 0
+        self._last_punch_time: datetime | None = None
         self.health_monitor = HealthMonitor()
         self.health_monitor.register_check(self._check_punch_source_health)
         self.health_monitor.register_check(self._check_start_list_source_health)
@@ -671,6 +698,9 @@ class PreWarning(
         if self.start_list_source is not None:
             self.start_list_source.stop()
         self._screen_sleep_inhibitor.uninhibit()
+        if self._control_window is not None:
+            self._control_window.Destroy()
+            self._control_window = None
 
     @staticmethod
     def _get_portrait_screen() -> wx.Display | None:
@@ -752,8 +782,6 @@ class PreWarning(
         self.health_indicator.SetForegroundColour(wx.Colour(0, 180, 0))
         self.health_indicator.SetToolTip(_("All systems OK"))
         self.health_indicator.Bind(wx.EVT_LEFT_DOWN, self._on_health_indicator_click)
-        self.health_indicator.SetCursor(wx.Cursor(wx.CURSOR_HAND))
-
         self.header_panel_sizer.Add(
             self.health_indicator,
             proportion=0,
@@ -895,6 +923,10 @@ class PreWarning(
         self._update_column_sizes()
 
         self._remove_non_visible_rows()
+
+        # Forward to control window
+        if self._control_window is not None and self._control_window.IsShown():
+            wx.CallAfter(self._control_window.add_prewarning, punch_time, team, leg)
 
     def _add_pre_warning_with_refresh(
         self, passed_time: str, bib_number: str, relay_leg: str
@@ -1079,6 +1111,13 @@ class PreWarning(
     def _config_dialog(self, perform_validation: bool = False):
         start = time()
         state_providers = {}
+
+        dialog_parent = self
+        control_was_active = (
+            self._control_window is not None
+            and self._control_window.IsShown()
+            and self._control_window.IsActive()
+        )
         if self.punch_source is not None:
             state_providers[self.punch_source.name] = self.punch_source
         if MeosInfoServer.has_instance():
@@ -1093,6 +1132,9 @@ class PreWarning(
         def _on_language_changed(value):
             set_language(value)
             self._update_labels()
+            if self._control_window is not None:
+                self._control_window.refresh_translations()
+                self._update_control_window()
             if settings_dialog:
                 settings_dialog.refresh_translations()
 
@@ -1106,14 +1148,25 @@ class PreWarning(
 
         settings_dialog = ConfigDialog(
             self.config,
-            self,
+            dialog_parent,
             title=_("Settings"),
             state_providers=state_providers,
             on_save=_on_save,
         )
         created = time()
         self.logger.debug("Config Dialog created: %d seconds", created - start)
-        settings_dialog.Center()
+
+        if control_was_active and self._control_window is not None:
+            settings_dialog.CenterOnParent()
+            # Move to control window's display
+            ctrl_display = wx.Display(wx.Display.GetFromWindow(self._control_window))
+            area = ctrl_display.GetClientArea()
+            dlg_size = settings_dialog.GetSize()
+            x = area.GetLeft() + (area.GetWidth() - dlg_size.GetWidth()) // 2
+            y = area.GetTop() + (area.GetHeight() - dlg_size.GetHeight()) // 2
+            settings_dialog.SetPosition(wx.Point(x, y))
+        else:
+            settings_dialog.Center()
 
         settings_dialog.TransferDataToWindow()
 
@@ -1121,19 +1174,27 @@ class PreWarning(
             settings_dialog.Validate()
 
         res = settings_dialog.ShowModal()
+
         if res == wx.ID_CANCEL and perform_validation:
             sys.exit(1)
         settings_dialog.Destroy()
+
         self.CONFIG_OPTION_LANGUAGE.on_change = None
 
         if res == wx.ID_CANCEL:
             # Revert to the last saved language (initial or after Save was clicked)
             set_language(saved_lang[0])
             self._update_labels()
+            if self._control_window is not None:
+                self._control_window.refresh_translations()
+                self._update_control_window()
             self.config.get_section(Config.SECTION_COMMON)[
                 self.CONFIG_OPTION_LANGUAGE.name
             ] = saved_lang[0]
         self._refresh_health()
+
+        if control_was_active and self._control_window is not None:
+            self._control_window.Raise()
 
     # -- Health indicator --------------------------------------------------
 
@@ -1274,6 +1335,12 @@ class PreWarning(
             bib_range = self.start_list_source.get_bib_range()
             if bib_range is not None:
                 stats_lines.append(f"{_('Bib range')}: {bib_range[0]} - {bib_range[1]}")
+            team_count = self.start_list_source.get_team_count()
+            if team_count is not None:
+                stats_lines.append(f"{_('Teams')}: {team_count}")
+            runner_count = self.start_list_source.get_runner_count()
+            if runner_count is not None:
+                stats_lines.append(f"{_('Runners (SI card)')}: {runner_count}")
 
         # Voices
         from utils.voice_manager_dialog import get_installed_voice_shortnames
@@ -1306,9 +1373,19 @@ class PreWarning(
             tooltip = issue_lines + "\n\n" + "\n".join(stats_lines)
 
         self.health_indicator.SetToolTip(tooltip)
+        if status == HealthStatus.OK:
+            self.health_indicator.SetCursor(wx.Cursor(wx.CURSOR_ARROW))
+        else:
+            self.health_indicator.SetCursor(wx.Cursor(wx.CURSOR_HAND))
         self.health_indicator.Refresh()
 
+        self._update_control_window()
+
     def _on_health_indicator_click(self, event: wx.MouseEvent) -> None:
+        """Open the relevant dialog based on current health issues."""
+        self._on_health_indicator_click_action()
+
+    def _on_health_indicator_click_action(self):
         """Open the relevant dialog based on current health issues."""
         _, issues = self.health_monitor.evaluate()
         action = self.health_monitor.get_primary_action(issues)
@@ -1316,7 +1393,6 @@ class PreWarning(
             self._open_voice_manager()
         elif action == HealthAction.SETTINGS:
             self._config_dialog()
-        # If no action or OK, do nothing
 
     def _apply_screen_sleep_setting(self) -> None:
         """Enable or disable screen sleep prevention based on config."""
@@ -1326,6 +1402,359 @@ class PreWarning(
             self._screen_sleep_inhibitor.inhibit()
         else:
             self._screen_sleep_inhibitor.uninhibit()
+        self._update_control_window()
+
+    def _init_control_window(self) -> None:
+        """Create and show the control window if enabled and a landscape display exists."""
+        config_section = self.config.get_section(Config.SECTION_COMMON)
+        enabled = self.CONFIG_OPTION_ENABLE_CONTROL_WINDOW.get_value(config_section)
+        if not enabled:
+            return
+        if wx.Display.GetCount() < 2:
+            return
+
+        main_display = wx.Display(wx.Display.GetFromWindow(self))
+        landscape = ControlWindow.find_landscape_display(main_display)
+        if landscape is None:
+            return
+
+        self._control_window = ControlWindow(
+            parent=self,
+            action_handlers={
+                "settings": self._config_dialog,
+                "voice_manager": self._open_voice_manager,
+                "clear": self._clear,
+                "fake_punch": self._simulate_punch,
+                "test_sound": self._play_test_sound,
+                "full_screen": self._toggle_full_screen,
+                "health_dot_click": self._on_health_indicator_click_action,
+                "exit": self.Close,
+            },
+            update_callback=self._update_control_window,
+            key_handler=self._on_key_press,
+        )
+        self._control_window.position_on_display(landscape)
+        self._control_window.Show()
+
+    def _toggle_control_window(self) -> None:
+        """Show or hide the control window."""
+        if self._control_window is None:
+            # Create it if it doesn't exist yet
+            main_display = wx.Display(wx.Display.GetFromWindow(self))
+            landscape = ControlWindow.find_landscape_display(main_display)
+            self._control_window = ControlWindow(
+                parent=self,
+                action_handlers={
+                    "settings": self._config_dialog,
+                    "voice_manager": self._open_voice_manager,
+                    "clear": self._clear,
+                    "fake_punch": self._simulate_punch,
+                    "test_sound": self._play_test_sound,
+                    "full_screen": self._toggle_full_screen,
+                    "health_dot_click": self._on_health_indicator_click_action,
+                    "exit": self.Close,
+                },
+                update_callback=self._update_control_window,
+                key_handler=self._on_key_press,
+            )
+            if landscape is not None:
+                self._control_window.position_on_display(landscape)
+            self._control_window.Show()
+            self._update_control_window()
+        elif self._control_window.IsShown():
+            self._control_window.Hide()
+        else:
+            self._control_window.Show()
+            self._control_window.Raise()
+
+    def _update_control_window(self) -> None:
+        """Push current health/stats data to the control window."""
+        if self._control_window is None or not self._control_window.IsShown():
+            return
+
+        # Health items
+        health_items: list[tuple[str, str, wx.Colour | None, str]] = []
+
+        # Punch source — merged status and health check
+        punch_issues = self._check_punch_source_health()
+        if punch_issues:
+            issue = punch_issues[0]
+            colour = (
+                wx.Colour(220, 0, 0)
+                if issue.status == HealthStatus.ERROR
+                else wx.Colour(220, 160, 0)
+            )
+            health_items.append(
+                (
+                    _("Punch source"),
+                    issue.message,
+                    colour,
+                    _("The configured punch source and its current status."),
+                )
+            )
+        else:
+            ps_name = (
+                _(type(self.punch_source).display_name) if self.punch_source else "-"
+            )
+            health_items.append(
+                (
+                    _("Punch source"),
+                    f"{ps_name} ({_('Running')})",
+                    wx.Colour(0, 150, 0),
+                    _("The configured punch source and its current status."),
+                )
+            )
+
+        # Start list source — merged status and health check
+        sls_issues = self._check_start_list_source_health()
+        if sls_issues:
+            issue = sls_issues[0]
+            colour = (
+                wx.Colour(220, 0, 0)
+                if issue.status == HealthStatus.ERROR
+                else wx.Colour(220, 160, 0)
+            )
+            health_items.append(
+                (
+                    _("Start list source"),
+                    issue.message,
+                    colour,
+                    _("The configured start list source and its current status."),
+                )
+            )
+        else:
+            sls_name = (
+                _(type(self.start_list_source).display_name)
+                if self.start_list_source
+                else "-"
+            )
+            health_items.append(
+                (
+                    _("Start list source"),
+                    f"{sls_name} ({_('Running')})",
+                    wx.Colour(0, 150, 0),
+                    _("The configured start list source and its current status."),
+                )
+            )
+
+        # IP address
+        health_items.append(
+            (
+                _("IP address"),
+                self._get_local_ip(),
+                None,
+                _("The local network IP address of this computer."),
+            )
+        )
+
+        if self._screen_sleep_inhibitor.is_active:
+            health_items.append(
+                (
+                    _("Screen sleep"),
+                    _("Prevented"),
+                    wx.Colour(0, 150, 0),
+                    _("Whether the display is prevented from turning off."),
+                )
+            )
+        else:
+            health_items.append(
+                (
+                    _("Screen sleep"),
+                    _("Normal"),
+                    None,
+                    _("Whether the display is prevented from turning off."),
+                )
+            )
+
+        # Full screen status
+        fs_hotkey = ""
+        for binding in self.hotkey_bindings:
+            if binding.handler == self._toggle_full_screen:
+                fs_hotkey = str(binding.hotkey)
+                break
+        fs_tooltip = _(
+            "Whether the main window is in full screen mode. Toggle with {hotkey}."
+        ).format(hotkey=fs_hotkey)
+        if self.IsFullScreen():
+            health_items.append(
+                (
+                    _("Full Screen"),
+                    _("Yes"),
+                    None,
+                    fs_tooltip,
+                )
+            )
+        else:
+            health_items.append(
+                (
+                    _("Full Screen"),
+                    _("No"),
+                    None,
+                    fs_tooltip,
+                )
+            )
+
+        # Health check results
+        status, issues = self.health_monitor.evaluate()
+
+        voice_issues = self._check_voice_health()
+
+        green = wx.Colour(0, 150, 0)
+
+        if voice_issues:
+            issue = voice_issues[0]
+            colour = (
+                wx.Colour(220, 0, 0)
+                if issue.status == HealthStatus.ERROR
+                else wx.Colour(220, 160, 0)
+            )
+            health_items.append(
+                (
+                    _("Voice check"),
+                    issue.message,
+                    colour,
+                    _("Checks that voices are installed and complete."),
+                )
+            )
+        else:
+            health_items.append(
+                (
+                    _("Voice check"),
+                    _("OK"),
+                    green,
+                    _("Checks that voices are installed and complete."),
+                )
+            )
+
+        self._control_window.update_health(health_items)
+
+        # Stats items
+        stats_items: list[tuple[str, str, str]] = []
+        stats_items.append(
+            (
+                _("Punches received"),
+                str(self._stats_punches_received),
+                _("Total number of punches received from the punch source."),
+            )
+        )
+        stats_items.append(
+            (
+                _("Punches matched"),
+                str(self._stats_punches_matched),
+                _("Punches successfully matched to a team in the start list."),
+            )
+        )
+        stats_items.append(
+            (
+                _("Announcements"),
+                str(self._stats_announcements),
+                _("Number of pre-warnings announced (displayed and read aloud)."),
+            )
+        )
+        stats_items.append(
+            (
+                _("Dedup skipped"),
+                str(self._stats_dedup_skipped),
+                _("Punches skipped by deduplication rules."),
+            )
+        )
+        stats_items.append(
+            (
+                _("Last punch received"),
+                self._last_punch_time.strftime("%H:%M:%S")
+                if self._last_punch_time
+                else "-",
+                _("Time when the last punch was received by the system."),
+            )
+        )
+
+        if self.start_list_source is not None:
+            bib_range = self.start_list_source.get_bib_range()
+            if bib_range is not None:
+                stats_items.append(
+                    (
+                        _("Bib range"),
+                        f"{bib_range[0]} - {bib_range[1]}",
+                        _("The range of team bib numbers in the start list."),
+                    )
+                )
+            else:
+                stats_items.append(
+                    (
+                        _("Bib range"),
+                        "-",
+                        _("The range of team bib numbers in the start list."),
+                    )
+                )
+            team_count = self.start_list_source.get_team_count()
+            stats_items.append(
+                (
+                    _("Teams"),
+                    str(team_count) if team_count is not None else "-",
+                    _("Number of teams in the start list."),
+                )
+            )
+            runner_count = self.start_list_source.get_runner_count()
+            stats_items.append(
+                (
+                    _("Runners (SI card)"),
+                    str(runner_count) if runner_count is not None else "-",
+                    _(
+                        "Number of runners with an SI card registered in the start list."
+                    ),
+                )
+            )
+        else:
+            stats_items.append(
+                (
+                    _("Bib range"),
+                    "-",
+                    _("The range of team bib numbers in the start list."),
+                )
+            )
+            stats_items.append(
+                (
+                    _("Teams"),
+                    "-",
+                    _("Number of teams in the start list."),
+                )
+            )
+            stats_items.append(
+                (
+                    _("Runners (SI card)"),
+                    "-",
+                    _(
+                        "Number of runners with an SI card registered in the start list."
+                    ),
+                )
+            )
+
+        from utils.voice_manager_dialog import get_installed_voice_shortnames
+
+        voice_count = len(get_installed_voice_shortnames())
+        stats_items.append(
+            (
+                _("Installed voices"),
+                str(voice_count),
+                _("Number of TTS voices installed for announcements."),
+            )
+        )
+
+        self._control_window.update_stats(stats_items)
+
+        # Status dot (reuses status/issues from above)
+        if status == HealthStatus.OK:
+            dot_colour = wx.Colour(0, 180, 0)
+            dot_tooltip = _("All systems OK")
+        elif status == HealthStatus.WARNING:
+            dot_colour = wx.Colour(220, 160, 0)
+            dot_tooltip = "\n".join(f"\u2022 {i.message}" for i in issues)
+        else:
+            dot_colour = wx.Colour(220, 0, 0)
+            dot_tooltip = "\n".join(f"\u2022 {i.message}" for i in issues)
+        self._control_window.update_status_dot(
+            dot_colour, dot_tooltip, actionable=status != HealthStatus.OK
+        )
 
     def _toggle_full_screen(self):
         self.logger.debug("Toggle Full Screen")
@@ -1333,6 +1762,7 @@ class PreWarning(
             self.ShowFullScreen(False, style=wx.FULLSCREEN_ALL)
         else:
             self.ShowFullScreen(True, style=wx.FULLSCREEN_ALL)
+        self._update_control_window()
 
     def _simulate_punch(self):
         self.logger.debug("Simulate Punch")
@@ -1360,25 +1790,53 @@ class PreWarning(
 
     def _open_voice_manager(self):
         self.logger.debug("Open Voice Manager")
+        dialog_parent = self
+        control_was_active = (
+            self._control_window is not None
+            and self._control_window.IsShown()
+            and self._control_window.IsActive()
+        )
         bib_range = None
         if self.start_list_source is not None:
             bib_range = self.start_list_source.get_bib_range()
-        dlg = VoiceManagerDialog(self, bib_range=bib_range)
+        dlg = VoiceManagerDialog(dialog_parent, bib_range=bib_range)
+        if control_was_active and self._control_window is not None:
+            ctrl_display = wx.Display(wx.Display.GetFromWindow(self._control_window))
+            area = ctrl_display.GetClientArea()
+            dlg_size = dlg.GetSize()
+            x = area.GetLeft() + (area.GetWidth() - dlg_size.GetWidth()) // 2
+            y = area.GetTop() + (area.GetHeight() - dlg_size.GetHeight()) // 2
+            dlg.SetPosition(wx.Point(x, y))
         dlg.ShowModal()
         dlg.Destroy()
         self._refresh_health()
+        if control_was_active and self._control_window is not None:
+            self._control_window.Raise()
 
     def _notify_ip(self):
         self.logger.debug("Notify IP")
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(("8.8.8.8", 0))  # connecting to a UDP address doesn't send packets
-        local_ip_address = s.getsockname()[0]
+        local_ip_address = self._get_local_ip()
         self.logger.debug("local_ip_address: %s", local_ip_address)
         for number in local_ip_address.split("."):
             self.announcement_queue.put(
                 {_ANNOUNCE_KEY_VOICE: None, _ANNOUNCE_KEY_SOUND: number}
             )
-        s.close()
+            pass
+
+    @staticmethod
+    def _get_local_ip() -> str:
+        """Get the local IPv4 address."""
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            # RFC 5737 TEST-NET-1 address — reserved for documentation, never routable.
+            # Connecting a UDP socket to any address determines the local interface
+            # without sending any packets.
+            s.connect(("192.0.2.1", 1))
+            ip = s.getsockname()[0]
+            s.close()
+            return ip
+        except OSError:
+            return "-"
 
     def _close(self, event=None):
         self.logger.debug("Close")
@@ -1410,7 +1868,7 @@ class PreWarning(
         for key_binding in self.hotkey_bindings:
             if key_binding.matches(key_event):
                 key_binding.handler()
-                break
+                return
 
         key_event.Skip()
 
@@ -1575,6 +2033,7 @@ class PreWarning(
         while True:
             punch = self.punch_queue.get()
             self._stats_punches_received += 1
+            self._last_punch_time = datetime.now()
             self.logger.debug(
                 "Processing: %s from: %s",
                 punch[PUNCH_KEY_CARD_NUMBER],
@@ -1593,6 +2052,7 @@ class PreWarning(
                         self._dedup_card_control, key, punch_passed_time
                     ):
                         self.logger.debug("Skipping duplicate card+control: %s", key)
+                        self._stats_dedup_skipped += 1
                         continue
 
             source = self.start_list_source
@@ -1654,6 +2114,7 @@ class PreWarning(
                 with self._dedup_lock:
                     if self._is_deduped(self._dedup_bib_leg, key, punch_passed_time):
                         self.logger.debug("Skipping duplicate bib+leg: %s", key)
+                        self._stats_dedup_skipped += 1
                         continue
 
             country = punch.get(PUNCH_KEY_COUNTRY)
@@ -1665,6 +2126,7 @@ class PreWarning(
             wx.CallAfter(
                 self._add_pre_warning_with_refresh, passed_time, bib_number, relay_leg
             )
+            wx.CallAfter(self._update_control_window)
 
             if self._dedup_card_control_enabled:
                 key = (punch[PUNCH_KEY_CARD_NUMBER], punch[PUNCH_KEY_CONTROL_CODE])

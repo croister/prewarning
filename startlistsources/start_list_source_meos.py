@@ -86,3 +86,15 @@ class StartListSourceMeos(_StartListSourceBase):
         if not self._running:
             return None
         return MeosInfoServer().get_bib_range()
+
+    def get_team_count(self) -> int | None:
+        """Returns the number of teams from MeOS."""
+        if not self._running:
+            return None
+        return MeosInfoServer().get_team_count()
+
+    def get_runner_count(self) -> int | None:
+        """Returns the number of runners from MeOS."""
+        if not self._running:
+            return None
+        return MeosInfoServer().get_runner_count()

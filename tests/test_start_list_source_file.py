@@ -234,3 +234,70 @@ class TestGetBibRange:
     def test_returns_range_with_multiple_teams(self, source):
         source.team_names = {50: "Team A", 101: "Team B", 200: "Team C"}
         assert source.get_bib_range() == (50, 200)
+
+
+class TestGetTeamCount:
+    @pytest.fixture
+    def source(self, wx_app):
+        with patch("watchdog.observers.Observer") as mock_obs:
+            mock_obs.return_value.is_alive.return_value = False
+            mock_obs.return_value.name = "MockedObserver"
+            with patch.object(
+                __import__("utils.config", fromlist=["Config"]).Config,
+                "register_config_section_listener",
+            ):
+                from startlistsources.start_list_source_file import (
+                    StartListSourceFile,
+                )
+
+                return StartListSourceFile()
+
+    def test_returns_none_when_no_data(self, source):
+        assert source.get_team_count() is None
+
+    def test_returns_none_when_team_names_empty(self, source):
+        source.team_names = {}
+        assert source.get_team_count() is None
+
+    def test_returns_count_with_teams(self, source):
+        source.team_names = {101: "Team A", 102: "Team B", 103: "Team C"}
+        assert source.get_team_count() == 3
+
+    def test_returns_one_with_single_team(self, source):
+        source.team_names = {101: "Team Alpha"}
+        assert source.get_team_count() == 1
+
+
+class TestGetRunnerCount:
+    @pytest.fixture
+    def source(self, wx_app):
+        with patch("watchdog.observers.Observer") as mock_obs:
+            mock_obs.return_value.is_alive.return_value = False
+            mock_obs.return_value.name = "MockedObserver"
+            with patch.object(
+                __import__("utils.config", fromlist=["Config"]).Config,
+                "register_config_section_listener",
+            ):
+                from startlistsources.start_list_source_file import (
+                    StartListSourceFile,
+                )
+
+                return StartListSourceFile()
+
+    def test_returns_none_when_no_data(self, source):
+        assert source.get_runner_count() is None
+
+    def test_returns_none_when_runners_empty(self, source):
+        source.runners = {}
+        assert source.get_runner_count() is None
+
+    def test_returns_count_with_runners(self, source):
+        source.runners = {
+            "12345": {"control_card": "12345"},
+            "67890": {"control_card": "67890"},
+        }
+        assert source.get_runner_count() == 2
+
+    def test_returns_one_with_single_runner(self, source):
+        source.runners = {"12345": {"control_card": "12345"}}
+        assert source.get_runner_count() == 1

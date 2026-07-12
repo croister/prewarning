@@ -609,3 +609,17 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
             if not bibs:
                 return None
             return (min(bibs), max(bibs))
+
+    def get_team_count(self) -> int | None:
+        """Returns the number of teams in the start list."""
+        with self._data_lock:
+            if not self.team_names:
+                return None
+            return len(self.team_names)
+
+    def get_runner_count(self) -> int | None:
+        """Returns the number of runners (SI cards) in the start list."""
+        with self._data_lock:
+            if not self.runners:
+                return None
+            return len(self.runners)
