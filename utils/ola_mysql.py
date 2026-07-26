@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-
 import logging
-from enum import unique, Enum
-from typing import List, Any, Dict
+from enum import Enum, unique
+from typing import Any
 
 import pymysql
 from pymysql.connections import Connection
@@ -16,14 +14,13 @@ from utils.config_definitions import (
     ConfigSectionEnableType,
     ConfigSectionOptionDefinition,
     ConfigSelectorDefinition,
+    ConfigVerifierDefinition,
     SelectionData,
     SelectionResult,
 )
-from utils.config_definitions import ConfigVerifierDefinition
 from utils.i18n import N_
 from utils.singleton import Singleton
 from validators.host_and_domain_name_validators import is_hostname_or_ip
-
 
 LOGGER_NAME = "OlaMySql"
 
@@ -72,7 +69,7 @@ _KEY_PUNCHING_CODES = "punchingCodes"
 _KEY_CLASS_COUNT = "classCount"
 
 
-def get_database_names(connection: Connection) -> List[str]:
+def get_database_names(connection: Connection) -> list[str]:
     logging.getLogger(LOGGER_NAME).debug("get_database_names")
 
     database_names = []
@@ -97,7 +94,7 @@ def is_ola_database(connection: Connection) -> bool:
 
     is_ola_db = get_ola_db_version(connection) != 0
     logging.getLogger(LOGGER_NAME).debug(
-        "is_ola_database({}) == {}".format(str(connection.db), is_ola_db)
+        f"is_ola_database({connection.db!s}) == {is_ola_db}"
     )
     return is_ola_db
 
@@ -133,10 +130,10 @@ class EventForm(Enum):
     def __str__(self) -> str:
         return str(self.value)
 
-    def as_list(self) -> List["EventForm"]:
+    def as_list(self) -> list[EventForm]:
         return [self]
 
-    def as_str_list(self) -> List[str]:
+    def as_str_list(self) -> list[str]:
         return [str(self)]
 
     def __eq__(self, other):
@@ -147,11 +144,11 @@ class EventForm(Enum):
 
 @unique
 class EventFormType(Enum):
-    INDIVIDUAL = [EventForm.INDIVIDUAL_SINGLE_DAY, EventForm.INDIVIDUAL_MULTI_DAY]
-    TEAM = [EventForm.TEAM_SINGLE_DAY, EventForm.TEAM_MULTI_DAY]
-    RELAY = [EventForm.RELAY_SINGLE_DAY, EventForm.RELAY_MULTI_DAY]
-    PATROL = [EventForm.PATROL_SINGLE_DAY, EventForm.PATROL_MULTI_DAY]
-    ALL = [
+    INDIVIDUAL = [EventForm.INDIVIDUAL_SINGLE_DAY, EventForm.INDIVIDUAL_MULTI_DAY]  # noqa: RUF012 - Enum/class-level registry, ClassVar is incorrect here
+    TEAM = [EventForm.TEAM_SINGLE_DAY, EventForm.TEAM_MULTI_DAY]  # noqa: RUF012 - Enum/class-level registry, ClassVar is incorrect here
+    RELAY = [EventForm.RELAY_SINGLE_DAY, EventForm.RELAY_MULTI_DAY]  # noqa: RUF012 - Enum/class-level registry, ClassVar is incorrect here
+    PATROL = [EventForm.PATROL_SINGLE_DAY, EventForm.PATROL_MULTI_DAY]  # noqa: RUF012 - Enum/class-level registry, ClassVar is incorrect here
+    ALL = [  # noqa: RUF012 - Enum/class-level registry, ClassVar is incorrect here
         EventForm.INDIVIDUAL_SINGLE_DAY,
         EventForm.INDIVIDUAL_MULTI_DAY,
         EventForm.TEAM_SINGLE_DAY,
@@ -165,14 +162,14 @@ class EventFormType(Enum):
     def __str__(self) -> str:
         return ", ".join(self.as_str_list())
 
-    def as_list(self) -> List[EventForm]:
+    def as_list(self) -> list[EventForm]:
         return self.value
 
-    def as_str_list(self) -> List[str]:
+    def as_str_list(self) -> list[str]:
         return [str(v) for v in self.value]
 
     def __eq__(self, other):
-        if isinstance(other, str) or isinstance(other, EventForm):
+        if isinstance(other, (str, EventForm)):
             return other in self.value
         return super().__eq__(other)
 
@@ -183,7 +180,7 @@ def _generate_in_format_str(no_of_values: int):
 
 def get_events(
     connection: Connection, event_forms: EventForm | EventFormType | None = None
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
 
     if event_forms is None:
         event_forms = EventFormType.ALL
@@ -203,8 +200,8 @@ def get_events(
             "  `punchingSportIdent`,"
             "  `punchingEmit`"
             " FROM `Events`"
-            " WHERE `eventForm` IN ({})"
-            ";".format(event_forms_format_str)
+            f" WHERE `eventForm` IN ({event_forms_format_str})"
+            ";"
         )
         cursor.execute(sql, event_forms.as_str_list())
         events.extend(cursor.fetchall())
@@ -258,9 +255,7 @@ def is_valid_event(
         correct_event_type = event_forms == event_form_str
 
     valid_event = event_exists and correct_event_type
-    logging.getLogger(LOGGER_NAME).debug(
-        "is_valid_event({}) == {}".format(event_id, valid_event)
-    )
+    logging.getLogger(LOGGER_NAME).debug(f"is_valid_event({event_id}) == {valid_event}")
     return valid_event
 
 
@@ -270,13 +265,11 @@ def is_relay_event(connection: Connection, event_id: int) -> bool:
     relay_event = is_valid_event(
         connection, event_id=event_id, event_forms=EventFormType.RELAY
     )
-    logging.getLogger(LOGGER_NAME).debug(
-        "is_relay_event({}) == {}".format(event_id, relay_event)
-    )
+    logging.getLogger(LOGGER_NAME).debug(f"is_relay_event({event_id}) == {relay_event}")
     return relay_event
 
 
-def get_event_races(connection: Connection, event_id: int) -> List[Dict[str, Any]]:
+def get_event_races(connection: Connection, event_id: int) -> list[dict[str, Any]]:
     logging.getLogger(LOGGER_NAME).debug("get_event_races")
 
     event_races: list[dict[str, Any]] = []
@@ -297,14 +290,14 @@ def is_valid_event_race(
         er[_KEY_EVENT_RACE_ID] for er in get_event_races(connection, event_id)
     ]
     logging.getLogger(LOGGER_NAME).debug(
-        "is_valid_event_race({}) == {}".format(event_race_id, valid_event_race)
+        f"is_valid_event_race({event_race_id}) == {valid_event_race}"
     )
     return valid_event_race
 
 
 def get_event_race_split_time_controls(
     connection: Connection, ola_db_version: int, is_relay: bool, event_race_id: int
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     logging.getLogger(LOGGER_NAME).debug("get_event_split_time_controls")
 
     class_names_query = 'GROUP_CONCAT(DISTINCT `EventClasses`.`name` SEPARATOR ", ")'
@@ -330,7 +323,7 @@ def get_event_race_split_time_controls(
                 "       `Controls`.`location` AS `controlLocation`,"
                 "       `Controls`.`controlAreaName` AS `controlAreaName`,"
                 "       COUNT(DISTINCT `RaceClasses`.`raceClassId`) AS `classCount`,"
-                "       {class_names_query} AS `classNames`,"
+                f"       {class_names_query} AS `classNames`,"
                 "       `RaceClassSplitTimeControls`.`noSplitTimes` AS `noSplitTimes`"
                 " FROM `Controls`"
                 "  LEFT JOIN `CoursesWayPointControls`"
@@ -355,7 +348,7 @@ def get_event_race_split_time_controls(
                 "       `Controls`.`ID` ASC,"
                 "       `EventClasses`.`name` ASC,"
                 "       `RaceClasses`.`raceClassName` ASC"
-                ";".format(class_names_query=class_names_query)
+                ";"
             )
         elif ola_db_version >= OLA_6_3_0_0_DB_VERSION:
             sql = (
@@ -370,7 +363,7 @@ def get_event_race_split_time_controls(
                 "       `Controls`.`location` AS `controlLocation`,"
                 "       `Controls`.`controlAreaName` AS `controlAreaName`,"
                 "       COUNT(DISTINCT `RaceClasses`.`raceClassId`) AS `classCount`,"
-                "       {class_names_query} AS `classNames`"
+                f"       {class_names_query} AS `classNames`"
                 " FROM `Controls`"
                 "  LEFT JOIN `CoursesWayPointControls`"
                 "         ON `Controls`.`controlId` = `CoursesWayPointControls`.`controlId`"
@@ -394,7 +387,7 @@ def get_event_race_split_time_controls(
                 "       `Controls`.`ID` ASC,"
                 "       `EventClasses`.`name` ASC,"
                 "       `RaceClasses`.`raceClassName` ASC"
-                ";".format(class_names_query=class_names_query)
+                ";"
             )
         else:
             sql = (
@@ -409,7 +402,7 @@ def get_event_race_split_time_controls(
                 "       `Controls`.`location` AS `controlLocation`,"
                 "       `Controls`.`controlAreaName` AS `controlAreaName`,"
                 "       COUNT(DISTINCT `RaceClasses`.`raceClassId`) AS `classCount`,"
-                "       {class_names_query} AS `classNames`"
+                f"       {class_names_query} AS `classNames`"
                 " FROM `Controls`"
                 "  LEFT JOIN `CoursesWayPointControls`"
                 "         ON `Controls`.`controlId` = `CoursesWayPointControls`.`controlId`"
@@ -436,7 +429,7 @@ def get_event_race_split_time_controls(
                 "       `Controls`.`ID` ASC,"
                 "       `EventClasses`.`name` ASC,"
                 "       `RaceClasses`.`raceClassName` ASC"
-                ";".format(class_names_query=class_names_query)
+                ";"
             )
         args = [event_race_id]
         cursor.execute(sql, args)
@@ -452,7 +445,7 @@ def are_valid_event_race_control_ids(
     ola_db_version: int,
     is_relay: bool,
     event_race_id: int,
-    control_ids: List[int],
+    control_ids: list[int],
 ) -> bool:
     logging.getLogger(LOGGER_NAME).debug("is_valid_event_race_control_ids")
 
@@ -481,7 +474,7 @@ def are_valid_event_race_control_ids(
 def _verify_connection_parameters(host: str, user: str, password: str):
     try:
         connect(host, user, password).close()
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
         logging.getLogger(LOGGER_NAME).debug("_verify_connection_parameters: %s", e)
         return False
     return True
@@ -498,7 +491,7 @@ def _select_database(host: str, user: str, password: str) -> SelectionResult | b
             for database in databases:
                 result.add_value(SelectionData(database, database))
             return result
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
         logging.getLogger(LOGGER_NAME).debug("_select_database: %s", e)
         return False
 
@@ -508,7 +501,7 @@ def _verify_database(host: str, user: str, password: str, database: str) -> bool
         connection = connect(host, user, password, database)
         with connection:
             return is_ola_database(connection)
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
         logging.getLogger(LOGGER_NAME).debug("_verify_database: %s", e)
         return False
 
@@ -531,17 +524,11 @@ def _select_event(
                 result.add_value(
                     SelectionData(
                         event[_KEY_EVENT_ID],
-                        "{id}: {name} ({form}) {start}-{end}".format(
-                            id=event[_KEY_EVENT_ID],
-                            name=event[_KEY_EVENT_NAME],
-                            form=event[_KEY_EVENT_FORM],
-                            start=event[_KEY_EVENT_START_DATE],
-                            end=event[_KEY_EVENT_FINISH_DATE],
-                        ),
+                        f"{event[_KEY_EVENT_ID]}: {event[_KEY_EVENT_NAME]} ({event[_KEY_EVENT_FORM]}) {event[_KEY_EVENT_START_DATE]}-{event[_KEY_EVENT_FINISH_DATE]}",
                     )
                 )
             return result
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
         logging.getLogger(LOGGER_NAME).debug("_select_event: %s", e)
         return False
 
@@ -561,7 +548,7 @@ def _verify_event(
         connection = connect(host, user, password, database)
         with connection:
             return is_valid_event(connection, event_id, event_forms)
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
         logging.getLogger(LOGGER_NAME).debug("_verify_event: %s", e)
         return False
 
@@ -580,17 +567,11 @@ def _select_event_race(
                 result.add_value(
                     SelectionData(
                         events_race[_KEY_EVENT_RACE_ID],
-                        "{id}: {name} ({light}) {distance} distance {date}".format(
-                            id=events_race[_KEY_EVENT_RACE_ID],
-                            name=events_race[_KEY_EVENT_RACE_NAME],
-                            light=events_race[_KEY_EVENT_RACE_LIGHT],
-                            distance=events_race[_KEY_EVENT_RACE_DISTANCE],
-                            date=events_race[_KEY_EVENT_RACE_DATE],
-                        ),
+                        f"{events_race[_KEY_EVENT_RACE_ID]}: {events_race[_KEY_EVENT_RACE_NAME]} ({events_race[_KEY_EVENT_RACE_LIGHT]}) {events_race[_KEY_EVENT_RACE_DISTANCE]} distance {events_race[_KEY_EVENT_RACE_DATE]}",
                     )
                 )
             return result
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
         logging.getLogger(LOGGER_NAME).debug("_select_event_race: %s", e)
         return False
 
@@ -607,7 +588,7 @@ def _verify_event_race(
         connection = connect(host, user, password, database)
         with connection:
             return is_valid_event_race(connection, event_id, event_race_id)
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
         logging.getLogger(LOGGER_NAME).debug("_verify_event_race: %s", e)
         return False
 
@@ -617,9 +598,9 @@ def get_event_race_split_times(
     ola_db_version: int,
     event_id: int,
     event_race_id: int,
-    control_ids: List[int],
+    control_ids: list[int],
     last_modify_time: str | None = None,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     logging.getLogger(LOGGER_NAME).debug("get_event_race_split_times")
 
     if last_modify_time is None:
@@ -676,11 +657,11 @@ def get_event_race_split_times(
                 "         ON `p_curr`.`nationalityId` = `c_curr`.`countryId`"
                 " WHERE `EventRaces`.`eventId` = %s"
                 "   AND `EventRaces`.`eventRaceId` = %s"
-                "   AND `Controls`.`ID` IN ({})"
+                f"   AND `Controls`.`ID` IN ({control_ids_format_str})"
                 "   AND `SplitTimes`.`modifyDate` >= %s"
                 " ORDER BY"
                 "  `SplitTimes`.`modifyDate` ASC"
-                ";".format(control_ids_format_str)
+                ";"
             )
         else:
             sql = (
@@ -732,13 +713,13 @@ def get_event_race_split_times(
                 "         ON `p_curr`.`nationalityId` = `c_curr`.`countryId`"
                 " WHERE `EventRaces`.`eventId` = %s"
                 "   AND `EventRaces`.`eventRaceId` = %s"
-                "   AND `Controls`.`ID` IN ({})"
+                f"   AND `Controls`.`ID` IN ({control_ids_format_str})"
                 "   AND `SplitTimes`.`modifyDate` >= %s"
                 " ORDER BY"
                 "  `SplitTimes`.`modifyDate` ASC"
-                ";".format(control_ids_format_str)
+                ";"
             )
-        args: list[int | str] = list()
+        args: list[int | str] = []
         args.append(event_id)
         args.append(event_race_id)
         args.extend(control_ids)
@@ -1034,9 +1015,7 @@ class OlaMySql(ConfigConsumer, Singleton, metaclass=_OlaMySqlMeta):
 
         if LOGGER_NAME != self.__class__.__name__:
             raise ValueError(
-                "LOGGER_NAME not correct: {} vs {}".format(
-                    LOGGER_NAME, self.__class__.__name__
-                )
+                f"LOGGER_NAME not correct: {LOGGER_NAME} vs {self.__class__.__name__}"
             )
 
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -1055,7 +1034,7 @@ class OlaMySql(ConfigConsumer, Singleton, metaclass=_OlaMySqlMeta):
 
         self.logger.debug(self)
 
-    def config_updated(self, section_names: List[str]):
+    def config_updated(self, section_names: list[str]):
         self._parse_config()
 
     def _parse_config(self):
@@ -1076,7 +1055,7 @@ class OlaMySql(ConfigConsumer, Singleton, metaclass=_OlaMySqlMeta):
         self.ola_db_version = None
         self.is_relay = None
 
-    def get_database_names(self) -> List[str]:
+    def get_database_names(self) -> list[str]:
         self.logger.debug("get_database_names")
 
         assert self.host is not None
@@ -1096,9 +1075,7 @@ class OlaMySql(ConfigConsumer, Singleton, metaclass=_OlaMySqlMeta):
                 self.CONFIG_SECTION_OLA_MYSQL,
             )
             raise ValueError(
-                'The value for "database" in the "{}" section is missing.'.format(
-                    self.CONFIG_SECTION_OLA_MYSQL
-                )
+                f'The value for "database" in the "{self.CONFIG_SECTION_OLA_MYSQL}" section is missing.'
             )
 
         assert self.host is not None
@@ -1113,12 +1090,11 @@ class OlaMySql(ConfigConsumer, Singleton, metaclass=_OlaMySqlMeta):
                     'The database "%s" is not a OLA database.', self.database
                 )
                 raise ValueError(
-                    'The database "{}" is not a OLA database.'.format(self.database)
+                    f'The database "{self.database}" is not a OLA database.'
                 )
 
-        if self.is_relay is None:
-            if self.event is not None:
-                self.is_relay = is_relay_event(connection, event_id=self.event)
+        if self.is_relay is None and self.event is not None:
+            self.is_relay = is_relay_event(connection, event_id=self.event)
 
         return connection
 
@@ -1133,7 +1109,7 @@ class OlaMySql(ConfigConsumer, Singleton, metaclass=_OlaMySqlMeta):
 
     def get_events(
         self, event_forms: EventForm | EventFormType | None = None
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         self.logger.debug("get_events")
 
         connection = self._connect()
@@ -1141,7 +1117,7 @@ class OlaMySql(ConfigConsumer, Singleton, metaclass=_OlaMySqlMeta):
             events = get_events(connection, event_forms)
         return events
 
-    def get_event_races(self) -> List[Dict[str, Any]]:
+    def get_event_races(self) -> list[dict[str, Any]]:
         self.logger.debug("get_event_races")
 
         if self.event is None:
@@ -1152,67 +1128,66 @@ class OlaMySql(ConfigConsumer, Singleton, metaclass=_OlaMySqlMeta):
             event_races = get_event_races(connection, self.event)
         return event_races
 
-    def get_event_classes(self) -> List[Dict[str, Any]]:
+    def get_event_classes(self) -> list[dict[str, Any]]:
         self.logger.debug("get_event_classes")
         if self.event is None:
             raise ValueError("A Event needs to be selected first")
         event_classes = []
         connection = self._connect()
-        with connection:
-            with connection.cursor(DictCursor) as cursor:
-                sql = (
-                    "SELECT"
-                    "  `EventClasses`.`eventClassId`,"
-                    "  `EventClasses`.`baseClassId`,"
-                    "  `EventClasses`.`name`,"
-                    "  `EventClasses`.`shortName` AS `class`,"
-                    "  `EventClasses`.`eventId`,"
-                    "  `EventClasses`.`classStatus`,"
-                    "  `EventClasses`.`collectedTo`,"
-                    "  `CollectedToEventClasses`.`shortName` AS `collectedToName`,"
-                    "  `EventClasses`.`dividedFrom`,"
-                    "  `EventClasses`.`finalFromClassId`,"
-                    "  `EventClasses`.`lowAge`,"
-                    "  `EventClasses`.`highAge`,"
-                    "  `EventClasses`.`sex`,"
-                    "  `EventClasses`.`numberInTeam`,"
-                    "  `EventClasses`.`teamEntry`,"
-                    "  `EventClasses`.`maxNumberInClass`,"
-                    "  `EventClasses`.`numberOfVacancies`,"
-                    "  `EventClasses`.`divideClassMethod`,"
-                    "  `EventClasses`.`actualForRanking`,"
-                    "  `EventClasses`.`noTimePresentation`,"
-                    "  `EventClasses`.`substituteClassId`,"
-                    "  `EventClasses`.`notQualifiedSubstitutionClassId`,"
-                    "  `EventClasses`.`classTypeId`,"
-                    "  `ClassTypes`.`name` AS `classTypeName`,"
-                    "  `EventClasses`.`normalizedClass`,"
-                    "  `EventClasses`.`numberOfPrizesTotal`,"
-                    "  `EventClasses`.`noTotalResult`,"
-                    "  `EventClasses`.`allowEventRaceEntry`,"
-                    "  `EventClasses`.`allowCardReusage`,"
-                    "  `EventClasses`.`sequence`,"
-                    "  `EventClasses`.`allowNoTimePresentationEntries`"
-                    " FROM `EventClasses`"
-                    "  LEFT JOIN `EventClasses` AS `CollectedToEventClasses`"
-                    "         ON `CollectedToEventClasses`.`baseClassId` = `EventClasses`.`collectedTo`"
-                    "  LEFT JOIN `ClassTypes`"
-                    "         ON `EventClasses`.`classTypeId` = `ClassTypes`.`classTypeId`"
-                    " WHERE `EventClasses`.`eventId` = %s"
-                    "   AND (`CollectedToEventClasses`.`eventId` = %s"
-                    "        OR `CollectedToEventClasses`.`eventId` IS NULL)"
-                    " ORDER BY"
-                    "  `EventClasses`.`sequence`"
-                    ";"
-                )
-                cursor.execute(sql, (self.event, self.event))
-                event_classes.extend(cursor.fetchall())
-                self.logger.debug("Event classes data: %s", event_classes)
+        with connection, connection.cursor(DictCursor) as cursor:
+            sql = (
+                "SELECT"
+                "  `EventClasses`.`eventClassId`,"
+                "  `EventClasses`.`baseClassId`,"
+                "  `EventClasses`.`name`,"
+                "  `EventClasses`.`shortName` AS `class`,"
+                "  `EventClasses`.`eventId`,"
+                "  `EventClasses`.`classStatus`,"
+                "  `EventClasses`.`collectedTo`,"
+                "  `CollectedToEventClasses`.`shortName` AS `collectedToName`,"
+                "  `EventClasses`.`dividedFrom`,"
+                "  `EventClasses`.`finalFromClassId`,"
+                "  `EventClasses`.`lowAge`,"
+                "  `EventClasses`.`highAge`,"
+                "  `EventClasses`.`sex`,"
+                "  `EventClasses`.`numberInTeam`,"
+                "  `EventClasses`.`teamEntry`,"
+                "  `EventClasses`.`maxNumberInClass`,"
+                "  `EventClasses`.`numberOfVacancies`,"
+                "  `EventClasses`.`divideClassMethod`,"
+                "  `EventClasses`.`actualForRanking`,"
+                "  `EventClasses`.`noTimePresentation`,"
+                "  `EventClasses`.`substituteClassId`,"
+                "  `EventClasses`.`notQualifiedSubstitutionClassId`,"
+                "  `EventClasses`.`classTypeId`,"
+                "  `ClassTypes`.`name` AS `classTypeName`,"
+                "  `EventClasses`.`normalizedClass`,"
+                "  `EventClasses`.`numberOfPrizesTotal`,"
+                "  `EventClasses`.`noTotalResult`,"
+                "  `EventClasses`.`allowEventRaceEntry`,"
+                "  `EventClasses`.`allowCardReusage`,"
+                "  `EventClasses`.`sequence`,"
+                "  `EventClasses`.`allowNoTimePresentationEntries`"
+                " FROM `EventClasses`"
+                "  LEFT JOIN `EventClasses` AS `CollectedToEventClasses`"
+                "         ON `CollectedToEventClasses`.`baseClassId` = `EventClasses`.`collectedTo`"
+                "  LEFT JOIN `ClassTypes`"
+                "         ON `EventClasses`.`classTypeId` = `ClassTypes`.`classTypeId`"
+                " WHERE `EventClasses`.`eventId` = %s"
+                "   AND (`CollectedToEventClasses`.`eventId` = %s"
+                "        OR `CollectedToEventClasses`.`eventId` IS NULL)"
+                " ORDER BY"
+                "  `EventClasses`.`sequence`"
+                ";"
+            )
+            cursor.execute(sql, (self.event, self.event))
+            event_classes.extend(cursor.fetchall())
+            self.logger.debug("Event classes data: %s", event_classes)
         return event_classes
 
     def get_event_race_results(
-        self, event_class_ids: List[str], runner_statuses: List[str] | None = None
-    ) -> List[Dict[str, Any]]:
+        self, event_class_ids: list[str], runner_statuses: list[str] | None = None
+    ) -> list[dict[str, Any]]:
         self.logger.debug("get_event_results")
         if self.event is None:
             raise ValueError("A Event needs to be selected first")
@@ -1222,59 +1197,54 @@ class OlaMySql(ConfigConsumer, Singleton, metaclass=_OlaMySqlMeta):
             runner_statuses = [_RUNNER_STATUS_PASSED]
         event_results = []
         connection = self._connect()
-        with connection:
-            with connection.cursor(DictCursor) as cursor:
-                event_class_ids_format_str = _generate_in_format_str(
-                    len(event_class_ids)
-                )
-                runner_statuses_format_str = _generate_in_format_str(
-                    len(runner_statuses)
-                )
-                sql = (
-                    "SELECT"
-                    "  `Results`.`bibNumber`,"
-                    "  `Results`.`individualCourseId`,"
-                    "  `Results`.`rawDataFromElectronicPunchingCardsId`,"
-                    "  `Results`.`modifyDate`,"
-                    "  `Results`.`totalTime`,"
-                    "  `Results`.`position`,"
-                    "  `Persons`.`familyname` as `lastname`,"
-                    "  `Persons`.`firstname` as `firstname`,"
-                    "  `Organisations`.`shortname` as `clubname`,"
-                    "  `EventClasses`.`shortName`,"
-                    "  `Results`.`runnerStatus`,"
-                    "  `Results`.`entryid`,"
-                    "  `Results`.`allocatedStartTime`,"
-                    "  `Results`.`starttime`,"
-                    "  `Entries`.`allocationControl`,"
-                    "  `Entries`.`allocationEntryId`"
-                    " FROM `Results`"
-                    "   INNER JOIN `Entries`"
-                    "           ON `Results`.`entryId` = `Entries`.`entryId`"
-                    "   INNER JOIN `Persons`"
-                    "           ON `Entries`.`competitorId` = `Persons`.`personId`"
-                    "   LEFT JOIN `Organisations`"
-                    "           ON `Persons`.`defaultOrganisationId` = `Organisations`.`organisationId`"
-                    "   INNER JOIN `RaceClasses`"
-                    "           ON `Results`.`raceClassID` = `RaceClasses`.`raceClassId`"
-                    "   INNER JOIN `EventClasses`"
-                    "           ON `RaceClasses`.`eventClassId` = `EventClasses`.`eventClassId`"
-                    "  WHERE `RaceClasses`.`eventRaceId` = %s"
-                    "    AND `EventClasses`.`eventId` = %s"
-                    "    AND `EventClasses`.`eventClassId` IN ({})"
-                    "    AND `RaceClasses`.`raceClassStatus` NOT IN ('notUsed')"
-                    "    AND `Results`.`runnerStatus` IN ({})"
-                    ";".format(event_class_ids_format_str, runner_statuses_format_str)
-                )
-                args = [self.event_race, self.event]
-                args.extend(event_class_ids)
-                args.extend(runner_statuses)
-                cursor.execute(sql, args)
-                event_results.extend(cursor.fetchall())
-                self.logger.debug("Event results data: %s", event_results)
+        with connection, connection.cursor(DictCursor) as cursor:
+            event_class_ids_format_str = _generate_in_format_str(len(event_class_ids))
+            runner_statuses_format_str = _generate_in_format_str(len(runner_statuses))
+            sql = (
+                "SELECT"
+                "  `Results`.`bibNumber`,"
+                "  `Results`.`individualCourseId`,"
+                "  `Results`.`rawDataFromElectronicPunchingCardsId`,"
+                "  `Results`.`modifyDate`,"
+                "  `Results`.`totalTime`,"
+                "  `Results`.`position`,"
+                "  `Persons`.`familyname` as `lastname`,"
+                "  `Persons`.`firstname` as `firstname`,"
+                "  `Organisations`.`shortname` as `clubname`,"
+                "  `EventClasses`.`shortName`,"
+                "  `Results`.`runnerStatus`,"
+                "  `Results`.`entryid`,"
+                "  `Results`.`allocatedStartTime`,"
+                "  `Results`.`starttime`,"
+                "  `Entries`.`allocationControl`,"
+                "  `Entries`.`allocationEntryId`"
+                " FROM `Results`"
+                "   INNER JOIN `Entries`"
+                "           ON `Results`.`entryId` = `Entries`.`entryId`"
+                "   INNER JOIN `Persons`"
+                "           ON `Entries`.`competitorId` = `Persons`.`personId`"
+                "   LEFT JOIN `Organisations`"
+                "           ON `Persons`.`defaultOrganisationId` = `Organisations`.`organisationId`"
+                "   INNER JOIN `RaceClasses`"
+                "           ON `Results`.`raceClassID` = `RaceClasses`.`raceClassId`"
+                "   INNER JOIN `EventClasses`"
+                "           ON `RaceClasses`.`eventClassId` = `EventClasses`.`eventClassId`"
+                "  WHERE `RaceClasses`.`eventRaceId` = %s"
+                "    AND `EventClasses`.`eventId` = %s"
+                f"    AND `EventClasses`.`eventClassId` IN ({event_class_ids_format_str})"
+                "    AND `RaceClasses`.`raceClassStatus` NOT IN ('notUsed')"
+                f"    AND `Results`.`runnerStatus` IN ({runner_statuses_format_str})"
+                ";"
+            )
+            args = [self.event_race, self.event]
+            args.extend(event_class_ids)
+            args.extend(runner_statuses)
+            cursor.execute(sql, args)
+            event_results.extend(cursor.fetchall())
+            self.logger.debug("Event results data: %s", event_results)
         return event_results
 
-    def get_event_race_split_time_controls(self) -> List[Dict[str, Any]]:
+    def get_event_race_split_time_controls(self) -> list[dict[str, Any]]:
         self.logger.debug("get_event_split_time_controls")
         if self.event is None:
             raise ValueError("A Event needs to be selected first")
@@ -1294,8 +1264,8 @@ class OlaMySql(ConfigConsumer, Singleton, metaclass=_OlaMySqlMeta):
         return split_time_controls
 
     def get_event_race_split_times(
-        self, control_ids: List[int], last_modify_time: str | None = None
-    ) -> List[Dict[str, Any]]:
+        self, control_ids: list[int], last_modify_time: str | None = None
+    ) -> list[dict[str, Any]]:
         self.logger.debug("get_event_race_split_times")
         if self.event is None:
             raise ValueError("A Event needs to be selected first")
@@ -1320,66 +1290,65 @@ class OlaMySql(ConfigConsumer, Singleton, metaclass=_OlaMySqlMeta):
 
     def get_event_race_pre_warning_data(
         self, card_number: str
-    ) -> Dict[str, Any] | None:
+    ) -> dict[str, Any] | None:
         self.logger.debug("get_event_pre_warning_data")
         if self.event is None:
             raise ValueError("A Event needs to be selected first")
         if self.event_race is None:
             raise ValueError("A Event Race needs to be selected first")
         connection = self._connect()
-        with connection:
-            with connection.cursor(DictCursor) as cursor:
-                sql = (
-                    "SELECT"
-                    "  `Results`.`bibNumber`,"
-                    "  `RaceClasses`.`relayLeg`,"
-                    "  (SELECT MAX(`rc2`.`relayLeg`) FROM `RaceClasses` `rc2`"
-                    "   WHERE `rc2`.`eventClassId` = `RaceClasses`.`eventClassId`)"
-                    "    = `RaceClasses`.`relayLeg` AS isLastLeg,"
-                    "  COALESCE("
-                    "    (SELECT `c_next`.`alpha3`"
-                    "     FROM `Results` `r_next`"
-                    "     LEFT JOIN `RaceClasses` `rc_next`"
-                    "       ON `r_next`.`raceClassId` = `rc_next`.`raceClassId`"
-                    "     LEFT JOIN `Persons` `p_next`"
-                    "       ON `r_next`.`relayPersonId` = `p_next`.`personId`"
-                    "     LEFT JOIN `Countries` `c_next`"
-                    "       ON `p_next`.`nationalityId` = `c_next`.`countryId`"
-                    "     WHERE `r_next`.`entryId` = `Results`.`entryId`"
-                    "       AND `rc_next`.`relayLeg` = `RaceClasses`.`relayLeg` + 1"
-                    "     LIMIT 1),"
-                    "    `c_curr`.`alpha3`"
-                    "  ) AS country"
-                    " FROM `Results`"
-                    "  LEFT JOIN `RaceClasses`"
-                    "         ON `Results`.`raceClassId` = `RaceClasses`.`raceClassId`"
-                    "  LEFT JOIN `EventRaces`"
-                    "         ON `RaceClasses`.`eventRaceId` = `EventRaces`.`eventRaceId`"
-                    "  LEFT JOIN `ElectronicPunchingCards`"
-                    "         ON `Results`.`electronicPunchingCardId` = `ElectronicPunchingCards`.`cardId`"
-                    "  LEFT JOIN `Persons` `p_curr`"
-                    "         ON `Results`.`relayPersonId` = `p_curr`.`personId`"
-                    "  LEFT JOIN `Countries` `c_curr`"
-                    "         ON `p_curr`.`nationalityId` = `c_curr`.`countryId`"
-                    " WHERE `EventRaces`.`eventId` = %s"
-                    "   AND `EventRaces`.`eventRaceId` = %s"
-                    "   AND `ElectronicPunchingCards`.`cardNumber` = %s"
-                    " ORDER BY"
-                    "  `Results`.`bibNumber`,"
-                    "  `RaceClasses`.`relayLeg`"
-                    ";"
-                )
-                args = [self.event, self.event_race, card_number]
-                cursor.execute(sql, args)
-                event_pre_warning_data = cursor.fetchall()
-                self.logger.debug("Event Pre-Warning data: %s", event_pre_warning_data)
-                if len(event_pre_warning_data) == 0:
-                    return None
-                if len(event_pre_warning_data) == 1:
-                    return event_pre_warning_data[0]
-                else:
-                    self.logger.debug("Too many matches, skipping!")
-                    return None
+        with connection, connection.cursor(DictCursor) as cursor:
+            sql = (
+                "SELECT"
+                "  `Results`.`bibNumber`,"
+                "  `RaceClasses`.`relayLeg`,"
+                "  (SELECT MAX(`rc2`.`relayLeg`) FROM `RaceClasses` `rc2`"
+                "   WHERE `rc2`.`eventClassId` = `RaceClasses`.`eventClassId`)"
+                "    = `RaceClasses`.`relayLeg` AS isLastLeg,"
+                "  COALESCE("
+                "    (SELECT `c_next`.`alpha3`"
+                "     FROM `Results` `r_next`"
+                "     LEFT JOIN `RaceClasses` `rc_next`"
+                "       ON `r_next`.`raceClassId` = `rc_next`.`raceClassId`"
+                "     LEFT JOIN `Persons` `p_next`"
+                "       ON `r_next`.`relayPersonId` = `p_next`.`personId`"
+                "     LEFT JOIN `Countries` `c_next`"
+                "       ON `p_next`.`nationalityId` = `c_next`.`countryId`"
+                "     WHERE `r_next`.`entryId` = `Results`.`entryId`"
+                "       AND `rc_next`.`relayLeg` = `RaceClasses`.`relayLeg` + 1"
+                "     LIMIT 1),"
+                "    `c_curr`.`alpha3`"
+                "  ) AS country"
+                " FROM `Results`"
+                "  LEFT JOIN `RaceClasses`"
+                "         ON `Results`.`raceClassId` = `RaceClasses`.`raceClassId`"
+                "  LEFT JOIN `EventRaces`"
+                "         ON `RaceClasses`.`eventRaceId` = `EventRaces`.`eventRaceId`"
+                "  LEFT JOIN `ElectronicPunchingCards`"
+                "         ON `Results`.`electronicPunchingCardId` = `ElectronicPunchingCards`.`cardId`"
+                "  LEFT JOIN `Persons` `p_curr`"
+                "         ON `Results`.`relayPersonId` = `p_curr`.`personId`"
+                "  LEFT JOIN `Countries` `c_curr`"
+                "         ON `p_curr`.`nationalityId` = `c_curr`.`countryId`"
+                " WHERE `EventRaces`.`eventId` = %s"
+                "   AND `EventRaces`.`eventRaceId` = %s"
+                "   AND `ElectronicPunchingCards`.`cardNumber` = %s"
+                " ORDER BY"
+                "  `Results`.`bibNumber`,"
+                "  `RaceClasses`.`relayLeg`"
+                ";"
+            )
+            args = [self.event, self.event_race, card_number]
+            cursor.execute(sql, args)
+            event_pre_warning_data = cursor.fetchall()
+            self.logger.debug("Event Pre-Warning data: %s", event_pre_warning_data)
+            if len(event_pre_warning_data) == 0:
+                return None
+            if len(event_pre_warning_data) == 1:
+                return event_pre_warning_data[0]
+            else:
+                self.logger.debug("Too many matches, skipping!")
+                return None
 
     def get_bib_range(self) -> tuple[int, int] | None:
         """Returns the min and max bib numbers for the current event race."""
@@ -1387,25 +1356,24 @@ class OlaMySql(ConfigConsumer, Singleton, metaclass=_OlaMySqlMeta):
         if self.event is None or self.event_race is None:
             return None
         connection = self._connect()
-        with connection:
-            with connection.cursor(DictCursor) as cursor:
-                sql = (
-                    "SELECT"
-                    "  MIN(`Results`.`bibNumber`) AS min_bib,"
-                    "  MAX(`Results`.`bibNumber`) AS max_bib"
-                    " FROM `Results`"
-                    "  LEFT JOIN `RaceClasses`"
-                    "         ON `Results`.`raceClassId` = `RaceClasses`.`raceClassId`"
-                    "  LEFT JOIN `EventRaces`"
-                    "         ON `RaceClasses`.`eventRaceId` = `EventRaces`.`eventRaceId`"
-                    " WHERE `EventRaces`.`eventId` = %s"
-                    "   AND `EventRaces`.`eventRaceId` = %s"
-                    "   AND `Results`.`bibNumber` IS NOT NULL"
-                    ";"
-                )
-                args = [self.event, self.event_race]
-                cursor.execute(sql, args)
-                row = cursor.fetchone()
-                if row and row["min_bib"] is not None:
-                    return (int(row["min_bib"]), int(row["max_bib"]))
-                return None
+        with connection, connection.cursor(DictCursor) as cursor:
+            sql = (
+                "SELECT"
+                "  MIN(`Results`.`bibNumber`) AS min_bib,"
+                "  MAX(`Results`.`bibNumber`) AS max_bib"
+                " FROM `Results`"
+                "  LEFT JOIN `RaceClasses`"
+                "         ON `Results`.`raceClassId` = `RaceClasses`.`raceClassId`"
+                "  LEFT JOIN `EventRaces`"
+                "         ON `RaceClasses`.`eventRaceId` = `EventRaces`.`eventRaceId`"
+                " WHERE `EventRaces`.`eventId` = %s"
+                "   AND `EventRaces`.`eventRaceId` = %s"
+                "   AND `Results`.`bibNumber` IS NOT NULL"
+                ";"
+            )
+            args = [self.event, self.event_race]
+            cursor.execute(sql, args)
+            row = cursor.fetchone()
+            if row and row["min_bib"] is not None:
+                return (int(row["min_bib"]), int(row["max_bib"]))
+            return None

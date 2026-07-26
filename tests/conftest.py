@@ -2,6 +2,7 @@ import logging
 
 import pytest
 import wx
+
 from utils.singleton import _Singleton
 
 

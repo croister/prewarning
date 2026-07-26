@@ -1,14 +1,12 @@
-# -*- coding: utf-8 -*-
-
 import logging
-from typing import List, Dict
 
 from pymysql import OperationalError
 
-from utils.config import ConfigSectionDefinition, Config
+from utils.config import Config, ConfigSectionDefinition
 from utils.config_definitions import ConfigSectionEnableType
 from utils.i18n import N_
 from utils.ola_mysql import OlaMySql
+
 from ._base import _StartListSourceBase
 
 
@@ -81,7 +79,7 @@ class StartListSourceOlaMySql(_StartListSourceBase):
     def on_modified(self, event):
         pass
 
-    def config_updated(self, section_names: List[str]):
+    def config_updated(self, section_names: list[str]):
         self.update()
 
     def update(self):
@@ -90,7 +88,7 @@ class StartListSourceOlaMySql(_StartListSourceBase):
     def _parse_config(self):
         pass
 
-    def lookup_from_card_number(self, card_number: str) -> Dict[str, str] | None:
+    def lookup_from_card_number(self, card_number: str) -> dict[str, str] | None:
         """Returns Bib-Number and Relay Leg for the provided Card Number.
 
         :param str card_number: The Card Number to look up.

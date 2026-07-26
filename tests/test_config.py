@@ -1,5 +1,6 @@
-from unittest.mock import MagicMock, patch
 from pathlib import Path
+from unittest.mock import MagicMock, patch
+
 import pytest
 
 from utils.config import Config
@@ -17,8 +18,8 @@ tmp_config_path = "/tmp/test_config.ini"
 def reset_config_class_state():
     saved_defs = dict(Config.CONFIG_SECTION_DEFINITIONS)
     saved_listeners = dict(Config.CONFIG_SECTION_LISTENERS)
-    Config.CONFIG_SECTION_DEFINITIONS = dict()
-    Config.CONFIG_SECTION_LISTENERS = dict()
+    Config.CONFIG_SECTION_DEFINITIONS = {}
+    Config.CONFIG_SECTION_LISTENERS = {}
     yield
     Config.CONFIG_SECTION_DEFINITIONS = saved_defs
     Config.CONFIG_SECTION_LISTENERS = saved_listeners
@@ -240,7 +241,7 @@ class TestConfigInstance:
     def test_update_live_section_option(self, mock_watchdog):
         c = Config()
         c.config.add_section("sect")
-        c.prev_config_sections["sect"] = dict()
+        c.prev_config_sections["sect"] = {}
         opt = ConfigOptionDefinition("opt", "Opt", str, "desc")
         c.update_live_section_option("sect", opt, "new_value")
         assert c.config["sect"]["opt"] == "new_value"

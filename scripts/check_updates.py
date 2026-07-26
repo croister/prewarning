@@ -19,6 +19,7 @@ def _check_python_version() -> str | None:
         cwd=str(PROJECT_DIR),
         capture_output=True,
         text=True,
+        check=False,
     )
     if result.returncode != 0:
         return None
@@ -29,6 +30,7 @@ def _check_python_version() -> str | None:
         ["uv", "python", "list", "--all-versions"],
         capture_output=True,
         text=True,
+        check=False,
     )
     if result.returncode != 0:
         return None
@@ -65,6 +67,7 @@ def main() -> int:
         cwd=str(PROJECT_DIR),
         capture_output=True,
         text=True,
+        check=False,
     )
 
     if result.returncode != 0:

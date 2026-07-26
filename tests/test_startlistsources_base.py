@@ -1,7 +1,8 @@
 from unittest.mock import patch
+
 import pytest
 
-from startlistsources._base import _StartListSourceBase, _NOT_OVERRIDDEN
+from startlistsources._base import _NOT_OVERRIDDEN, _StartListSourceBase
 
 
 class TestStartListSourceBase:

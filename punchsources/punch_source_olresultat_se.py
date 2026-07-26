@@ -1,23 +1,19 @@
-# -*- coding: utf-8 -*-
-
 import logging
 from datetime import date, datetime
 from threading import Event, Thread
-from typing import List, Dict
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 from imurl import URL
 
-from utils.state_saver import StateSaverMixin
-from utils.config import ConfigSectionDefinition, ConfigOptionDefinition, Config
+from utils.config import Config, ConfigOptionDefinition, ConfigSectionDefinition
 from utils.config_definitions import (
     ConfigSectionEnableType,
-    ConfigVerifierDefinition,
     ConfigSectionOptionDefinition,
-    VerificationResult,
+    ConfigVerifierDefinition,
     RuntimeStateGroup,
     RuntimeStateOptionDefinition,
+    VerificationResult,
 )
 from utils.constants import (
     FETCH_INTERVAL_VALID_VALUES,
@@ -26,13 +22,14 @@ from utils.constants import (
     PUNCH_KEY_ID,
     PUNCH_KEY_PASSED_TIME,
 )
+from utils.i18n import N_
+from utils.state_saver import StateSaverMixin
 from validators.datetime_validators import is_date, is_time
 from validators.number_validators import is_not_negative_int
 from validators.regex_validators import is_control_ids
 from validators.url_validators import is_http_or_https_url
-from utils.i18n import N_
-from ._base import _PunchSourceBase
 
+from ._base import _PunchSourceBase
 
 _MODULE_LOGGER_NAME = "PunchSourceOlresultatSe"
 
@@ -54,7 +51,7 @@ def _normalize_passed_time(raw: str) -> datetime:
         return datetime.fromisoformat(raw)
     except ValueError, TypeError:
         pass
-    return datetime.now()
+    return datetime.now()  # noqa: DTZ005 - local elapsed-time comparison, no cross-timezone logic
 
 
 def _fetch_punches(
@@ -63,7 +60,7 @@ def _fetch_punches(
     last_id: int,
     from_date: str | None = None,
     from_time: str | None = None,
-    control_codes: List[str] | None = None,
+    control_codes: list[str] | None = None,
 ):
     if url_str is None or len(url_str) == 0:
         raise ValueError("URL must be configured.")
@@ -89,7 +86,7 @@ def _fetch_punches(
             response_encoding = DEFAULT_RESPONSE_ENCODING
         data = response.read().decode(response_encoding)
         splitlines = data.splitlines()
-        punches = list()
+        punches = []
         if splitlines:
             logging.getLogger(_MODULE_LOGGER_NAME).debug(
                 '_fetch_punches data: "%s"', data
@@ -134,7 +131,7 @@ def _verify_last_id(url_str: str, unit_id: str, last_id: int):
             return VerificationResult(message="No Punches received.")
 
         return VerificationResult(message=f"{len(punches)} Punches received.")
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
         logging.getLogger(_MODULE_LOGGER_NAME).debug("_verify_last_id: %s", e)
         return VerificationResult(message=str(e), status=False)
 
@@ -155,7 +152,7 @@ def _verify_date_time(
             return VerificationResult(message="No Punches received.")
 
         return VerificationResult(message=f"{len(punches)} Punches received.")
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
         logging.getLogger(_MODULE_LOGGER_NAME).debug("_verify_date_time: %s", e)
         return VerificationResult(message=str(e), status=False)
 
@@ -166,7 +163,7 @@ def _verify_control_codes(
     last_id: int,
     from_date: str,
     from_time: str,
-    control_codes: List[str],
+    control_codes: list[str],
 ) -> VerificationResult:
     try:
         if control_codes is None:
@@ -187,7 +184,7 @@ def _verify_control_codes(
             return VerificationResult(message="No Punches received.")
 
         return VerificationResult(message=f"{len(punches)} Punches received.")
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
         logging.getLogger(_MODULE_LOGGER_NAME).debug("_verify_control_codes: %s", e)
         return VerificationResult(message=str(e), status=False)
 
@@ -244,7 +241,7 @@ class PunchSourceOlresultatSe(StateSaverMixin, _PunchSourceBase):
         description=N_(
             "The date to fetch Punches from, used to only fetch newer Punches. ISO 8601 format (YYYY-MM-DD)"
         ),
-        default_value=date.today().isoformat(),
+        default_value=date.today().isoformat(),  # noqa: DTZ011
         validator=is_date,
     )
 
@@ -418,9 +415,7 @@ class PunchSourceOlresultatSe(StateSaverMixin, _PunchSourceBase):
 
         if _MODULE_LOGGER_NAME != self.__class__.__name__:
             raise ValueError(
-                "_MODULE_LOGGER_NAME not correct: {} vs {}".format(
-                    _MODULE_LOGGER_NAME, self.__class__.__name__
-                )
+                f"_MODULE_LOGGER_NAME not correct: {_MODULE_LOGGER_NAME} vs {self.__class__.__name__}"
             )
 
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -431,7 +426,7 @@ class PunchSourceOlresultatSe(StateSaverMixin, _PunchSourceBase):
         self.from_date = None
         self.from_time = None
         self.fetch_interval_seconds = None
-        self.control_codes = list()
+        self.control_codes = []
 
         self.response_encoding = "utf-8"
         self._stop_event = Event()
@@ -476,7 +471,7 @@ class PunchSourceOlresultatSe(StateSaverMixin, _PunchSourceBase):
     def is_running(self) -> bool:
         return not self._stop_event.is_set()
 
-    def config_updated(self, section_names: List[str]):
+    def config_updated(self, section_names: list[str]):
         self.update()
 
     def update(self):
@@ -516,7 +511,7 @@ class PunchSourceOlresultatSe(StateSaverMixin, _PunchSourceBase):
         if new_control_codes is not None:
             self.control_codes.extend(new_control_codes.split())
 
-    def _get_tracking_state(self) -> Dict[str, str]:
+    def _get_tracking_state(self) -> dict[str, str]:
         return {
             self.CONFIG_OPTION_PUNCH_SOURCE_OL_RESULTAT_SE_LAST_RECEIVED_PUNCH_ID.name: str(
                 self.last_received_punch_id
@@ -596,7 +591,7 @@ class PunchSourceOlresultatSe(StateSaverMixin, _PunchSourceBase):
                 )
             except URLError as e:
                 self.logger.error("We failed to reach a server. Reason: %s", e.reason)
-            except Exception as e:
+            except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
                 self.logger.error("Unexpected error fetching punches: %s", e)
 
             self._stop_event.wait(timeout=self.fetch_interval_seconds)

@@ -1,6 +1,6 @@
-from unittest.mock import MagicMock, patch
 from datetime import datetime
 from time import time
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -69,7 +69,7 @@ class TestIsDeduped:
 
 class TestParsePassedTime:
     def test_datetime_object(self):
-        dt = datetime(2026, 6, 14, 12, 0, 0)
+        dt = datetime(2026, 6, 14, 12, 0, 0)  # noqa: DTZ001 - naive datetime matches MeOS/OLA data model
         result = PreWarning._parse_passed_time(dt)
         assert isinstance(result, float)
         assert result == dt.timestamp()
@@ -89,14 +89,13 @@ class TestProcessPunchesDedup:
         punch = {
             "cardNumber": "card1",
             "controlCode": "31",
-            "passedTime": datetime(2026, 6, 14, 12, 0, 0),
+            "passedTime": datetime(2026, 6, 14, 12, 0, 0),  # noqa: DTZ001 - naive datetime matches MeOS/OLA data model
         }
         pw.punch_queue = MagicMock()
         pw.punch_queue.get.side_effect = [punch, StopIteration]
 
-        with patch("prewarning.wx.CallAfter"):
-            with pytest.raises(StopIteration):
-                PreWarning._process_punches(pw)
+        with patch("prewarning.wx.CallAfter"), pytest.raises(StopIteration):
+            PreWarning._process_punches(pw)
 
         pw.start_list_source.lookup_from_card_number.assert_not_called()
         pw.announcement_queue.put.assert_not_called()
@@ -108,7 +107,7 @@ class TestProcessPunchesDedup:
         punch = {
             "cardNumber": "card1",
             "controlCode": "31",
-            "passedTime": datetime(2026, 6, 14, 12, 0, 0),
+            "passedTime": datetime(2026, 6, 14, 12, 0, 0),  # noqa: DTZ001 - naive datetime matches MeOS/OLA data model
             "bibNumber": 101,
             "relayLeg": 1,
             "country": "SWE",
@@ -116,9 +115,8 @@ class TestProcessPunchesDedup:
         pw.punch_queue = MagicMock()
         pw.punch_queue.get.side_effect = [punch, StopIteration]
 
-        with patch("prewarning.wx.CallAfter"):
-            with pytest.raises(StopIteration):
-                PreWarning._process_punches(pw)
+        with patch("prewarning.wx.CallAfter"), pytest.raises(StopIteration):
+            PreWarning._process_punches(pw)
 
         pw.announcement_queue.put.assert_called_once()
 
@@ -129,7 +127,7 @@ class TestProcessPunchesDedup:
         punch = {
             "cardNumber": "card1",
             "controlCode": "32",
-            "passedTime": datetime(2026, 6, 14, 12, 0, 0),
+            "passedTime": datetime(2026, 6, 14, 12, 0, 0),  # noqa: DTZ001 - naive datetime matches MeOS/OLA data model
             "bibNumber": 101,
             "relayLeg": 1,
             "country": "SWE",
@@ -137,9 +135,8 @@ class TestProcessPunchesDedup:
         pw.punch_queue = MagicMock()
         pw.punch_queue.get.side_effect = [punch, StopIteration]
 
-        with patch("prewarning.wx.CallAfter"):
-            with pytest.raises(StopIteration):
-                PreWarning._process_punches(pw)
+        with patch("prewarning.wx.CallAfter"), pytest.raises(StopIteration):
+            PreWarning._process_punches(pw)
 
         pw.announcement_queue.put.assert_called_once()
 
@@ -149,7 +146,7 @@ class TestProcessPunchesDedup:
         punch = {
             "cardNumber": "card1",
             "controlCode": "31",
-            "passedTime": datetime(2026, 6, 14, 12, 0, 0),
+            "passedTime": datetime(2026, 6, 14, 12, 0, 0),  # noqa: DTZ001 - naive datetime matches MeOS/OLA data model
         }
         pw.start_list_source.lookup_from_card_number.return_value = {
             "bibNumber": 101,
@@ -162,9 +159,8 @@ class TestProcessPunchesDedup:
         pw.punch_queue = MagicMock()
         pw.punch_queue.get.side_effect = [punch, StopIteration]
 
-        with patch("prewarning.wx.CallAfter"):
-            with pytest.raises(StopIteration):
-                PreWarning._process_punches(pw)
+        with patch("prewarning.wx.CallAfter"), pytest.raises(StopIteration):
+            PreWarning._process_punches(pw)
 
         pw.start_list_source.lookup_from_card_number.assert_called_once_with("card1")
         pw.announcement_queue.put.assert_not_called()
@@ -175,7 +171,7 @@ class TestProcessPunchesDedup:
         punch = {
             "cardNumber": "card1",
             "controlCode": "31",
-            "passedTime": datetime(2026, 6, 14, 12, 0, 0),
+            "passedTime": datetime(2026, 6, 14, 12, 0, 0),  # noqa: DTZ001 - naive datetime matches MeOS/OLA data model
         }
         pw.start_list_source.lookup_from_card_number.return_value = {
             "bibNumber": 101,
@@ -188,9 +184,8 @@ class TestProcessPunchesDedup:
         pw.punch_queue = MagicMock()
         pw.punch_queue.get.side_effect = [punch, StopIteration]
 
-        with patch("prewarning.wx.CallAfter"):
-            with pytest.raises(StopIteration):
-                PreWarning._process_punches(pw)
+        with patch("prewarning.wx.CallAfter"), pytest.raises(StopIteration):
+            PreWarning._process_punches(pw)
 
         pw.announcement_queue.put.assert_called_once()
 
@@ -200,7 +195,7 @@ class TestProcessPunchesDedup:
         punch = {
             "cardNumber": "card1",
             "controlCode": "31",
-            "passedTime": datetime(2026, 6, 14, 12, 0, 0),
+            "passedTime": datetime(2026, 6, 14, 12, 0, 0),  # noqa: DTZ001 - naive datetime matches MeOS/OLA data model
         }
         pw.start_list_source.lookup_from_card_number.return_value = {
             "bibNumber": 101,
@@ -213,9 +208,8 @@ class TestProcessPunchesDedup:
         pw.punch_queue = MagicMock()
         pw.punch_queue.get.side_effect = [punch, StopIteration]
 
-        with patch("prewarning.wx.CallAfter"):
-            with pytest.raises(StopIteration):
-                PreWarning._process_punches(pw)
+        with patch("prewarning.wx.CallAfter"), pytest.raises(StopIteration):
+            PreWarning._process_punches(pw)
 
         pw.announcement_queue.put.assert_called_once()
 
@@ -225,7 +219,7 @@ class TestProcessPunchesDedup:
         punch = {
             "cardNumber": "card1",
             "controlCode": "31",
-            "passedTime": datetime(2026, 6, 14, 12, 0, 0),
+            "passedTime": datetime(2026, 6, 14, 12, 0, 0),  # noqa: DTZ001 - naive datetime matches MeOS/OLA data model
             "bibNumber": 101,
             "relayLeg": 1,
             "country": "SWE",
@@ -233,9 +227,8 @@ class TestProcessPunchesDedup:
         pw.punch_queue = MagicMock()
         pw.punch_queue.get.side_effect = [punch, StopIteration]
 
-        with patch("prewarning.wx.CallAfter"):
-            with pytest.raises(StopIteration):
-                PreWarning._process_punches(pw)
+        with patch("prewarning.wx.CallAfter"), pytest.raises(StopIteration):
+            PreWarning._process_punches(pw)
 
         assert ("card1", "31") in pw._dedup_card_control
         assert ("101", "1") in pw._dedup_bib_leg
@@ -246,19 +239,19 @@ class TestProcessPunchesDedup:
         punch_skip_card = {
             "cardNumber": "card1",
             "controlCode": "31",
-            "passedTime": datetime(2026, 6, 14, 12, 0, 0),
+            "passedTime": datetime(2026, 6, 14, 12, 0, 0),  # noqa: DTZ001 - naive datetime matches MeOS/OLA data model
         }
 
         punch_skip_bib = {
             "cardNumber": "card2",
             "controlCode": "32",
-            "passedTime": datetime(2026, 6, 14, 12, 1, 0),
+            "passedTime": datetime(2026, 6, 14, 12, 1, 0),  # noqa: DTZ001 - naive datetime matches MeOS/OLA data model
         }
 
         punch_allowed = {
             "cardNumber": "card3",
             "controlCode": "33",
-            "passedTime": datetime(2026, 6, 14, 12, 2, 0),
+            "passedTime": datetime(2026, 6, 14, 12, 2, 0),  # noqa: DTZ001 - naive datetime matches MeOS/OLA data model
             "bibNumber": 103,
             "relayLeg": 1,
             "country": "SWE",
@@ -279,9 +272,8 @@ class TestProcessPunchesDedup:
             StopIteration,
         ]
 
-        with patch("prewarning.wx.CallAfter"):
-            with pytest.raises(StopIteration):
-                PreWarning._process_punches(pw)
+        with patch("prewarning.wx.CallAfter"), pytest.raises(StopIteration):
+            PreWarning._process_punches(pw)
 
         pw.announcement_queue.put.assert_called_once()
         call_args = pw.announcement_queue.put.call_args[0][0]
@@ -294,16 +286,15 @@ class TestProcessPunchesDedup:
         punch = {
             "cardNumber": "card1",
             "controlCode": "31",
-            "passedTime": datetime(2026, 6, 14, 12, 0, 0),
+            "passedTime": datetime(2026, 6, 14, 12, 0, 0),  # noqa: DTZ001 - naive datetime matches MeOS/OLA data model
             "bibNumber": 101,
             "relayLeg": 1,
         }
         pw.punch_queue = MagicMock()
         pw.punch_queue.get.side_effect = [punch, StopIteration]
 
-        with patch("prewarning.wx.CallAfter"):
-            with pytest.raises(StopIteration):
-                PreWarning._process_punches(pw)
+        with patch("prewarning.wx.CallAfter"), pytest.raises(StopIteration):
+            PreWarning._process_punches(pw)
 
         pw.start_list_source.lookup_from_card_number.assert_not_called()
         pw.announcement_queue.put.assert_not_called()

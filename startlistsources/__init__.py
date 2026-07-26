@@ -1,7 +1,7 @@
 import inspect
-
 from typing import TYPE_CHECKING
-from startlistsources._base import _StartListSourceBase, _NOT_OVERRIDDEN
+
+from startlistsources._base import _NOT_OVERRIDDEN, _StartListSourceBase
 from startlistsources.start_list_source_ola_mysql import StartListSourceOlaMySql
 from utils.config import Config
 from utils.config_definitions import ConfigOptionDefinition
@@ -49,7 +49,7 @@ def _import_all_modules():
             "pyo",
         ):
             modulename = filename.split(".")[0]
-            package_module = ".".join([__name__, modulename])
+            package_module = f"{__name__}.{modulename}"
             try:
                 module = importlib.import_module(package_module)
             except Exception:
@@ -63,7 +63,7 @@ def _import_all_modules():
 
 def _populate_start_list_sources():
     global START_LIST_SOURCES
-    START_LIST_SOURCES = dict()
+    START_LIST_SOURCES = {}
     __all__.append("START_LIST_SOURCES")
 
     def add_start_list_sources(classes):

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 PreWarning main file.
 """
@@ -10,39 +8,38 @@ import logging
 import logging.config
 import socket
 import sys
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from queue import Queue
-from threading import Thread, Lock
+from threading import Lock, Thread
 from time import strftime, time
-from typing import List, Dict
 
-from ruamel.yaml import YAML
-from babel import Locale
 import pycountry
-from watchdog.events import LoggingEventHandler, DirModifiedEvent, FileModifiedEvent
-from watchdog.observers import Observer
 import wx
 import wx.grid
 import wx.lib.stattext
+from babel import Locale
+from ruamel.yaml import YAML
+from watchdog.events import DirModifiedEvent, FileModifiedEvent, LoggingEventHandler
+from watchdog.observers import Observer
 
-from punchsources import PUNCH_SOURCES, COMMON_PUNCH_SOURCE
+from punchsources import COMMON_PUNCH_SOURCE, PUNCH_SOURCES
 from punchsources._base import PunchListener
-from startlistsources import START_LIST_SOURCES, COMMON_START_LIST_SOURCE
-from utils.meos_info_server import MeosInfoServer
+from startlistsources import COMMON_START_LIST_SOURCE, START_LIST_SOURCES
+from utils.about_dialog import AboutDialog
 from utils.config import Config
 from utils.config_consumer import ConfigConsumer
 from utils.config_definitions import (
     ConfigOptionDefinition,
     ConfigSectionDefinition,
-    ConfigVerifierDefinition,
     ConfigSectionOptionDefinition,
+    ConfigVerifierDefinition,
 )
 from utils.config_dialog import ConfigDialog
 from utils.constants import (
-    CONFIGURATION_DIR,
     APPLICATION_DIR,
     AUDIO_EXTENSION,
+    CONFIGURATION_DIR,
     DING_FILENAME,
     PUNCH_KEY_BIB_NUMBER,
     PUNCH_KEY_CARD_NUMBER,
@@ -53,7 +50,6 @@ from utils.constants import (
     PUNCH_KEY_RELAY_LEG,
     TESTING_FILENAME,
 )
-from utils.about_dialog import AboutDialog
 from utils.health import HealthAction, HealthIssue, HealthMonitor, HealthStatus
 from utils.help_dialog import HelpDialog
 from utils.hotkey_bindings import (
@@ -61,9 +57,10 @@ from utils.hotkey_bindings import (
     HotKeyDefinition,
     key_event_to_str,
 )
-from utils.i18n import _, N_, set_language
+from utils.i18n import N_, _, set_language
+from utils.meos_info_server import MeosInfoServer
 from utils.screen_sleep import ScreenSleepInhibitor
-from utils.sound import Sound, verify_sound, get_all_sounds
+from utils.sound import Sound, get_all_sounds, verify_sound
 from utils.version import __version__
 from utils.voice_manager_dialog import VoiceManagerDialog
 
@@ -80,6 +77,8 @@ LOGGING_CONFIGURATION_FILE_NAME = "logging.yaml"
 
 # Logging configuration file location
 LOGGING_CONFIGURATION_FILE = CONFIGURATION_DIR / LOGGING_CONFIGURATION_FILE_NAME
+
+_logger = logging.getLogger(__name__)
 
 LOGGING_CONFIGURATION_FILE_FILTER_VALUES = {
     "APPLICATION_DIR": APPLICATION_DIR,
@@ -110,17 +109,17 @@ def _update_logging_configuration():
             _filter_logging_configuration(config)
             logging.config.dictConfig(config)
     except PermissionError as e:
-        logging.error(
+        _logger.error(
             'PermissionError in accessing the logging configuration file: "%s" %s',
             src_path,
             e,
         )
     except OSError as e:
-        logging.error(
+        _logger.error(
             'OSError in accessing the logging configuration file: "%s" %s', src_path, e
         )
-    except Exception as e:
-        logging.error(
+    except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
+        _logger.error(
             'Exception in accessing the logging configuration file: "%s" %s',
             src_path,
             e,
@@ -236,7 +235,7 @@ class PreWarning(
             " the next announcement."
         ),
         default_value=10,
-        valid_values=list(range(0, 121)),
+        valid_values=list(range(121)),
         enabled_by=CONFIG_OPTION_ENABLE_INTRO_SOUND,
     )
 
@@ -324,7 +323,7 @@ class PreWarning(
         value_type=int,
         description=N_("How long a dedup key remains active. 0 = forever (session)."),
         default_value=0,
-        valid_values=list(range(0, 3601)),
+        valid_values=list(range(3601)),
     )
 
     COMMON_CONFIG_SECTION_DEFINITION = ConfigSectionDefinition(
@@ -402,7 +401,7 @@ class PreWarning(
         return cls.COMMON_CONFIG_SECTION_DEFINITION
 
     @classmethod
-    def get_config_section_definitions(cls) -> List[ConfigSectionDefinition]:
+    def get_config_section_definitions(cls) -> list[ConfigSectionDefinition]:
         return [
             cls.COMMON_CONFIG_SECTION_DEFINITION,
             cls.DEDUP_CONFIG_SECTION_DEFINITION,
@@ -609,7 +608,7 @@ class PreWarning(
                 validation_errors = self.config.validate()
             else:
                 raise ValueError(
-                    f"The configuration contains the following errors: {str(validation_errors)}."
+                    f"The configuration contains the following errors: {validation_errors!s}."
                 )
         self._parse_config()
 
@@ -714,9 +713,9 @@ class PreWarning(
 
         src_path = event.src_path
         if Path(str(src_path)).resolve() == LOGGING_CONFIGURATION_FILE:
-            logging.debug("Updating logging configuration - before")
+            _logger.debug("Updating logging configuration - before")
             _update_logging_configuration()
-            logging.debug("Updating logging configuration - after")
+            _logger.debug("Updating logging configuration - after")
 
     def _create_gui(self):
         self.SetIcon(wx.Icon((APPLICATION_DIR / "favicon.ico").as_posix()))
@@ -1011,7 +1010,7 @@ class PreWarning(
         self.prewarning_grid.AutoSizeColumns()
 
         self._print_sizes()
-        (grid_width, grid_height) = self.grid_panel.GetSize()
+        (grid_width, _grid_height) = self.grid_panel.GetSize()
 
         col_size_leg = self.prewarning_grid.GetColSize(COL_NR_LEG)
         new_col_size_leg = col_size_leg + int(col_size_leg / 3)
@@ -1180,13 +1179,13 @@ class PreWarning(
 
     def _check_voice_health(self) -> list[HealthIssue]:
         from utils.voice_manager_dialog import (
-            get_installed_voice_shortnames,
-            _list_installed_voices,
-            parse_extra_ranges,
             CONFIG_OPTION_EXTRA_RANGES,
-            DEFAULT_RANGE_START,
             DEFAULT_RANGE_END,
+            DEFAULT_RANGE_START,
             VOICEMANAGER_SECTION_NAME,
+            _list_installed_voices,
+            get_installed_voice_shortnames,
+            parse_extra_ranges,
         )
 
         issues: list[HealthIssue] = []
@@ -1379,7 +1378,6 @@ class PreWarning(
             self.announcement_queue.put(
                 {_ANNOUNCE_KEY_VOICE: None, _ANNOUNCE_KEY_SOUND: number}
             )
-            pass
         s.close()
 
     def _close(self, event=None):
@@ -1416,7 +1414,7 @@ class PreWarning(
 
         key_event.Skip()
 
-    def config_updated(self, section_names: List[str]):
+    def config_updated(self, section_names: list[str]):
         wx.CallAfter(self._apply_config_update)
 
     def _apply_config_update(self):
@@ -1547,7 +1545,7 @@ class PreWarning(
             self.start_list_source.start()
         wx.CallLater(1000, self._refresh_health)
 
-    def punch_received(self, punch: Dict[str, str]):
+    def punch_received(self, punch: dict[str, str]):
         self.logger.debug("punch_received: %s", punch)
         self.punch_queue.put(punch)
 
@@ -1696,7 +1694,7 @@ class PreWarning(
                 assert self.intro_sound_file is not None
                 if (
                     self.last_sound_time is None
-                    or (datetime.now() - self.last_sound_time).total_seconds()
+                    or (datetime.now() - self.last_sound_time).total_seconds()  # noqa: DTZ005 - local elapsed-time comparison, no cross-timezone logic
                     >= self.intro_sound_trigger_timeout_seconds.total_seconds()
                 ):
                     self.logger.debug("intro_sound_file: %s", self.intro_sound_file)
@@ -1711,7 +1709,7 @@ class PreWarning(
                         sound.get(_ANNOUNCE_KEY_VOICE),
                     )
 
-                self.last_sound_time = datetime.now()
+                self.last_sound_time = datetime.now()  # noqa: DTZ005 - local elapsed-time comparison, no cross-timezone logic
 
 
 def _init_language():

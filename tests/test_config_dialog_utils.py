@@ -1,17 +1,17 @@
 from configparser import ConfigParser
 from pathlib import Path
-import wx
+
 import pytest
+import wx
 
 from utils.config_definitions import ConfigOptionDefinition
-
 from utils.config_dialog import (
-    _default_value,
-    _value,
-    _has_default_value,
     _default_tooltip,
-    _set_value,
+    _default_value,
     _get_value,
+    _has_default_value,
+    _set_value,
+    _value,
 )
 
 

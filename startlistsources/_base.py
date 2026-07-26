@@ -1,11 +1,7 @@
-# -*- coding: utf-8 -*-
-
-from abc import abstractmethod
 import logging
-from typing import Dict
+from abc import abstractmethod
 
 from utils.config_consumer import ConfigConsumer
-
 
 _NOT_OVERRIDDEN = object()
 
@@ -46,7 +42,7 @@ class _StartListSourceBase(ConfigConsumer):
         """Returns if the StartListSource is running."""
 
     @abstractmethod
-    def lookup_from_card_number(self, card_number: str) -> Dict[str, str] | None:
+    def lookup_from_card_number(self, card_number: str) -> dict[str, str] | None:
         """Returns team information for the provided Card Number.
 
         The returned dict must contain these keys:
@@ -62,7 +58,7 @@ class _StartListSourceBase(ConfigConsumer):
         :return: A dict with the team information, or None if not found.
         :rtype: Dict[str, str] or None
         """
-        return dict()
+        return {}
 
     def get_bib_range(self) -> tuple[int, int] | None:
         """Returns the range of bib numbers in the start list.

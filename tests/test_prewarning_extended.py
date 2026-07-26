@@ -1,6 +1,7 @@
-from unittest.mock import MagicMock, patch, call
-import wx
+from unittest.mock import MagicMock, call, patch
+
 import pytest
+import wx
 
 from prewarning import PreWarning
 

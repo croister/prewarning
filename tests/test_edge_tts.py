@@ -54,7 +54,7 @@ class TestGenerateRange:
 
         generate_range(
             "sv-SE-SofieNeural",
-            range(0, 3),
+            range(3),
             [],
             target_dir,
         )
@@ -75,7 +75,7 @@ class TestGenerateRange:
 
         generate_range(
             "test-voice",
-            range(0, 1),
+            range(1),
             texts,
             target_dir,
         )
@@ -89,7 +89,7 @@ class TestGenerateRange:
     def test_creates_target_directory(self, mock_edge_tts, tmp_path):
         target_dir = tmp_path / "new-voice" / "subdir"
 
-        generate_range("test-voice", range(0, 1), [], target_dir)
+        generate_range("test-voice", range(1), [], target_dir)
 
         assert target_dir.exists()
 
@@ -99,7 +99,7 @@ class TestGenerateRange:
 
         generate_range(
             "test-voice",
-            range(0, 3),
+            range(3),
             [VoiceFile("Test", "test")],
             target_dir,
             progress_callback=progress,
@@ -114,7 +114,7 @@ class TestGenerateRange:
     def test_progress_callback_none_does_not_raise(self, mock_edge_tts, tmp_path):
         target_dir = tmp_path / "no-progress"
 
-        generate_range("test-voice", range(0, 2), [], target_dir)
+        generate_range("test-voice", range(2), [], target_dir)
 
         assert target_dir.exists()
 
@@ -124,7 +124,7 @@ class TestGenerateRange:
 
         generate_range(
             "test-voice",
-            range(0, 10),
+            range(10),
             [VoiceFile("A", "a"), VoiceFile("B", "b")],
             target_dir,
             progress_callback=progress,

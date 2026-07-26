@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-
 import logging
-from typing import List, Callable
+from collections.abc import Callable
 
 import wx
 
@@ -153,7 +151,7 @@ KEY_CODE_LOOKUP = {
 def keycode_to_str(key_code: int) -> str:
     if key_code in KEY_CODE_LOOKUP:
         return KEY_CODE_LOOKUP[key_code]
-    return '"{key_code}"'.format(key_code=chr(key_code))
+    return f'"{chr(key_code)}"'
 
 
 def modifiers_to_str(modifiers: int) -> str:
@@ -196,15 +194,15 @@ class HotKeyDefinition:
 
         self.logger.debug(self)
 
-    def with_alt(self) -> "HotKeyDefinition":
+    def with_alt(self) -> HotKeyDefinition:
         self.modifiers = self.modifiers | wx.ACCEL_ALT
         return self
 
-    def with_ctrl(self) -> "HotKeyDefinition":
+    def with_ctrl(self) -> HotKeyDefinition:
         self.modifiers = self.modifiers | wx.ACCEL_CTRL
         return self
 
-    def with_shift(self) -> "HotKeyDefinition":
+    def with_shift(self) -> HotKeyDefinition:
         self.modifiers = self.modifiers | wx.ACCEL_SHIFT
         return self
 
@@ -238,7 +236,7 @@ class HotKeyBindingDefinition:
         hotkey: HotKeyDefinition,
         handler: Callable,
         description: str,
-        alternate_hotkeys: List[HotKeyDefinition] | None = None,
+        alternate_hotkeys: list[HotKeyDefinition] | None = None,
         hidden: bool = False,
         window_id: wx.WindowIDRef = None,
         bitmap_name: str | None = None,

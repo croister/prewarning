@@ -1,5 +1,6 @@
-from utils.constants import APPLICATION_DIR, CONFIGURATION_DIR, DATA_DIR
 from pathlib import Path
+
+from utils.constants import APPLICATION_DIR, CONFIGURATION_DIR, DATA_DIR
 
 
 class TestConstants:

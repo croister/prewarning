@@ -1,46 +1,44 @@
-# -*- coding: utf-8 -*-
-
 import logging
 from threading import Event, Thread
-from typing import List, Dict, Any
+from typing import Any
 
 from pymysql import OperationalError
 
-from utils.state_saver import StateSaverMixin
-from utils.config import ConfigSectionDefinition, ConfigOptionDefinition, Config
+from utils.config import Config, ConfigOptionDefinition, ConfigSectionDefinition
 from utils.config_definitions import (
     ConfigSectionEnableType,
-    ConfigVerifierDefinition,
     ConfigSectionOptionDefinition,
     ConfigSelectorDefinition,
-    SelectionData,
-    SelectionType,
-    SelectionResult,
-    VerificationResult,
+    ConfigVerifierDefinition,
     RuntimeStateGroup,
     RuntimeStateOptionDefinition,
+    SelectionData,
+    SelectionResult,
+    SelectionType,
+    VerificationResult,
 )
+from utils.constants import FETCH_INTERVAL_VALID_VALUES, PUNCH_KEY_ID
+from utils.i18n import N_
 from utils.ola_mysql import (
-    OlaMySql,
-    connect,
-    get_event_race_split_time_controls,
-    are_valid_event_race_control_ids,
-    get_event_race_split_times,
-    get_ola_db_version,
-    is_relay_event,
     _KEY_CLASS_COUNT,
     _KEY_CLASS_NAMES,
     _KEY_CONTROL_ID,
     _KEY_CONTROL_NAME,
     _KEY_PUNCHING_CODES,
     _KEY_SPLIT_TIME_CONTROL_NAME,
+    OlaMySql,
+    are_valid_event_race_control_ids,
+    connect,
+    get_event_race_split_time_controls,
+    get_event_race_split_times,
+    get_ola_db_version,
+    is_relay_event,
 )
+from utils.state_saver import StateSaverMixin
 from validators.datetime_validators import is_timestamp
 from validators.regex_validators import is_control_ids, is_punch_id
-from utils.constants import FETCH_INTERVAL_VALID_VALUES, PUNCH_KEY_ID
-from utils.i18n import N_
-from ._base import _PunchSourceBase
 
+from ._base import _PunchSourceBase
 
 _MODULE_LOGGER_NAME = "PunchSourceOlaMySql"
 
@@ -82,12 +80,12 @@ def _select_control_ids(
                     )
                 )
             return result
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
         logging.getLogger(_MODULE_LOGGER_NAME).debug("_select_control_ids: %s", e)
         return False
 
 
-def _split_time_control_name(control_id: Dict[str, Any]) -> str:
+def _split_time_control_name(control_id: dict[str, Any]) -> str:
     split_time_control_name = control_id[_KEY_SPLIT_TIME_CONTROL_NAME]
     if split_time_control_name is None or len(split_time_control_name) == 0:
         split_time_control_name = control_id[_KEY_CONTROL_NAME]
@@ -97,24 +95,16 @@ def _split_time_control_name(control_id: Dict[str, Any]) -> str:
     return split_time_control_name
 
 
-def _split_time_control_description(control_id: Dict[str, Any]) -> str:
+def _split_time_control_description(control_id: dict[str, Any]) -> str:
     split_time_control_name = _split_time_control_name(control_id)
 
     class_names = control_id[_KEY_CLASS_NAMES]
     if class_names is None:
         class_names = ""
     if len(class_names) > 50:
-        class_names = "{class_names:.46} ...".format(class_names=class_names)
+        class_names = f"{class_names:.46} ..."
 
-    description = (
-        "{id}: {name} ({e_codes}) used by {class_count} classes ({class_names})".format(
-            id=control_id[_KEY_CONTROL_ID],
-            name=split_time_control_name,
-            e_codes=control_id[_KEY_PUNCHING_CODES],
-            class_count=control_id[_KEY_CLASS_COUNT],
-            class_names=class_names,
-        )
-    )
+    description = f"{control_id[_KEY_CONTROL_ID]}: {split_time_control_name} ({control_id[_KEY_PUNCHING_CODES]}) used by {control_id[_KEY_CLASS_COUNT]} classes ({class_names})"
     return description
 
 
@@ -144,7 +134,7 @@ def _verify_control_ids(
                 event_race_id=event_race_id,
                 control_ids=control_id_ints,
             )
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
         logging.getLogger(_MODULE_LOGGER_NAME).debug("_select_control_ids: %s", e)
         return False
 
@@ -193,7 +183,7 @@ def _verify_fetch(
             return VerificationResult(
                 message=f"{len(event_split_times)} Punches received."
             )
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
         logging.getLogger(_MODULE_LOGGER_NAME).debug("_verify_fetch: %s", e)
         return VerificationResult(message=str(e), status=False)
 
@@ -476,9 +466,7 @@ class PunchSourceOlaMySql(StateSaverMixin, _PunchSourceBase):
 
         if _MODULE_LOGGER_NAME != self.__class__.__name__:
             raise ValueError(
-                "_MODULE_LOGGER_NAME not correct: {} vs {}".format(
-                    _MODULE_LOGGER_NAME, self.__class__.__name__
-                )
+                f"_MODULE_LOGGER_NAME not correct: {_MODULE_LOGGER_NAME} vs {self.__class__.__name__}"
             )
 
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -541,7 +529,7 @@ class PunchSourceOlaMySql(StateSaverMixin, _PunchSourceBase):
     def is_running(self) -> bool:
         return not self._stop_event.is_set()
 
-    def config_updated(self, section_names: List[str]):
+    def config_updated(self, section_names: list[str]):
         self.update()
 
     def update(self):
@@ -564,7 +552,7 @@ class PunchSourceOlaMySql(StateSaverMixin, _PunchSourceBase):
         if self.control_ids is not None:
             self.control_ids = [int(c) for c in self.control_ids.split()]
 
-    def _get_tracking_state(self) -> Dict[str, str]:
+    def _get_tracking_state(self) -> dict[str, str]:
         return {
             self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_LAST_MODIFIED_TIME.name: str(
                 self.last_modify_time or ""
@@ -647,7 +635,7 @@ class PunchSourceOlaMySql(StateSaverMixin, _PunchSourceBase):
                     self._save_state()
             except OperationalError as oe:
                 self.logger.error(oe)
-            except Exception as e:
+            except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
                 self.logger.error("Unexpected error fetching punches: %s", e)
 
             self._stop_event.wait(timeout=self.fetch_interval_seconds)

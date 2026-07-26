@@ -1,4 +1,5 @@
 import pytest
+
 from utils.singleton import Singleton, _Singleton
 
 

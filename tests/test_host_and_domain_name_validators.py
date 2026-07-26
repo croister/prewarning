@@ -1,7 +1,7 @@
 from validators.host_and_domain_name_validators import (
+    is_domain_name,
     is_hostname,
     is_hostname_or_ip,
-    is_domain_name,
 )
 
 

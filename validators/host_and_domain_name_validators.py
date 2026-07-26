@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-
 from validators.constants import (
-    HOSTNAME_PATTERN,
-    HOSTNAME_FQDN_PATTERN,
     DOMAIN_NAME_PATTERN,
+    HOSTNAME_FQDN_PATTERN,
+    HOSTNAME_PATTERN,
 )
 from validators.ip_address_validators import is_ip
 from validators.validator_decorator import validator
@@ -45,10 +43,7 @@ def is_hostname(value: str) -> bool:
     if HOSTNAME_PATTERN.match(encoded_value):
         return True
 
-    if HOSTNAME_FQDN_PATTERN.match(encoded_value):
-        return True
-
-    return False
+    return bool(HOSTNAME_FQDN_PATTERN.match(encoded_value))
 
 
 @validator(message="Not a valid hostname or IP address.")
@@ -85,10 +80,7 @@ def is_hostname_or_ip(value: str):
     if is_ip(value):
         return True
 
-    if is_hostname(value):
-        return True
-
-    return False
+    return bool(is_hostname(value))
 
 
 @validator(message="Not a valid domain name.")
@@ -122,7 +114,4 @@ def is_domain_name(value: str) -> bool:
     if len(encoded_value) > 255:
         return False
 
-    if DOMAIN_NAME_PATTERN.match(encoded_value):
-        return True
-
-    return False
+    return bool(DOMAIN_NAME_PATTERN.match(encoded_value))

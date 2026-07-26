@@ -1,26 +1,26 @@
-from unittest.mock import MagicMock, patch
 from configparser import ConfigParser
 from pathlib import Path
+from unittest.mock import MagicMock, patch
+
 import pytest
 
 from utils.config_definitions import (
     ConfigOptionDefinition,
-    ConfigSectionOptionDefinition,
-    ConfigSectionEnableType,
     ConfigSectionDefinition,
-    config_section_definitions_sort_key,
-    VerificationResult,
-    VerificationError,
-    ConfigVerifierDefinition,
-    SelectionData,
-    SelectionType,
-    SelectionResult,
-    SelectionError,
+    ConfigSectionEnableType,
+    ConfigSectionOptionDefinition,
     ConfigSelectorDefinition,
+    ConfigVerifierDefinition,
     RuntimeStateGroup,
     RuntimeStateOptionDefinition,
+    SelectionData,
+    SelectionError,
+    SelectionResult,
+    SelectionType,
+    VerificationError,
+    VerificationResult,
+    config_section_definitions_sort_key,
 )
-
 
 # ---------------------------------------------------------------------------
 # ConfigOptionDefinition

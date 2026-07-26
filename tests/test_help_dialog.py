@@ -23,8 +23,9 @@ class TestHelpDialog:
         dlg.Destroy()
 
     def test_html_contains_help_title(self, wx_app):
-        from utils.help_dialog import HelpDialog
         from wx.html import HtmlWindow
+
+        from utils.help_dialog import HelpDialog
 
         dlg = HelpDialog(None, "2.0.0")
         html_windows = [c for c in dlg.GetChildren() if isinstance(c, HtmlWindow)]
@@ -153,8 +154,9 @@ class TestHelpDialog:
         parent.Destroy()
 
     def test_wxhtml_link_click(self, wx_app, monkeypatch):
-        from utils.help_dialog import WxHTML
         import webbrowser
+
+        from utils.help_dialog import WxHTML
 
         opened = []
         monkeypatch.setattr(webbrowser, "open", lambda url: opened.append(url))

@@ -1,6 +1,7 @@
-from unittest.mock import patch, MagicMock
-import wx
+from unittest.mock import MagicMock, patch
+
 import pytest
+import wx
 
 from utils.config_selection import select_file
 

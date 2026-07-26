@@ -64,6 +64,7 @@ def check_pot_freshness() -> list[str]:
             ],
             cwd=str(PROJECT_DIR),
             capture_output=True,
+            check=False,
         )
         if result.returncode != 0:
             return ["Failed to run pybabel extract."]

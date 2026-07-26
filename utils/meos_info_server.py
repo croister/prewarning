@@ -1,17 +1,19 @@
-# -*- coding: utf-8 -*-
-
 import logging
 import socket
 import struct
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
 from threading import Event, Thread
-from typing import Dict, List, Set
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 from xml.etree import ElementTree as ET
 
-from utils.config import Config, ConfigOptionDefinition, ConfigSectionDefinition
+from utils.config import (
+    Config,
+    ConfigConsumer,
+    ConfigOptionDefinition,
+    ConfigSectionDefinition,
+)
 from utils.config_definitions import (
     ConfigSectionEnableType,
     ConfigSectionOptionDefinition,
@@ -24,11 +26,6 @@ from utils.config_definitions import (
     SelectionType,
     VerificationResult,
 )
-from utils.singleton import Singleton
-from utils.state_saver import StateSaverMixin
-from validators.url_validators import is_http_or_https_url
-from utils.config import ConfigConsumer
-from utils.i18n import N_
 from utils.constants import (
     FETCH_INTERVAL_VALID_VALUES,
     PUNCH_KEY_BIB_NUMBER,
@@ -40,6 +37,10 @@ from utils.constants import (
     PUNCH_KEY_PASSED_TIME,
     PUNCH_KEY_RELAY_LEG,
 )
+from utils.i18n import N_
+from utils.singleton import Singleton
+from utils.state_saver import StateSaverMixin
+from validators.url_validators import is_http_or_https_url
 
 _MODULE_LOGGER_NAME = "MeosInfoServer"
 
@@ -127,7 +128,7 @@ def _verify_url(url: str) -> VerificationResult:
         return VerificationResult(
             message="Unexpected response from MeOS.", status=False
         )
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
         logging.getLogger(_MODULE_LOGGER_NAME).debug("_verify_url: %s", e)
         msg = str(e)
         if "timed out" in msg:
@@ -152,7 +153,7 @@ def _select_controls(url: str) -> SelectionResult | bool:
         ctrl_root = _fetch_xml(
             f"{base}/meos?get=control", timeout=_HTTP_SELECTOR_TIMEOUT_SECONDS
         )
-        control_map: Dict[int, str] = {}
+        control_map: dict[int, str] = {}
         for elem in ctrl_root:
             if _strip_ns(elem.tag) == _TAG_CONTROL:
                 ctrl_id = int(elem.get(_ATTR_ID, 0))
@@ -162,7 +163,7 @@ def _select_controls(url: str) -> SelectionResult | bool:
         cls_root = _fetch_xml(
             f"{base}/meos?get=class", timeout=_HTTP_SELECTOR_TIMEOUT_SECONDS
         )
-        radio_ids: Set[int] = set()
+        radio_ids: set[int] = set()
         for elem in cls_root:
             if _strip_ns(elem.tag) == _TAG_CLASS:
                 radio_attr = elem.get(_TAG_RADIO, "")
@@ -180,7 +181,7 @@ def _select_controls(url: str) -> SelectionResult | bool:
             result.add_value(SelectionData(str(ctrl_id), f"{ctrl_id}: {name}"))
 
         return result
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
         logging.getLogger(_MODULE_LOGGER_NAME).debug("_select_controls: %s", e)
         return False
 
@@ -190,7 +191,7 @@ class MeosPunchListener(ABC):
     Distinct from PunchListener which is the external interface on _PunchSourceBase."""
 
     @abstractmethod
-    def meos_punch_received(self, punch: Dict) -> None:
+    def meos_punch_received(self, punch: dict) -> None:
         pass
 
 
@@ -337,16 +338,16 @@ class MeosInfoServer(
         # Caches
         self._zero_time: datetime | None = None
         self._competition_date: datetime | None = None
-        self._control_map: Dict[int, str] = {}
-        self._radio_control_ids: Set[int] = set()
-        self._org_nat: Dict[int, str] = {}
-        self._team_bib: Dict[int, str] = {}
-        self._team_org: Dict[int, int] = {}
-        self._team_leg_count: Dict[int, int] = {}
-        self._cmp_info: Dict[int, Dict] = {}
-        self._seen_radio: Dict[int, Set[int]] = {}
+        self._control_map: dict[int, str] = {}
+        self._radio_control_ids: set[int] = set()
+        self._org_nat: dict[int, str] = {}
+        self._team_bib: dict[int, str] = {}
+        self._team_org: dict[int, int] = {}
+        self._team_leg_count: dict[int, int] = {}
+        self._cmp_info: dict[int, dict] = {}
+        self._seen_radio: dict[int, set[int]] = {}
 
-        self._listeners: List[MeosPunchListener] = []
+        self._listeners: list[MeosPunchListener] = []
         self._ref_count: int = 0
 
         self._poll_event = Event()
@@ -379,7 +380,7 @@ class MeosInfoServer(
     def update(self) -> None:
         self._parse_config()
 
-    def config_updated(self, section_names: List[str]) -> None:
+    def config_updated(self, section_names: list[str]) -> None:
         self.update()
 
     # -- Lifecycle ------------------------------------------------------------
@@ -434,31 +435,31 @@ class MeosInfoServer(
         base = self._url.rstrip("/")
         try:
             self._fetch_competition(base)
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
             self.logger.warning("Failed to prime competition cache: %s", e)
         if self._stop_event.is_set():
             return
         try:
             self._fetch_controls(base)
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
             self.logger.warning("Failed to prime control cache: %s", e)
         if self._stop_event.is_set():
             return
         try:
             self._fetch_class_radio(base)
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
             self.logger.warning("Failed to prime class cache: %s", e)
         if self._stop_event.is_set():
             return
         try:
             self._fetch_orgs(base)
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
             self.logger.warning("Failed to prime org cache: %s", e)
         if self._stop_event.is_set():
             return
         try:
             self._fetch_teams(base)
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
             self.logger.warning("Failed to prime team cache: %s", e)
 
     def _fetch_competition(self, base: str) -> None:
@@ -468,10 +469,10 @@ class MeosInfoServer(
                 date_str = elem.get(_ATTR_DATE, "")
                 zero_str = elem.get(_ATTR_ZEROTIME, "00:00:00")
                 try:
-                    self._zero_time = datetime.strptime(
+                    self._zero_time = datetime.strptime(  # noqa: DTZ007 - parsing timestamps without timezone info
                         f"{date_str} {zero_str}", "%Y-%m-%d %H:%M:%S"
                     )
-                    self._competition_date = datetime.strptime(date_str, "%Y-%m-%d")
+                    self._competition_date = datetime.strptime(date_str, "%Y-%m-%d")  # noqa: DTZ007 - parsing timestamps without timezone info
                 except ValueError:
                     pass
 
@@ -541,7 +542,7 @@ class MeosInfoServer(
         while not self._stop_event.is_set():
             try:
                 self._do_fetch()
-            except Exception as e:
+            except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
                 self.logger.error("Error in poll loop: %s", e)
             self._poll_event.wait(timeout=self._fetch_interval)
             self._poll_event.clear()
@@ -682,7 +683,7 @@ class MeosInfoServer(
                         self._zero_time + timedelta(seconds=running_time / 10)
                     ).replace(microsecond=0)
 
-            punch: Dict = {
+            punch: dict = {
                 PUNCH_KEY_ID: f"{cmp_id}_{radio_id}",
                 PUNCH_KEY_CONTROL_CODE: str(radio_id),
                 PUNCH_KEY_CARD_NUMBER: card_number,
@@ -739,9 +740,9 @@ class MeosInfoServer(
                         time_val,
                     )
                     self._poll_event.set()
-            except socket.timeout:
+            except TimeoutError:
                 pass
-            except Exception as e:
+            except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
                 self.logger.debug("UDP recv error: %s", e)
         sock.close()
 
@@ -755,21 +756,21 @@ class MeosInfoServer(
         if listener in self._listeners:
             self._listeners.remove(listener)
 
-    def _notify_listeners(self, punch: Dict) -> None:
+    def _notify_listeners(self, punch: dict) -> None:
         self.logger.debug("New punch: %s", punch)
         for listener in self._listeners:
             listener.meos_punch_received(punch)
 
     # -- Public API ------------------------------------------------------------
 
-    def get_selector_controls(self) -> "SelectionResult | bool":
+    def get_selector_controls(self) -> SelectionResult | bool:
         if not self._url:
             return False
         return _select_controls(self._url)
 
-    def lookup_card(self, card_number: str) -> Dict | None:
+    def lookup_card(self, card_number: str) -> dict | None:
         # Check cache first
-        for cmp_id, info in self._cmp_info.items():
+        for info in self._cmp_info.values():
             if info.get(_CMP_KEY_CARD) == card_number:
                 team_id = info.get(_CMP_KEY_TEAM_ID)
                 leg = info.get(_CMP_KEY_LEG)
@@ -788,7 +789,7 @@ class MeosInfoServer(
         )
         return http_result
 
-    def _build_lookup_result(self, team_id: int, bib: str, leg: int) -> Dict:
+    def _build_lookup_result(self, team_id: int, bib: str, leg: int) -> dict:
         max_leg = self._team_leg_count.get(team_id)
         is_last_leg = max_leg is not None and leg >= max_leg
         country = self._resolve_next_leg_country(team_id, leg, is_last_leg)
@@ -836,7 +837,7 @@ class MeosInfoServer(
                 return nat
         return None
 
-    def _lookup_card_http(self, card_number: str, retry: bool = True) -> Dict | None:
+    def _lookup_card_http(self, card_number: str, retry: bool = True) -> dict | None:
         if not self._url:
             return None
         try:
@@ -855,14 +856,14 @@ class MeosInfoServer(
                         # Refresh team bib cache once
                         try:
                             self._fetch_teams(base)
-                        except Exception:
+                        except Exception:  # noqa: BLE001, S110 - best-effort operation, failure is non-critical
                             pass
                         bib = self._team_bib.get(team_id)
                     if bib:
                         return self._build_lookup_result(team_id, bib, leg)
         except (HTTPError, URLError) as e:
             self.logger.error("lookup_card HTTP error: %s", e)
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
             self.logger.error("lookup_card error: %s", e)
         return None
 

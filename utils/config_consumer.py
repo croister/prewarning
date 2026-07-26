@@ -1,8 +1,5 @@
-# -*- coding: utf-8 -*-
-
-from abc import ABC, abstractmethod
 import logging
-from typing import List
+from abc import ABC, abstractmethod
 
 from utils.config_definitions import ConfigSectionDefinition
 
@@ -20,10 +17,9 @@ class ConfigConsumer(ABC):
         :return: The configuration section definition for the class
         :rtype: ConfigSectionDefinition
         """
-        pass
 
     @classmethod
-    def get_config_section_definitions(cls) -> List[ConfigSectionDefinition]:
+    def get_config_section_definitions(cls) -> list[ConfigSectionDefinition]:
         """Returns a list of configuration section definitions.
         The default implementation adds the classes own config section,
         can be overridden to add more config sections to get notifications when they are changed.
@@ -54,5 +50,5 @@ class ConfigConsumer(ABC):
 
                 Config.register_config_section_listener(definition.name, self)
 
-    def config_updated(self, section_names: List[str]):
+    def config_updated(self, section_names: list[str]):
         pass

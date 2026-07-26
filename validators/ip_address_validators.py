@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import ipaddress
 
 from validators.validator_decorator import validator
@@ -23,10 +21,7 @@ def is_ipv4(value: str) -> bool:
     except ValueError:
         return False
 
-    if not isinstance(address, ipaddress.IPv4Address):
-        return False
-
-    return True
+    return isinstance(address, ipaddress.IPv4Address)
 
 
 @validator(message="Not a valid CIDR-notated IP version 4 address range.")
@@ -76,10 +71,7 @@ def is_ipv6(value: str) -> bool:
     except ValueError:
         return False
 
-    if not isinstance(address, ipaddress.IPv6Address):
-        return False
-
-    return True
+    return isinstance(address, ipaddress.IPv6Address)
 
 
 @validator(message="Not a valid CIDR-notated IP version 6 address range.")

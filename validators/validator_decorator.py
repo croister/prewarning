@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-
 import functools
 import inspect
 import itertools
-from typing import Callable
+from collections.abc import Callable
 
 from validators.validation_error import ValidationError
 
@@ -61,9 +59,7 @@ def validator(*, message=None):
                 msg = (
                     message
                     if message is not None
-                    else 'Not valid according to the "{}" validator.'.format(
-                        func.__name__
-                    )
+                    else f'Not valid according to the "{func.__name__}" validator.'
                 )
                 return ValidationError(func, msg, func_args_as_dict(func, args, kwargs))
             return True

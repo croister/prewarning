@@ -1,22 +1,22 @@
-from unittest.mock import MagicMock, patch, call
 from configparser import ConfigParser
-import wx
-import pytest
+from unittest.mock import MagicMock, call, patch
 
+import pytest
+import wx
+
+from utils.config import Config
 from utils.config_definitions import (
     ConfigOptionDefinition,
     ConfigSectionDefinition,
     RuntimeStateGroup,
     RuntimeStateOptionDefinition,
 )
-from utils.config import Config
 from utils.config_dialog import (
+    ConfigDialog,
     ConfigOptionValidator,
     ConfigSectionPanel,
-    ConfigDialog,
     FilterableChoiceDialog,
 )
-
 
 # ---------------------------------------------------------------------------
 # ConfigOptionValidator

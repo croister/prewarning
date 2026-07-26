@@ -11,6 +11,7 @@ def main():
     result = subprocess.run(
         [sys.executable, "-m", "PyInstaller", str(SPEC_FILE)],
         cwd=str(PROJECT_DIR),
+        check=False,
     )
     sys.exit(result.returncode)
 

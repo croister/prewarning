@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from datetime import datetime, timedelta
 from unittest.mock import MagicMock, patch
 from xml.etree import ElementTree as ET
@@ -10,7 +8,6 @@ from utils.meos_info_server import (
     MeosInfoServer,
     MeosPunchListener,
 )
-
 
 MOP_NS = "http://www.melin.nu/mop"
 
@@ -55,14 +52,16 @@ def _reset_singleton():
 
 @pytest.fixture
 def server():
-    with patch.object(MeosInfoServer, "_parse_config"):
-        with patch.object(MeosInfoServer, "_data_read", return_value=False):
-            s = MeosInfoServer()
-            s._url = "http://localhost:2009"
-            s._fetch_interval = 1
-            s._use_udp = False
-            s._zero_time = datetime(2026, 6, 16, 5, 0, 0)
-            return s
+    with (
+        patch.object(MeosInfoServer, "_parse_config"),
+        patch.object(MeosInfoServer, "_data_read", return_value=False),
+    ):
+        s = MeosInfoServer()
+        s._url = "http://localhost:2009"
+        s._fetch_interval = 1
+        s._use_udp = False
+        s._zero_time = datetime(2026, 6, 16, 5, 0, 0)  # noqa: DTZ001 - naive datetime matches MeOS/OLA data model
+        return s
 
 
 class TestDiffParsing:
@@ -132,7 +131,7 @@ class TestDiffParsing:
         assert punch1["cardNumber"] == "506576"
         assert punch1["bibNumber"] == "43"
         assert punch1["relayLeg"] == 1
-        assert punch1["passedTime"] == datetime(2026, 6, 16, 5, 0, 0) + timedelta(
+        assert punch1["passedTime"] == datetime(2026, 6, 16, 5, 0, 0) + timedelta(  # noqa: DTZ001 - naive datetime matches MeOS/OLA data model
             seconds=12340 / 10
         )
 
@@ -172,11 +171,11 @@ class TestDiffParsing:
 
         punch = listener.meos_punch_received.call_args[0][0]
         # 36000 tenths = 3600 seconds = 1 hour after zero time (05:00:00)
-        assert punch["passedTime"] == datetime(2026, 6, 16, 6, 0, 0)
+        assert punch["passedTime"] == datetime(2026, 6, 16, 6, 0, 0)  # noqa: DTZ001 - naive datetime matches MeOS/OLA data model
 
     def test_running_time_includes_start_time_offset(self, server):
         # st=18000 tenths = 1800s = 00:30:00 from midnight
-        server._competition_date = datetime(2026, 6, 16)
+        server._competition_date = datetime(2026, 6, 16)  # noqa: DTZ001 - naive datetime matches MeOS/OLA data model
         server._cmp_info[1] = {"card": "12345", "st": 18000}
 
         listener = MagicMock(spec=MeosPunchListener)
@@ -188,7 +187,7 @@ class TestDiffParsing:
 
         punch = listener.meos_punch_received.call_args[0][0]
         # midnight + (18000 + 36000) / 10 = 00:00:00 + 5400s = 01:30:00
-        assert punch["passedTime"] == datetime(2026, 6, 16, 1, 30, 0)
+        assert punch["passedTime"] == datetime(2026, 6, 16, 1, 30, 0)  # noqa: DTZ001 - naive datetime matches MeOS/OLA data model
 
 
 class TestMopCompleteVsDiff:

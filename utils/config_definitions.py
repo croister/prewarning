@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
-
 import inspect
 import logging
+from collections.abc import Callable
 from configparser import SectionProxy
 from enum import Enum, unique
 from pathlib import Path
-from typing import Any, Dict, List, Callable
+from typing import Any
 
 import wx
 
@@ -37,11 +36,11 @@ class ConfigOptionDefinition:
         description: str,
         mandatory: bool = False,
         default_value: Any = None,
-        valid_values: List[Any] | None = None,
+        valid_values: list[Any] | None = None,
         valid_values_display: dict[Any, str] | None = None,
         valid_values_gen: Callable | None = None,
         enabled_by: ConfigOptionDefinition | None = None,
-        enables: List[ConfigSectionDefinition | ConfigOptionDefinition] | None = None,
+        enables: list[ConfigSectionDefinition | ConfigOptionDefinition] | None = None,
         validator: Callable | None = None,
         read_only: bool = False,
         description_format_args: dict[str, Any] | None = None,
@@ -51,7 +50,7 @@ class ConfigOptionDefinition:
         self.logger = logging.getLogger(self.__class__.__name__)
 
         if enables is None:
-            enables = list()
+            enables = []
 
         self.name = name
         self.display_name = display_name
@@ -78,9 +77,7 @@ class ConfigOptionDefinition:
                     self.name,
                 )
                 raise ValueError(
-                    'Only bool option values are allows for "enabled_by" for the configuration option {}.'.format(
-                        self.name
-                    )
+                    f'Only bool option values are allows for "enabled_by" for the configuration option {self.name}.'
                 )
 
             enabled_by.enables.append(self)
@@ -97,7 +94,7 @@ class ConfigOptionDefinition:
             )
             raise ValueError(
                 "Both valid_values and valid_values_gen can not be set at the same time "
-                "on the configuration option {}.".format(self.name)
+                f"on the configuration option {self.name}."
             )
 
         if self.valid_values is not None:
@@ -112,30 +109,28 @@ class ConfigOptionDefinition:
             validation_errors = self.validate(self.default_value, True)
             if len(validation_errors):
                 raise ValueError(
-                    "The DEFAULT value ({}) for the configuration option {} has the following validation errors: {}.".format(
-                        self.default_value, self.name, str(validation_errors)
-                    )
+                    f"The DEFAULT value ({self.default_value}) for the configuration option {self.name} has the following validation errors: {validation_errors!s}."
                 )
 
-    def set_verifier(self, verifier: "ConfigVerifierDefinition"):
+    def set_verifier(self, verifier: ConfigVerifierDefinition):
         """Defines which function to use to verify this config option
 
         :param ConfigVerifierDefinition verifier: The function to use to verify this config option
         """
         if self.verifier is not None:
             self.logger.error('Verifier is already defined for "%s".', self.name)
-            raise ValueError('Verifier is already defined for "{}".'.format(self.name))
+            raise ValueError(f'Verifier is already defined for "{self.name}".')
 
         self.verifier = verifier
 
-    def set_selector(self, selector: "ConfigSelectorDefinition"):
+    def set_selector(self, selector: ConfigSelectorDefinition):
         """Defines which function to use to select a value for this config option
 
         :param ConfigSelectorDefinition selector: The function to use to select a value for this config option
         """
         if self.selector is not None:
             self.logger.error('Selector is already defined for "%s".', self.name)
-            raise ValueError('Selector is already defined for "{}".'.format(self.name))
+            raise ValueError(f'Selector is already defined for "{self.name}".')
 
         self.selector = selector
 
@@ -148,9 +143,7 @@ class ConfigOptionDefinition:
                     self.name,
                 )
                 raise ValueError(
-                    "A configuration option ({}) with the type bool must have a default value.".format(
-                        self.name
-                    )
+                    f"A configuration option ({self.name}) with the type bool must have a default value."
                 )
             if self.valid_values is not None or self.valid_values_gen is not None:
                 self.logger.error(
@@ -158,12 +151,10 @@ class ConfigOptionDefinition:
                     self.name,
                 )
                 raise ValueError(
-                    "A configuration option ({}) with the type bool can not have valid values defined.".format(
-                        self.name
-                    )
+                    f"A configuration option ({self.name}) with the type bool can not have valid values defined."
                 )
 
-    def get_valid_values(self) -> List[Any] | None:
+    def get_valid_values(self) -> list[Any] | None:
         """Returns the list of valid values for this option
 
         :return: The list of valid values for this option
@@ -176,7 +167,7 @@ class ConfigOptionDefinition:
             valid_values = self.valid_values_gen()
         return valid_values
 
-    def validate(self, value: Any, is_default: bool = False) -> List[str]:
+    def validate(self, value: Any, is_default: bool = False) -> list[str]:
         """Validates the value
 
         :param str value: The value to be validated
@@ -188,7 +179,7 @@ class ConfigOptionDefinition:
         if is_default:
             value_name = "DEFAULT value"
 
-        validation_errors = list()
+        validation_errors = []
         try:
             converted_value = self._convert_value(value_name, value)
 
@@ -239,9 +230,7 @@ class ConfigOptionDefinition:
                     self.name,
                 )
                 raise ValueError(
-                    'Unknown value type "{}" for the configuration option {}.'.format(
-                        self.value_type.__name__, self.name
-                    )
+                    f'Unknown value type "{self.value_type.__name__}" for the configuration option {self.name}.'
                 )
         except ValueError:
             self.logger.error(
@@ -253,9 +242,7 @@ class ConfigOptionDefinition:
                 type(value).__name__,
             )
             raise ValueError(
-                'The {} is expected to have the type "{}" but has the type "{}".'.format(
-                    value_name, self.value_type.__name__, type(value).__name__
-                )
+                f'The {value_name} is expected to have the type "{self.value_type.__name__}" but has the type "{type(value).__name__}".'
             )
 
     def get_value(self, config_section: SectionProxy) -> Any:
@@ -299,7 +286,7 @@ class ConfigOptionDefinition:
             if value is not None:
                 try:
                     value = Path(value)
-                except Exception as e:
+                except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
                     self.logger.debug("get_value: %s", e)
                     value = None
         else:
@@ -309,9 +296,7 @@ class ConfigOptionDefinition:
                 self.name,
             )
             raise ValueError(
-                'Unknown value type "{}" for the configuration option {}.'.format(
-                    self.value_type.__name__, self.name
-                )
+                f'Unknown value type "{self.value_type.__name__}" for the configuration option {self.name}.'
             )
         return value
 
@@ -329,7 +314,7 @@ class ConfigOptionDefinition:
         """
         config_section[self.name] = str(value)
 
-    def _validate_value_type(self, value_name: str, value: Any) -> List[str]:
+    def _validate_value_type(self, value_name: str, value: Any) -> list[str]:
         """Validates the type of value
 
         :param str value_name: The name of the value
@@ -337,7 +322,7 @@ class ConfigOptionDefinition:
         :return: The validation errors detected for this value
         :rtype: List[str]
         """
-        validation_errors = list()
+        validation_errors = []
 
         if not issubclass(type(value), self.value_type):
             self.logger.error(
@@ -349,13 +334,11 @@ class ConfigOptionDefinition:
                 type(value).__name__,
             )
             validation_errors.append(
-                'The value is expected to have the type "{}" but has the type "{}".'.format(
-                    self.value_type.__name__, type(value).__name__
-                )
+                f'The value is expected to have the type "{self.value_type.__name__}" but has the type "{type(value).__name__}".'
             )
         return validation_errors
 
-    def _validate_value(self, value_name: str, value: Any) -> List[str]:
+    def _validate_value(self, value_name: str, value: Any) -> list[str]:
         """Validates the value against the list of valid values
 
         :param str value_name: The name of the value
@@ -363,7 +346,7 @@ class ConfigOptionDefinition:
         :return: The validation errors detected for this value
         :rtype: List[str]
         """
-        validation_errors = list()
+        validation_errors = []
 
         valid_values = self.get_valid_values()
 
@@ -379,24 +362,20 @@ class ConfigOptionDefinition:
                         str(valid_values),
                     )
                     validation_errors.append(
-                        "The {} ({}) is not in the valid values list ({}).".format(
-                            value_name, self.name, str(valid_values)
-                        )
+                        f"The {value_name} ({self.name}) is not in the valid values list ({valid_values!s})."
                     )
         elif self.validator is not None:
             result = self.validator(value)
             if not result:
                 validation_errors.append(result.message)
         else:
-            if self.value_type is str:
-                pass
-            elif self.value_type is int:
-                pass
-            elif self.value_type is float:
-                pass
-            elif self.value_type is bool:
-                pass
-            elif self.value_type is Path:
+            if (
+                self.value_type is str
+                or self.value_type is int
+                or self.value_type is float
+                or self.value_type is bool
+                or self.value_type is Path
+            ):
                 pass
 
         return validation_errors
@@ -436,9 +415,7 @@ class ConfigOptionDefinition:
                 self.name,
             )
             raise ValueError(
-                '"enabled_by" is not configured for the configuration option {}.'.format(
-                    self.name
-                )
+                f'"enabled_by" is not configured for the configuration option {self.name}.'
             )
 
         option_definition = self.enabled_by
@@ -453,9 +430,7 @@ class ConfigOptionDefinition:
                 self.name,
             )
             raise ValueError(
-                'Unknown value type "{}" for the "enabled_by" value for the configuration option {}.'.format(
-                    str(value_type), self.name
-                )
+                f'Unknown value type "{value_type!s}" for the "enabled_by" value for the configuration option {self.name}.'
             )
 
 
@@ -491,7 +466,7 @@ class ConfigSectionEnableType(Enum):
 
 
 def config_section_definitions_sort_key(
-    config_section_definition: "ConfigSectionDefinition",
+    config_section_definition: ConfigSectionDefinition,
 ) -> str:
     return config_section_definition.sort_key()
 
@@ -514,9 +489,9 @@ class ConfigSectionDefinition:
         self,
         name: str,
         display_name: str,
-        option_definitions: List[ConfigOptionDefinition] | None = None,
+        option_definitions: list[ConfigOptionDefinition] | None = None,
         enable_type: ConfigSectionEnableType = ConfigSectionEnableType.ALWAYS,
-        requires: List["ConfigSectionDefinition"] | None = None,
+        requires: list[ConfigSectionDefinition] | None = None,
         sort_key_prefix: int = 100,
         # runtime_state_group: 'RuntimeStateGroup' = None,
     ):
@@ -525,32 +500,30 @@ class ConfigSectionDefinition:
         self.logger = logging.getLogger(self.__class__.__name__)
 
         if option_definitions is None:
-            option_definitions = list()
+            option_definitions = []
         if requires is None:
-            requires = list()
+            requires = []
 
         self.name = name
         self.display_name = display_name
-        self.option_definitions = dict(
-            {
-                option_definition.name: option_definition
-                for option_definition in option_definitions
-            }
-        )
+        self.option_definitions = {
+            option_definition.name: option_definition
+            for option_definition in option_definitions
+        }
         self.enable_type = enable_type
         self.requires = requires
         self.sort_key_prefix = sort_key_prefix
         # self.runtime_state_group = runtime_state_group
 
         self.enabled_by: ConfigSectionOptionDefinition | None = None
-        self.required_by: list[ConfigSectionDefinition] = list()
+        self.required_by: list[ConfigSectionDefinition] = []
 
         self.logger.debug(self)
 
     def sort_key(self):
-        return "{} {}".format(self.sort_key_prefix, self.name)
+        return f"{self.sort_key_prefix} {self.name}"
 
-    def copy_from(self, temp_config_section_definition: "ConfigSectionDefinition"):
+    def copy_from(self, temp_config_section_definition: ConfigSectionDefinition):
         """Copies relevant values from another ConfigSectionDefinition to this ConfigSectionDefinition
 
         :param ConfigSectionDefinition temp_config_section_definition: The other ConfigSectionDefinition
@@ -573,15 +546,13 @@ class ConfigSectionDefinition:
 
         :param ConfigOptionDefinition option_definition: The option definition to add
         """
-        if option_definition.name in self.option_definitions.keys():
+        if option_definition.name in self.option_definitions:
             self.logger.error(
                 'The configuration option definition for "%s" already exists.',
                 option_definition.name,
             )
             raise ValueError(
-                'The configuration option definition for "{}" already exists.'.format(
-                    option_definition.name
-                )
+                f'The configuration option definition for "{option_definition.name}" already exists.'
             )
 
         self.option_definitions[option_definition.name] = option_definition
@@ -593,13 +564,11 @@ class ConfigSectionDefinition:
         """
         if self.enabled_by is not None:
             self.logger.error('Enabled by is already defined for "%s".', self.name)
-            raise ValueError(
-                'Enabled by is already defined for "{}".'.format(self.name)
-            )
+            raise ValueError(f'Enabled by is already defined for "{self.name}".')
 
         self.enabled_by = config_section_option
 
-    def add_required_by(self, config_section: "ConfigSectionDefinition"):
+    def add_required_by(self, config_section: ConfigSectionDefinition):
         """Adds a config section that is required by this config section
 
         :param ConfigSectionDefinition config_section: The config section to add
@@ -611,20 +580,18 @@ class ConfigSectionDefinition:
                 config_section.name,
             )
             raise ValueError(
-                'This configuration section definition ({}) is already required by "{}".'.format(
-                    self.name, config_section.name
-                )
+                f'This configuration section definition ({self.name}) is already required by "{config_section.name}".'
             )
 
         self.required_by.append(config_section)
 
-    def get_initial_config_section(self) -> Dict[str, str]:
+    def get_initial_config_section(self) -> dict[str, str]:
         """Returns the initial values for this section.
 
         :return: The initial values
         :rtype: Dict[str, str]
         """
-        initial_config_section = dict()
+        initial_config_section = {}
         for option_definition in self.option_definitions.values():
             initial_config_section[option_definition.name] = (
                 option_definition.get_initial_option_value()
@@ -632,7 +599,7 @@ class ConfigSectionDefinition:
 
         return initial_config_section
 
-    def is_enabled(self, config_sections: Dict[str, SectionProxy]) -> bool:
+    def is_enabled(self, config_sections: dict[str, SectionProxy]) -> bool:
         """Determines if this config section is enabled
 
         :param Dict[str, SectionProxy] config_sections: The config sections
@@ -648,7 +615,7 @@ class ConfigSectionDefinition:
         else:
             return False
 
-    def _is_enabled_by(self, config_sections: Dict[str, SectionProxy]) -> bool:
+    def _is_enabled_by(self, config_sections: dict[str, SectionProxy]) -> bool:
         """Determines if this config section is enabled by a configuration in another config section
 
         :param Dict[str, SectionProxy] config_sections: The config sections
@@ -662,9 +629,7 @@ class ConfigSectionDefinition:
                 self.name,
             )
             raise ValueError(
-                'Enable type is  "{}" but "enabled_by" is not configured for the configuration section {}.'.format(
-                    self.enable_type, self.name
-                )
+                f'Enable type is  "{self.enable_type}" but "enabled_by" is not configured for the configuration section {self.name}.'
             )
 
         other_config_section = config_sections[self.enabled_by.section_name]
@@ -686,13 +651,11 @@ class ConfigSectionDefinition:
                 self.name,
             )
             raise ValueError(
-                'Unknown value type "{}" for the "enabled_by" value for the configuration section {}.'.format(
-                    str(value_type), self.name
-                )
+                f'Unknown value type "{value_type!s}" for the "enabled_by" value for the configuration section {self.name}.'
             )
 
     def _is_enabled_if_required_by(
-        self, config_sections: Dict[str, SectionProxy]
+        self, config_sections: dict[str, SectionProxy]
     ) -> bool:
         """Determines if this config section is enabled by checking if any of the requiring config sections are enabled
 
@@ -707,9 +670,7 @@ class ConfigSectionDefinition:
                 self.name,
             )
             raise ValueError(
-                'Enable type is  "{}" but "required_by" is not configured for the configuration section {}.'.format(
-                    self.enable_type, self.name
-                )
+                f'Enable type is  "{self.enable_type}" but "required_by" is not configured for the configuration section {self.name}.'
             )
 
         for config_section_definition in self.required_by:
@@ -751,13 +712,11 @@ class VerificationError(Exception):
         return "VerificationError(function={function}, message={message}, args={args})".format(
             function=self.function.__name__,
             message=self.message,
-            args=dict(
-                [
-                    (k, v)
-                    for (k, v) in self.__dict__.items()
-                    if k != "function" and k != "message"
-                ]
-            ),
+            args={
+                k: v
+                for (k, v) in self.__dict__.items()
+                if k != "function" and k != "message"
+            },
         )
 
     def __str__(self):
@@ -788,7 +747,7 @@ class ConfigVerifierDefinition:
     def __init__(
         self,
         function: Callable,
-        parameters: List[ConfigSectionOptionDefinition | Any],
+        parameters: list[ConfigSectionOptionDefinition | Any],
         message: str | None = None,
     ):
         super().__init__()
@@ -816,9 +775,8 @@ class ConfigVerifierDefinition:
         result = self.function(*args)
         if not result:
             message = self.message
-            if isinstance(result, VerificationResult):
-                if result.message is not None:
-                    message = result.message
+            if isinstance(result, VerificationResult) and result.message is not None:
+                message = result.message
             arg_names = inspect.getfullargspec(self.function)[0]
             return VerificationError(self.function, message, dict(zip(arg_names, args)))
 
@@ -831,9 +789,7 @@ class SelectionData:
         self.display_name = display_name
 
     def __repr__(self):
-        return "SelectionData(value={value}, display_name={display_name})".format(
-            value=self.value, display_name=self.display_name
-        )
+        return f"SelectionData(value={self.value}, display_name={self.display_name})"
 
     def __str__(self):
         return repr(self)
@@ -899,13 +855,11 @@ class SelectionError(Exception):
         return "SelectionError(function={function}, message={message}, args={args})".format(
             function=self.function.__name__,
             message=self.message,
-            args=dict(
-                [
-                    (k, v)
-                    for (k, v) in self.__dict__.items()
-                    if k != "function" and k != "message"
-                ]
-            ),
+            args={
+                k: v
+                for (k, v) in self.__dict__.items()
+                if k != "function" and k != "message"
+            },
         )
 
     def __str__(self):
@@ -936,7 +890,7 @@ class ConfigSelectorDefinition:
     def __init__(
         self,
         function: Callable,
-        parameters: List[ConfigSectionOptionDefinition] | List[Any],
+        parameters: list[ConfigSectionOptionDefinition] | list[Any],
         message: str | None = None,
     ):
         super().__init__()
@@ -990,7 +944,7 @@ class RuntimeStateGroup:
 
         self.state_file_name = state_file_name
 
-        self._option_definitions: Dict[str, "RuntimeStateOptionDefinition"] = {}
+        self._option_definitions: dict[str, RuntimeStateOptionDefinition] = {}
 
         self.state_file_location = DATA_DIR / state_file_name
 
@@ -1001,7 +955,7 @@ class RuntimeStateGroup:
 
         self.logger.debug(self)
 
-    def _register(self, option_definition: "RuntimeStateOptionDefinition"):
+    def _register(self, option_definition: RuntimeStateOptionDefinition):
         if option_definition.name in self._option_definitions:
             raise ValueError(
                 f'Option definition "{option_definition.name}" is already registered in this RuntimeStateGroup.'
@@ -1009,7 +963,7 @@ class RuntimeStateGroup:
         self._option_definitions[option_definition.name] = option_definition
 
     @property
-    def option_definitions(self) -> Dict[str, "RuntimeStateOptionDefinition"]:
+    def option_definitions(self) -> dict[str, RuntimeStateOptionDefinition]:
         return dict(self._option_definitions)
 
     def get_value(

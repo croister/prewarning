@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import logging
 from datetime import datetime
 
@@ -15,7 +13,7 @@ def _timestamp_pattern(value: str, datetime_pattern: str) -> bool:
     :param str datetime_pattern: The datetime pattern to validate with.
     """
     try:
-        parsed = datetime.strptime(value, datetime_pattern)
+        parsed = datetime.strptime(value, datetime_pattern)  # noqa: DTZ007 - parsing timestamps without timezone info
         return type(parsed) is datetime
     except (TypeError, ValueError) as e:
         logging.getLogger(LOGGER_NAME).debug("timestamp_pattern: %s", e)

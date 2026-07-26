@@ -1,4 +1,4 @@
-from validators.datetime_validators import is_timestamp, is_date, is_time
+from validators.datetime_validators import is_date, is_time, is_timestamp
 
 
 class TestIsTimestamp:

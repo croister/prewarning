@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
-
-from typing import Callable, Any, Iterable, Tuple
+from collections.abc import Callable, Iterable
+from typing import Any
 
 
 class ValidationError(Exception):
     def __init__(
-        self, function: Callable, message: str, args: Iterable[Tuple[str, Any]]
+        self, function: Callable, message: str, args: Iterable[tuple[str, Any]]
     ):
         self.function = function
         self.message = message
@@ -15,13 +14,11 @@ class ValidationError(Exception):
         return "ValidationError(function={function}, message={message}, args={args})".format(
             function=self.function.__name__,
             message=self.message,
-            args=dict(
-                [
-                    (k, v)
-                    for (k, v) in self.__dict__.items()
-                    if k != "function" and k != "message"
-                ]
-            ),
+            args={
+                k: v
+                for (k, v) in self.__dict__.items()
+                if k != "function" and k != "message"
+            },
         )
 
     def __str__(self):

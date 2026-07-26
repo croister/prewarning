@@ -1,10 +1,10 @@
 from validators.ip_address_validators import (
+    is_ip,
+    is_ip_cidr,
     is_ipv4,
     is_ipv4_cidr,
     is_ipv6,
     is_ipv6_cidr,
-    is_ip,
-    is_ip_cidr,
 )
 
 

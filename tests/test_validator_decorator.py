@@ -1,4 +1,4 @@
-from validators.validator_decorator import validator, func_args_as_dict
+from validators.validator_decorator import func_args_as_dict, validator
 
 
 def dummy_validator(value):

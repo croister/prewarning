@@ -1,8 +1,8 @@
 from validators.url_validators import (
-    is_url,
+    is_http_or_https_url,
     is_http_url,
     is_https_url,
-    is_http_or_https_url,
+    is_url,
 )
 
 

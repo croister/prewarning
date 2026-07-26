@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """Cross-platform screen sleep prevention."""
 
 import logging
@@ -38,7 +36,7 @@ class ScreenSleepInhibitor:
                 self._inhibit_linux()
             self._active = True
             logger.info("Screen sleep prevention activated.")
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
             logger.warning("Failed to inhibit screen sleep: %s", e)
 
     def uninhibit(self) -> None:
@@ -53,7 +51,7 @@ class ScreenSleepInhibitor:
             else:
                 self._uninhibit_linux()
             logger.info("Screen sleep prevention deactivated.")
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
             logger.warning("Failed to uninhibit screen sleep: %s", e)
         finally:
             self._active = False
@@ -98,6 +96,7 @@ class ScreenSleepInhibitor:
         result = subprocess.run(
             ["xdg-screensaver", "suspend", str(self._get_window_id())],
             capture_output=True,
+            check=False,
         )
         if result.returncode != 0:
             logger.warning(
@@ -110,6 +109,7 @@ class ScreenSleepInhibitor:
         subprocess.run(
             ["xdg-screensaver", "resume", str(self._get_window_id())],
             capture_output=True,
+            check=False,
         )
 
     def _get_window_id(self) -> int:
@@ -122,6 +122,6 @@ class ScreenSleepInhibitor:
                 top = app.GetTopWindow()
                 if top is not None:
                     return top.GetHandle()
-        except Exception:
+        except Exception:  # noqa: BLE001, S110 - best-effort operation, failure is non-critical
             pass
         return 0
