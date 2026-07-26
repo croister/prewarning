@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v9.0.0
       - name: Lint (YAML) - workflow definition
-        run: uvx yamllint .github/workflows/ && echo "No YAML issues found."
+        run: uv run --only-group lint yamllint .github/workflows/ && echo "No YAML issues found."
 
   audit:
     name: Audit (Dependencies)
@@ -35,7 +35,7 @@ jobs:
       - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v9.0.0
       - name: Lint (Spelling)
-        run: uvx codespell --skip=".git,uv.lock,dist,__pycache__,logs,startlists,test_data,**country_dict_by_ioc*,locales" --ignore-words-list="datas"
+        run: uv run --only-group lint codespell --skip=".git,uv.lock,dist,__pycache__,logs,startlists,test_data,**country_dict_by_ioc*,locales" --ignore-words-list="datas"
 
   ruff:
     name: Lint (Python)
@@ -44,9 +44,9 @@ jobs:
       - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v9.0.0
       - name: Lint (Python) - check
-        run: uvx ruff check .
+        run: uv run --only-group lint ruff check .
       - name: Lint (Python) - format
-        run: uvx ruff format --check .
+        run: uv run --only-group lint ruff format --check .
 
   i18n:
     name: Translations
@@ -55,7 +55,7 @@ jobs:
       - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v9.0.0
       - name: Check for untranslated strings
-        run: uv run --no-project python scripts/check_translations.py
+        run: uv run --only-group lint python scripts/check_translations.py
 
   test:
     name: Tests
