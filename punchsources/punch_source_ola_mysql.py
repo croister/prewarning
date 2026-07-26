@@ -18,6 +18,7 @@ from utils.config_definitions import (
     VerificationResult,
 )
 from utils.constants import FETCH_INTERVAL_VALID_VALUES, PUNCH_KEY_ID
+from utils.health import HealthStatus
 from utils.i18n import N_
 from utils.ola_mysql import (
     _KEY_CLASS_COUNT,
@@ -524,7 +525,7 @@ class PunchSourceOlaMySql(StateSaverMixin, _PunchSourceBase):
     def stop(self):
         self._stop_event.set()
         if self.punch_fetcher is not None and self.punch_fetcher.is_alive():
-            self.punch_fetcher.join()
+            self.punch_fetcher.join(timeout=2)
 
     def is_running(self) -> bool:
         return not self._stop_event.is_set()
@@ -633,10 +634,13 @@ class PunchSourceOlaMySql(StateSaverMixin, _PunchSourceBase):
                     self.last_modify_time = split_time[_SPLIT_TIME_KEY_MODIFY_DATE]
                     self.logger.debug("last_modify_time: %s", self.last_modify_time)
                     self._save_state()
+                self._set_health_status(HealthStatus.OK)
             except OperationalError as oe:
                 self.logger.error(oe)
+                self._set_health_status(HealthStatus.ERROR, str(oe))
             except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
                 self.logger.error("Unexpected error fetching punches: %s", e)
+                self._set_health_status(HealthStatus.ERROR, str(e))
 
             self._stop_event.wait(timeout=self.fetch_interval_seconds)
         self.logger.debug("Stopped")

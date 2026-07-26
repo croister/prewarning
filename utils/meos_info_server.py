@@ -37,6 +37,7 @@ from utils.constants import (
     PUNCH_KEY_PASSED_TIME,
     PUNCH_KEY_RELAY_LEG,
 )
+from utils.health import HealthStatus
 from utils.i18n import N_
 from utils.singleton import Singleton
 from utils.state_saver import StateSaverMixin
@@ -348,7 +349,11 @@ class MeosInfoServer(
         self._seen_radio: dict[int, set[int]] = {}
 
         self._listeners: list[MeosPunchListener] = []
+        self._data_ready_callbacks: list = []
         self._ref_count: int = 0
+
+        self._health_status: HealthStatus = HealthStatus.OK
+        self._health_message: str | None = None
 
         self._poll_event = Event()
         self._stop_event = Event()
@@ -539,11 +544,14 @@ class MeosInfoServer(
         self._next_difference = _INITIAL_DIFF_TOKEN
         self._suppress_notifications = True
         self._prime_caches()
+        self._set_health_status(HealthStatus.OK)
+        self._notify_data_ready()
         while not self._stop_event.is_set():
             try:
                 self._do_fetch()
             except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
                 self.logger.error("Error in poll loop: %s", e)
+                self._set_health_status(HealthStatus.ERROR, str(e))
             self._poll_event.wait(timeout=self._fetch_interval)
             self._poll_event.clear()
         self.logger.debug("Poll loop stopped")
@@ -573,79 +581,107 @@ class MeosInfoServer(
         if is_complete:
             self.logger.debug("Received MOPComplete, resetting caches")
             self._prime_caches()
+            self._notify_data_ready()
             self._seen_radio.clear()
             suppress = self._suppress_notifications
             self._suppress_notifications = False
         else:
             suppress = False
 
+        data_changed = False
         for elem in root:
             tag = _strip_ns(elem.tag)
             if tag == _TAG_TEAM:
-                self._process_team_elem(elem)
+                data_changed |= self._process_team_elem(elem)
             elif tag == _TAG_COMPETITOR:
-                self._process_cmp_elem(elem, suppress=suppress)
+                data_changed |= self._process_cmp_elem(elem, suppress=suppress)
             elif tag == _TAG_ORG:
-                self._process_org_elem(elem)
+                data_changed |= self._process_org_elem(elem)
 
         if next_diff != self._next_difference:
             self._next_difference = next_diff
             self._save_state()
         self.logger.debug("Diff fetched: type=%s, next=%s", root_tag, next_diff)
+        self._set_health_status(HealthStatus.OK)
+        if data_changed:
+            self._notify_data_ready()
 
-    def _process_org_elem(self, elem: ET.Element) -> None:
+    def _process_org_elem(self, elem: ET.Element) -> bool:
         org_id = int(elem.get(_ATTR_ID, 0))
         nat = elem.get(_ATTR_NAT)
-        if nat:
+        if nat and self._org_nat.get(org_id) != nat:
             self._org_nat[org_id] = nat
+            return True
+        return False
 
-    def _process_team_elem(self, elem: ET.Element) -> None:
+    def _process_team_elem(self, elem: ET.Element) -> bool:
         team_id = int(elem.get(_ATTR_ID, 0))
         base_elem = _find(elem, _TAG_BASE)
         r_elem = _find(elem, _TAG_RUNNERS)
+        changed = False
         if base_elem is not None:
             bib = base_elem.get(_ATTR_BIB)
-            if bib:
+            if bib and self._team_bib.get(team_id) != bib:
                 self._team_bib[team_id] = bib
                 self.logger.debug("Team %d bib updated: %s", team_id, bib)
+                changed = True
             org_id = base_elem.get(_ATTR_ORG)
             if org_id:
-                self._team_org[team_id] = int(org_id)
+                new_org = int(org_id)
+                if self._team_org.get(team_id) != new_org:
+                    self._team_org[team_id] = new_org
+                    changed = True
         if r_elem is not None and r_elem.text:
             legs = r_elem.text.split(";")
-            self._team_leg_count[team_id] = len(legs)
+            new_leg_count = len(legs)
+            if self._team_leg_count.get(team_id) != new_leg_count:
+                self._team_leg_count[team_id] = new_leg_count
+                changed = True
             for leg_idx, leg_runners in enumerate(legs, start=1):
                 for cmp_id_str in leg_runners.split(","):
                     cmp_id_str = cmp_id_str.strip()
                     if cmp_id_str and cmp_id_str != _MOP_EMPTY_SLOT:
                         cmp_id = int(cmp_id_str)
                         info = self._cmp_info.setdefault(cmp_id, {})
-                        info[_CMP_KEY_TEAM_ID] = team_id
-                        info[_CMP_KEY_LEG] = leg_idx
+                        if (
+                            info.get(_CMP_KEY_TEAM_ID) != team_id
+                            or info.get(_CMP_KEY_LEG) != leg_idx
+                        ):
+                            info[_CMP_KEY_TEAM_ID] = team_id
+                            info[_CMP_KEY_LEG] = leg_idx
+                            changed = True
+        return changed
 
-    def _process_cmp_elem(self, elem: ET.Element, suppress: bool = False) -> None:
+    def _process_cmp_elem(self, elem: ET.Element, suppress: bool = False) -> bool:
         cmp_id = int(elem.get(_ATTR_ID, 0))
+        changed = False
         card = elem.get(_CMP_KEY_CARD)
         if card and card != _MOP_EMPTY_SLOT:
             info = self._cmp_info.setdefault(cmp_id, {})
             if info.get(_CMP_KEY_CARD) != card:
                 info[_CMP_KEY_CARD] = card
                 self.logger.debug("Competitor %d card updated: %s", cmp_id, card)
+                changed = True
 
         base_elem = _find(elem, _TAG_BASE)
         if base_elem is not None:
             st = base_elem.get(_CMP_KEY_START_TIME)
             if st:
                 info = self._cmp_info.setdefault(cmp_id, {})
-                info[_CMP_KEY_START_TIME] = int(st)
+                new_st = int(st)
+                if info.get(_CMP_KEY_START_TIME) != new_st:
+                    info[_CMP_KEY_START_TIME] = new_st
+                    changed = True
             nat = base_elem.get(_ATTR_NAT)
             if nat:
                 info = self._cmp_info.setdefault(cmp_id, {})
-                info[_CMP_KEY_NAT] = nat
+                if info.get(_CMP_KEY_NAT) != nat:
+                    info[_CMP_KEY_NAT] = nat
+                    changed = True
 
         radio_elem = _find(elem, _TAG_RADIO)
         if radio_elem is None or not radio_elem.text:
-            return
+            return changed
 
         for entry in radio_elem.text.split(";"):
             entry = entry.strip()
@@ -703,6 +739,9 @@ class MeosInfoServer(
 
             if not suppress:
                 self._notify_listeners(punch)
+                changed = True
+
+        return changed
 
     # -- UDP listener ----------------------------------------------------------
 
@@ -755,6 +794,38 @@ class MeosInfoServer(
     def unregister_meos_punch_listener(self, listener: MeosPunchListener) -> None:
         if listener in self._listeners:
             self._listeners.remove(listener)
+
+    def register_data_ready_callback(self, callback) -> None:
+        """Register a callback to be invoked when cache data is loaded."""
+        if callback not in self._data_ready_callbacks:
+            self._data_ready_callbacks.append(callback)
+
+    def unregister_data_ready_callback(self, callback) -> None:
+        """Unregister a previously registered data-ready callback."""
+        if callback in self._data_ready_callbacks:
+            self._data_ready_callbacks.remove(callback)
+
+    def _notify_data_ready(self) -> None:
+        """Notify listeners that cached data has been loaded or refreshed."""
+        for callback in self._data_ready_callbacks:
+            try:
+                callback()
+            except Exception:
+                self.logger.exception("Error in data-ready callback")
+
+    @property
+    def health_status(self) -> tuple[HealthStatus, str | None]:
+        """The current health status of the MeOS Information Server connection."""
+        return self._health_status, self._health_message
+
+    def _set_health_status(
+        self, status: HealthStatus, message: str | None = None
+    ) -> None:
+        """Set the health status and notify if it changed."""
+        if self._health_status != status or self._health_message != message:
+            self._health_status = status
+            self._health_message = message
+            self._notify_data_ready()
 
     def _notify_listeners(self, punch: dict) -> None:
         self.logger.debug("New punch: %s", punch)

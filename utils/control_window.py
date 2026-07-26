@@ -1,13 +1,11 @@
-# -*- coding: utf-8 -*-
-
 """Control Window — secondary operator monitor on landscape display."""
 
 import logging
-from typing import Callable
+from collections.abc import Callable
 
 import wx
 
-from utils.i18n import _, N_
+from utils.i18n import N_, _
 
 # Column indices for recent pre-warnings
 _COL_TIME = 0
@@ -49,7 +47,7 @@ class ControlWindow(wx.Frame):
             from utils.about_dialog import APP_ICON_PATH
 
             self.SetIcon(wx.Icon(APP_ICON_PATH, wx.BITMAP_TYPE_ICO))
-        except Exception:
+        except Exception:  # noqa: BLE001, S110 - best-effort icon set, failure is non-critical
             pass
 
         self._build_ui()

@@ -27,6 +27,7 @@ from utils.constants import (
     PUNCH_KEY_IS_LAST_LEG,
     PUNCH_KEY_RELAY_LEG,
 )
+from utils.health import HealthStatus
 from utils.i18n import N_
 from utils.sound import Sound, get_all_sounds, verify_sound
 from validators.path_validators import file_exists
@@ -407,14 +408,22 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
                 and Path(src_path).resolve() == self.start_list_file
             )
             if is_current_file:
-                self._read_start_list()
+                try:
+                    self._read_start_list()
+                except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
+                    self.logger.error("Error reading start list: %s", e)
+                    self._set_health_status(HealthStatus.ERROR, str(e))
 
     def config_updated(self, section_names: list[str]):
         self.update()
 
     def update(self):
         self._parse_config()
-        self._read_start_list()
+        try:
+            self._read_start_list()
+        except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
+            self.logger.error("Error reading start list: %s", e)
+            self._set_health_status(HealthStatus.ERROR, str(e))
 
     def _parse_config(self):
         config_section = Config().get_section(self.name)
@@ -567,6 +576,9 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
 
             assert self.start_list_update_sound_file is not None
             Sound.play(self.start_list_update_sound_file)
+
+            self._set_health_status(HealthStatus.OK)
+            self._notify_data_changed()
 
     def lookup_from_card_number(self, card_number: str) -> dict[str, str] | None:
         """Returns Bib-Number and Relay Leg for the provided Card Number.

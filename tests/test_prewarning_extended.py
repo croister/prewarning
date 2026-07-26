@@ -378,6 +378,18 @@ class _MockPunchSource:
     def start(self):
         pass
 
+    def register_data_listener(self, callback):
+        pass
+
+    def register_health_listener(self, callback):
+        pass
+
+    @property
+    def health_status(self):
+        from utils.health import HealthStatus
+
+        return (HealthStatus.OK, None)
+
 
 class _OldMockPunchSource:
     name = "OldPunchName"
@@ -394,6 +406,18 @@ class _OldMockPunchSource:
     def start(self):
         pass
 
+    def register_data_listener(self, callback):
+        pass
+
+    def register_health_listener(self, callback):
+        pass
+
+    @property
+    def health_status(self):
+        from utils.health import HealthStatus
+
+        return (HealthStatus.OK, None)
+
 
 class _MockStartListSource:
     name = "MockStartList"
@@ -409,6 +433,18 @@ class _MockStartListSource:
 
     def start(self):
         pass
+
+    def register_data_listener(self, callback):
+        pass
+
+    def register_health_listener(self, callback):
+        pass
+
+    @property
+    def health_status(self):
+        from utils.health import HealthStatus
+
+        return (HealthStatus.OK, None)
 
 
 MOCK_PUNCH_SOURCES = {"MockPunch": _MockPunchSource}
@@ -577,15 +613,17 @@ class TestToggleControlWindow:
         with patch("prewarning.wx.Display") as mock_display:
             mock_display.GetFromWindow.return_value = 0
             mock_display.return_value = MagicMock()
-            with patch(
-                "prewarning.ControlWindow.find_landscape_display", return_value=None
+            with (
+                patch(
+                    "prewarning.ControlWindow.find_landscape_display", return_value=None
+                ),
+                patch("prewarning.ControlWindow") as mock_cw_class,
             ):
-                with patch("prewarning.ControlWindow") as mock_cw_class:
-                    mock_cw = MagicMock()
-                    mock_cw_class.return_value = mock_cw
-                    PreWarning._toggle_control_window(pw)
-                    mock_cw.Show.assert_called_once()
-                    pw._update_control_window.assert_called_once()
+                mock_cw = MagicMock()
+                mock_cw_class.return_value = mock_cw
+                PreWarning._toggle_control_window(pw)
+                mock_cw.Show.assert_called_once()
+                pw._update_control_window.assert_called_once()
 
     def test_hides_when_shown(self):
         pw = MagicMock()
@@ -756,3 +794,145 @@ class TestBaseStartListSourceGetTeamCountGetRunnerCount:
         pw = MagicMock(spec=_StartListSourceBase)
         result = _StartListSourceBase.get_runner_count(pw)
         assert result is None
+
+
+class TestCheckStartListSourceHealth:
+    """Tests for _check_start_list_source_health including non-relay detection."""
+
+    def test_returns_error_when_no_source_configured(self):
+        from utils.health import HealthStatus
+
+        pw = MagicMock()
+        pw.start_list_source = None
+        issues = PreWarning._check_start_list_source_health(pw)
+        assert len(issues) == 1
+        assert issues[0].status == HealthStatus.ERROR
+        assert "No start list source" in issues[0].message
+
+    def test_returns_error_when_source_not_running(self):
+        from utils.health import HealthStatus
+
+        pw = MagicMock()
+        pw.start_list_source = MagicMock()
+        pw.start_list_source.is_running.return_value = False
+        issues = PreWarning._check_start_list_source_health(pw)
+        assert len(issues) == 1
+        assert issues[0].status == HealthStatus.ERROR
+        assert "not running" in issues[0].message
+
+    def test_returns_error_when_runners_exist_but_no_teams(self):
+        from utils.health import HealthStatus
+
+        pw = MagicMock()
+        pw.start_list_source = MagicMock()
+        pw.start_list_source.is_running.return_value = True
+        pw.start_list_source.health_status = (HealthStatus.OK, None)
+        pw.start_list_source.get_runner_count.return_value = 50
+        pw.start_list_source.get_team_count.return_value = None
+        issues = PreWarning._check_start_list_source_health(pw)
+        assert len(issues) == 1
+        assert issues[0].status == HealthStatus.ERROR
+        assert "not a relay" in issues[0].message
+
+    def test_returns_no_issues_when_teams_and_runners_exist(self):
+        from utils.health import HealthStatus
+
+        pw = MagicMock()
+        pw.start_list_source = MagicMock()
+        pw.start_list_source.is_running.return_value = True
+        pw.start_list_source.health_status = (HealthStatus.OK, None)
+        pw.start_list_source.get_runner_count.return_value = 50
+        pw.start_list_source.get_team_count.return_value = 10
+        issues = PreWarning._check_start_list_source_health(pw)
+        assert issues == []
+
+    def test_returns_error_when_no_data_at_all(self):
+        from utils.health import HealthStatus
+
+        pw = MagicMock()
+        pw.start_list_source = MagicMock()
+        pw.start_list_source.is_running.return_value = True
+        pw.start_list_source.health_status = (HealthStatus.OK, None)
+        pw.start_list_source.get_runner_count.return_value = None
+        pw.start_list_source.get_team_count.return_value = None
+        issues = PreWarning._check_start_list_source_health(pw)
+        assert len(issues) == 1
+        assert issues[0].status == HealthStatus.ERROR
+        assert "no data" in issues[0].message
+
+    def test_returns_error_when_zero_runners_and_no_teams(self):
+        from utils.health import HealthStatus
+
+        pw = MagicMock()
+        pw.start_list_source = MagicMock()
+        pw.start_list_source.is_running.return_value = True
+        pw.start_list_source.health_status = (HealthStatus.OK, None)
+        pw.start_list_source.get_runner_count.return_value = 0
+        pw.start_list_source.get_team_count.return_value = None
+        issues = PreWarning._check_start_list_source_health(pw)
+        assert len(issues) == 1
+        assert issues[0].status == HealthStatus.ERROR
+        assert "no data" in issues[0].message
+
+    def test_returns_error_when_source_reports_health_error(self):
+        from utils.health import HealthStatus
+
+        pw = MagicMock()
+        pw.start_list_source = MagicMock()
+        pw.start_list_source.is_running.return_value = True
+        pw.start_list_source.health_status = (HealthStatus.ERROR, "Connection refused")
+        pw.start_list_source.get_runner_count.return_value = 0
+        pw.start_list_source.get_team_count.return_value = 0
+        issues = PreWarning._check_start_list_source_health(pw)
+        # Should have the source error issue
+        source_issues = [i for i in issues if "Connection refused" in i.message]
+        assert len(source_issues) == 1
+        assert source_issues[0].status == HealthStatus.ERROR
+
+
+class TestCheckPunchSourceHealth:
+    def test_returns_error_when_no_source_configured(self):
+        from utils.health import HealthStatus
+
+        pw = MagicMock()
+        pw.punch_source = None
+        issues = PreWarning._check_punch_source_health(pw)
+        assert len(issues) == 1
+        assert issues[0].status == HealthStatus.ERROR
+        assert "No punch source" in issues[0].message
+
+    def test_returns_error_when_source_not_running(self):
+        from utils.health import HealthStatus
+
+        pw = MagicMock()
+        pw.punch_source = MagicMock()
+        pw.punch_source.is_running.return_value = False
+        issues = PreWarning._check_punch_source_health(pw)
+        assert len(issues) == 1
+        assert issues[0].status == HealthStatus.ERROR
+        assert "not running" in issues[0].message
+
+    def test_returns_no_issues_when_source_running_and_healthy(self):
+        from utils.health import HealthStatus
+
+        pw = MagicMock()
+        pw.punch_source = MagicMock()
+        pw.punch_source.is_running.return_value = True
+        pw.punch_source.health_status = (HealthStatus.OK, None)
+        issues = PreWarning._check_punch_source_health(pw)
+        assert issues == []
+
+    def test_returns_error_when_source_reports_health_error(self):
+        from utils.health import HealthStatus
+
+        pw = MagicMock()
+        pw.punch_source = MagicMock()
+        pw.punch_source.is_running.return_value = True
+        pw.punch_source.health_status = (
+            HealthStatus.ERROR,
+            "Database connection lost",
+        )
+        issues = PreWarning._check_punch_source_health(pw)
+        assert len(issues) == 1
+        assert issues[0].status == HealthStatus.ERROR
+        assert "Database connection lost" in issues[0].message

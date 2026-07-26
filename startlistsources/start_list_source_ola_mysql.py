@@ -4,6 +4,7 @@ from pymysql import OperationalError
 
 from utils.config import Config, ConfigSectionDefinition
 from utils.config_definitions import ConfigSectionEnableType
+from utils.health import HealthStatus
 from utils.i18n import N_
 from utils.ola_mysql import OlaMySql
 
@@ -68,7 +69,9 @@ class StartListSourceOlaMySql(_StartListSourceBase):
 
     def start(self):
         self._running = True
+        self._set_health_status(HealthStatus.OK)
         self.update()
+        self._notify_data_changed()
 
     def stop(self):
         self._running = False
@@ -103,9 +106,11 @@ class StartListSourceOlaMySql(_StartListSourceBase):
                 card_number
             )
             self.logger.debug(pre_warning_data)
+            self._set_health_status(HealthStatus.OK)
             return pre_warning_data
         except OperationalError as oe:
             self.logger.error(oe)
+            self._set_health_status(HealthStatus.ERROR, str(oe))
 
         return None
 

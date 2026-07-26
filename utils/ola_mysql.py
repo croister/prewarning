@@ -36,6 +36,7 @@ def connect(
         password=password,
         database=database,
         cursorclass=DictCursor,
+        connect_timeout=10,
     )
     return connection  # type: ignore[return-value]
 

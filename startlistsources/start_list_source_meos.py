@@ -62,10 +62,12 @@ class StartListSourceMeos(_StartListSourceBase):
 
     def start(self) -> None:
         self._running = True
+        MeosInfoServer().register_data_ready_callback(self._on_data_ready)
         MeosInfoServer().start()
 
     def stop(self) -> None:
         if self._running:
+            MeosInfoServer().unregister_data_ready_callback(self._on_data_ready)
             MeosInfoServer().stop()
             self._running = False
 
@@ -74,6 +76,13 @@ class StartListSourceMeos(_StartListSourceBase):
 
     def config_updated(self, section_names: list[str]) -> None:
         pass
+
+    def _on_data_ready(self) -> None:
+        """Called when MeosInfoServer data is ready or refreshed."""
+        if MeosInfoServer.has_instance():
+            status, message = MeosInfoServer().health_status
+            self._set_health_status(status, message)
+            self._notify_data_changed()
 
     def lookup_from_card_number(self, card_number: str) -> dict[str, str] | None:
         if not self._running:
