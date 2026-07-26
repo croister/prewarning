@@ -22,6 +22,7 @@ from utils.constants import (
     PUNCH_KEY_ID,
     PUNCH_KEY_PASSED_TIME,
 )
+from utils.health import HealthStatus
 from utils.i18n import N_
 from utils.state_saver import StateSaverMixin
 from validators.datetime_validators import is_date, is_time
@@ -466,7 +467,7 @@ class PunchSourceOlresultatSe(StateSaverMixin, _PunchSourceBase):
     def stop(self):
         self._stop_event.set()
         if self.punch_fetcher is not None and self.punch_fetcher.is_alive():
-            self.punch_fetcher.join()
+            self.punch_fetcher.join(timeout=2)
 
     def is_running(self) -> bool:
         return not self._stop_event.is_set()
@@ -566,7 +567,7 @@ class PunchSourceOlresultatSe(StateSaverMixin, _PunchSourceBase):
 
             req = Request(url.url)
             try:
-                response = urlopen(req)
+                response = urlopen(req, timeout=10)
                 response_encoding = response.info().get_content_charset()
                 if response_encoding is None:
                     response_encoding = self.response_encoding
@@ -585,14 +586,18 @@ class PunchSourceOlresultatSe(StateSaverMixin, _PunchSourceBase):
                         self.last_received_punch_id = int(punch_dict[PUNCH_KEY_ID])
                         self.logger.debug(self.last_received_punch_id)
                     self._save_state()
+                self._set_health_status(HealthStatus.OK)
             except HTTPError as e:
                 self.logger.error(
                     "The server could not fulfill the request. Error code: %s", e.code
                 )
+                self._set_health_status(HealthStatus.ERROR, str(e))
             except URLError as e:
                 self.logger.error("We failed to reach a server. Reason: %s", e.reason)
+                self._set_health_status(HealthStatus.ERROR, str(e))
             except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
                 self.logger.error("Unexpected error fetching punches: %s", e)
+                self._set_health_status(HealthStatus.ERROR, str(e))
 
             self._stop_event.wait(timeout=self.fetch_interval_seconds)
         self.logger.debug("Stopped")

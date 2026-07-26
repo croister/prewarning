@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from unittest.mock import MagicMock, patch
 
 import wx
@@ -21,15 +19,17 @@ class TestFindLandscapeDisplay:
             def mock_display_init(self_display, idx):
                 self_display._idx = idx
 
-            with patch.object(wx.Display, "__init__", mock_display_init):
-                with patch.object(
+            with (
+                patch.object(wx.Display, "__init__", mock_display_init),
+                patch.object(
                     wx.Display,
                     "GetGeometry",
                     side_effect=[geo_portrait, geo_landscape],
-                ):
-                    ControlWindow.find_landscape_display()
-                    # Since mocking is complex with Display, just verify it doesn't crash
-                    # The real test is below with exclude_display
+                ),
+            ):
+                ControlWindow.find_landscape_display()
+                # Since mocking is complex with Display, just verify it doesn't crash
+                # The real test is below with exclude_display
 
     def test_returns_none_when_all_portrait(self, wx_app):
         with patch.object(wx.Display, "GetCount", return_value=2):

@@ -50,6 +50,7 @@ from utils.constants import (
     PUNCH_KEY_RELAY_LEG,
     TESTING_FILENAME,
 )
+from utils.control_window import ControlWindow
 from utils.health import HealthAction, HealthIssue, HealthMonitor, HealthStatus
 from utils.help_dialog import HelpDialog
 from utils.hotkey_bindings import (
@@ -57,7 +58,6 @@ from utils.hotkey_bindings import (
     HotKeyDefinition,
     key_event_to_str,
 )
-from utils.control_window import ControlWindow
 from utils.i18n import N_, _, set_language
 from utils.meos_info_server import MeosInfoServer
 from utils.screen_sleep import ScreenSleepInhibitor
@@ -617,6 +617,18 @@ class PreWarning(
         # Catch Clicking on the Corner X to close
         self.Bind(wx.EVT_CLOSE, self._close)
 
+        # Pre-init attributes that may be accessed if the config dialog triggers
+        # async events (timer ticks, config updates) during the validation loop.
+        self._control_window: ControlWindow | None = None
+        self._screen_sleep_inhibitor = ScreenSleepInhibitor()
+        self._health_tick_counter = 0
+        self._stats_punches_received = 0
+        self._stats_punches_matched = 0
+        self._stats_announcements = 0
+        self._stats_dedup_skipped = 0
+        self._last_punch_time: datetime | None = None
+        self.health_monitor = HealthMonitor()
+
         # Read the configuration
         self.config = Config(CONFIGURATION_FILE)
         self.config.start()
@@ -635,11 +647,7 @@ class PreWarning(
         # Init the sound util
         self.sound = Sound()
 
-        # Init the screen sleep inhibitor
-        self._screen_sleep_inhibitor = ScreenSleepInhibitor()
-
         # Init the control window
-        self._control_window: ControlWindow | None = None
         self._init_control_window()
 
         self._apply_screen_sleep_setting()
@@ -663,14 +671,7 @@ class PreWarning(
 
         self.update_sources()
 
-        # Init the health monitor
-        self._health_tick_counter = 0
-        self._stats_punches_received = 0
-        self._stats_punches_matched = 0
-        self._stats_announcements = 0
-        self._stats_dedup_skipped = 0
-        self._last_punch_time: datetime | None = None
-        self.health_monitor = HealthMonitor()
+        # Register health checks
         self.health_monitor.register_check(self._check_punch_source_health)
         self.health_monitor.register_check(self._check_start_list_source_health)
         self.health_monitor.register_check(self._check_voice_health)
@@ -689,6 +690,7 @@ class PreWarning(
         self.stop()
 
     def stop(self):
+        self.timer.Stop()
         if self.observer and self.observer.is_alive():
             self.observer.stop()
             self.observer.join()
@@ -1216,6 +1218,18 @@ class PreWarning(
                     action=HealthAction.SETTINGS,
                 )
             )
+        else:
+            source_status, source_msg = self.punch_source.health_status
+            if source_status == HealthStatus.ERROR:
+                issues.append(
+                    HealthIssue(
+                        message=_("Punch source error: {message}").format(
+                            message=source_msg
+                        ),
+                        status=HealthStatus.ERROR,
+                        action=HealthAction.SETTINGS,
+                    )
+                )
         return issues
 
     def _check_start_list_source_health(self) -> list[HealthIssue]:
@@ -1236,6 +1250,60 @@ class PreWarning(
                     action=HealthAction.SETTINGS,
                 )
             )
+        else:
+            # Check source-reported health
+            source_status, source_msg = self.start_list_source.health_status
+            if source_status == HealthStatus.ERROR:
+                issues.append(
+                    HealthIssue(
+                        message=_("Start list source error: {message}").format(
+                            message=source_msg
+                        ),
+                        status=HealthStatus.ERROR,
+                        action=HealthAction.SETTINGS,
+                    )
+                )
+            # Check for non-relay competition: runners exist but no teams
+            runner_count = self.start_list_source.get_runner_count()
+            team_count = self.start_list_source.get_team_count()
+            if runner_count is not None and runner_count > 0 and team_count is None:
+                issues.append(
+                    HealthIssue(
+                        message=_(
+                            "Start list has no team data. "
+                            "The competition is probably not a relay."
+                        ),
+                        status=HealthStatus.ERROR,
+                        action=HealthAction.SETTINGS,
+                    )
+                )
+            elif (
+                team_count is not None
+                and team_count > 0
+                and (runner_count is None or runner_count == 0)
+            ):
+                issues.append(
+                    HealthIssue(
+                        message=_(
+                            "Start list has no runners with SI cards registered."
+                        ),
+                        status=HealthStatus.ERROR,
+                        action=HealthAction.SETTINGS,
+                    )
+                )
+            elif (team_count is None or team_count == 0) and (
+                runner_count is None or runner_count == 0
+            ):
+                issues.append(
+                    HealthIssue(
+                        message=_(
+                            "Start list has no data. "
+                            "The competition may be empty or not loaded."
+                        ),
+                        status=HealthStatus.ERROR,
+                        action=HealthAction.SETTINGS,
+                    )
+                )
         return issues
 
     def _check_voice_health(self) -> list[HealthIssue]:
@@ -1335,12 +1403,18 @@ class PreWarning(
             bib_range = self.start_list_source.get_bib_range()
             if bib_range is not None:
                 stats_lines.append(f"{_('Bib range')}: {bib_range[0]} - {bib_range[1]}")
+            else:
+                stats_lines.append(f"{_('Bib range')}: -")
             team_count = self.start_list_source.get_team_count()
             if team_count is not None:
                 stats_lines.append(f"{_('Teams')}: {team_count}")
+            else:
+                stats_lines.append(f"{_('Teams')}: -")
             runner_count = self.start_list_source.get_runner_count()
             if runner_count is not None:
                 stats_lines.append(f"{_('Runners (SI card)')}: {runner_count}")
+            else:
+                stats_lines.append(f"{_('Runners (SI card)')}: -")
 
         # Voices
         from utils.voice_manager_dialog import get_installed_voice_shortnames
@@ -1430,7 +1504,7 @@ class PreWarning(
                 "health_dot_click": self._on_health_indicator_click_action,
                 "exit": self.Close,
             },
-            update_callback=self._update_control_window,
+            update_callback=self._refresh_health,
             key_handler=self._on_key_press,
         )
         self._control_window.position_on_display(landscape)
@@ -1454,7 +1528,7 @@ class PreWarning(
                     "health_dot_click": self._on_health_indicator_click_action,
                     "exit": self.Close,
                 },
-                update_callback=self._update_control_window,
+                update_callback=self._refresh_health,
                 key_handler=self._on_key_press,
             )
             if landscape is not None:
@@ -1475,65 +1549,85 @@ class PreWarning(
         # Health items
         health_items: list[tuple[str, str, wx.Colour | None, str]] = []
 
-        # Punch source — merged status and health check
+        # Punch source — always show name and status
+        ps_name = _(type(self.punch_source).display_name) if self.punch_source else "-"
+        ps_status = (
+            _("Running")
+            if self.punch_source and self.punch_source.is_running()
+            else _("Stopped")
+        )
         punch_issues = self._check_punch_source_health()
         if punch_issues:
-            issue = punch_issues[0]
             colour = (
+                wx.Colour(220, 0, 0)
+                if punch_issues[0].status == HealthStatus.ERROR
+                else wx.Colour(220, 160, 0)
+            )
+        else:
+            colour = wx.Colour(0, 150, 0)
+        health_items.append(
+            (
+                _("Punch source"),
+                f"{ps_name} ({ps_status})",
+                colour,
+                _("The configured punch source and its current status."),
+            )
+        )
+        for issue in punch_issues:
+            issue_colour = (
                 wx.Colour(220, 0, 0)
                 if issue.status == HealthStatus.ERROR
                 else wx.Colour(220, 160, 0)
             )
             health_items.append(
                 (
-                    _("Punch source"),
+                    "",
                     issue.message,
-                    colour,
-                    _("The configured punch source and its current status."),
-                )
-            )
-        else:
-            ps_name = (
-                _(type(self.punch_source).display_name) if self.punch_source else "-"
-            )
-            health_items.append(
-                (
-                    _("Punch source"),
-                    f"{ps_name} ({_('Running')})",
-                    wx.Colour(0, 150, 0),
-                    _("The configured punch source and its current status."),
+                    issue_colour,
+                    issue.message,
                 )
             )
 
-        # Start list source — merged status and health check
+        # Start list source — always show name and status
+        sls_name = (
+            _(type(self.start_list_source).display_name)
+            if self.start_list_source
+            else "-"
+        )
+        sls_status = (
+            _("Running")
+            if self.start_list_source and self.start_list_source.is_running()
+            else _("Stopped")
+        )
         sls_issues = self._check_start_list_source_health()
         if sls_issues:
-            issue = sls_issues[0]
             colour = (
+                wx.Colour(220, 0, 0)
+                if sls_issues[0].status == HealthStatus.ERROR
+                else wx.Colour(220, 160, 0)
+            )
+        else:
+            colour = wx.Colour(0, 150, 0)
+        health_items.append(
+            (
+                _("Start list source"),
+                f"{sls_name} ({sls_status})",
+                colour,
+                _("The configured start list source and its current status."),
+            )
+        )
+        for issue in sls_issues:
+            issue_colour = (
                 wx.Colour(220, 0, 0)
                 if issue.status == HealthStatus.ERROR
                 else wx.Colour(220, 160, 0)
             )
             health_items.append(
                 (
-                    _("Start list source"),
+                    "",
                     issue.message,
-                    colour,
-                    _("The configured start list source and its current status."),
-                )
-            )
-        else:
-            sls_name = (
-                _(type(self.start_list_source).display_name)
-                if self.start_list_source
-                else "-"
-            )
-            health_items.append(
-                (
-                    _("Start list source"),
-                    f"{sls_name} ({_('Running')})",
-                    wx.Colour(0, 150, 0),
-                    _("The configured start list source and its current status."),
+                    issue_colour,
+                    issue.message,
                 )
             )
 
@@ -1821,7 +1915,6 @@ class PreWarning(
             self.announcement_queue.put(
                 {_ANNOUNCE_KEY_VOICE: None, _ANNOUNCE_KEY_SOUND: number}
             )
-            pass
 
     @staticmethod
     def _get_local_ip() -> str:
@@ -1875,6 +1968,18 @@ class PreWarning(
     def config_updated(self, section_names: list[str]):
         wx.CallAfter(self._apply_config_update)
 
+    def _on_start_list_health_changed(self) -> None:
+        """Called when start list source health status changes."""
+        wx.CallAfter(self._refresh_health)
+
+    def _on_punch_source_health_changed(self) -> None:
+        """Called when punch source health status changes."""
+        wx.CallAfter(self._refresh_health)
+
+    def _on_start_list_data_changed(self) -> None:
+        """Called when start list data is loaded or refreshed."""
+        wx.CallAfter(self._refresh_health)
+
     def _apply_config_update(self):
         self._parse_config()
         self.update_sources()
@@ -1905,12 +2010,18 @@ class PreWarning(
         if self.punch_source is None:
             self.punch_source = PUNCH_SOURCES[self.punch_source_name]()
             self.punch_source.register_punch_listener(self)
+            self.punch_source.register_health_listener(
+                self._on_punch_source_health_changed
+            )
         elif type(self.punch_source).name != self.punch_source_name:
             is_running = self.punch_source.is_running()
             self.punch_source.stop()
             del self.punch_source
             self.punch_source = PUNCH_SOURCES[self.punch_source_name]()
             self.punch_source.register_punch_listener(self)
+            self.punch_source.register_health_listener(
+                self._on_punch_source_health_changed
+            )
             if is_running:
                 self.punch_source.start()
 
@@ -1928,11 +2039,23 @@ class PreWarning(
 
         if self.start_list_source is None:
             self.start_list_source = START_LIST_SOURCES[self.start_list_source_name]()
+            self.start_list_source.register_health_listener(
+                self._on_start_list_health_changed
+            )
+            self.start_list_source.register_data_listener(
+                self._on_start_list_data_changed
+            )
         elif type(self.start_list_source).name != self.start_list_source_name:
             is_running = self.start_list_source.is_running()
             self.start_list_source.stop()
             del self.start_list_source
             self.start_list_source = START_LIST_SOURCES[self.start_list_source_name]()
+            self.start_list_source.register_health_listener(
+                self._on_start_list_health_changed
+            )
+            self.start_list_source.register_data_listener(
+                self._on_start_list_data_changed
+            )
             if is_running:
                 self.start_list_source.start()
 
@@ -2033,7 +2156,7 @@ class PreWarning(
         while True:
             punch = self.punch_queue.get()
             self._stats_punches_received += 1
-            self._last_punch_time = datetime.now()
+            self._last_punch_time = datetime.now()  # noqa: DTZ005 - local elapsed-time comparison, no cross-timezone logic
             self.logger.debug(
                 "Processing: %s from: %s",
                 punch[PUNCH_KEY_CARD_NUMBER],

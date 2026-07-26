@@ -557,3 +557,163 @@ class TestStartListSourceMeosGetRunnerCount:
             68: {"card": "222222", "team_id": 23, "leg": 2},
         }
         assert source.get_runner_count() == 2
+
+
+class TestMeosInfoServerDataReadyCallbacks:
+    def test_register_callback(self, server):
+        callback = MagicMock()
+        server.register_data_ready_callback(callback)
+        assert callback in server._data_ready_callbacks
+
+    def test_register_same_callback_twice_only_adds_once(self, server):
+        callback = MagicMock()
+        server.register_data_ready_callback(callback)
+        server.register_data_ready_callback(callback)
+        assert server._data_ready_callbacks.count(callback) == 1
+
+    def test_unregister_callback(self, server):
+        callback = MagicMock()
+        server.register_data_ready_callback(callback)
+        server.unregister_data_ready_callback(callback)
+        assert callback not in server._data_ready_callbacks
+
+    def test_unregister_nonexistent_callback_does_not_raise(self, server):
+        callback = MagicMock()
+        server.unregister_data_ready_callback(callback)  # should not raise
+
+    def test_notify_data_ready_calls_all_callbacks(self, server):
+        cb1 = MagicMock()
+        cb2 = MagicMock()
+        server.register_data_ready_callback(cb1)
+        server.register_data_ready_callback(cb2)
+        server._notify_data_ready()
+        cb1.assert_called_once()
+        cb2.assert_called_once()
+
+    def test_notify_data_ready_continues_after_exception(self, server):
+        cb1 = MagicMock(side_effect=RuntimeError("test"))
+        cb2 = MagicMock()
+        server.register_data_ready_callback(cb1)
+        server.register_data_ready_callback(cb2)
+        server._notify_data_ready()
+        cb1.assert_called_once()
+        cb2.assert_called_once()
+
+
+class TestProcessElemReturnValues:
+    """Tests that _process_*_elem methods return True only when data actually changed."""
+
+    @pytest.fixture
+    def server(self):
+        with (
+            patch.object(MeosInfoServer, "_parse_config"),
+            patch.object(MeosInfoServer, "_data_read", return_value=False),
+        ):
+            s = MeosInfoServer()
+            s._url = "http://localhost:2009"
+            s._fetch_interval = 1
+            s._use_udp = False
+            s._zero_time = datetime(2026, 6, 16, 5, 0, 0)  # noqa: DTZ001 - naive datetime matches MeOS/OLA data model
+            return s
+
+    def test_process_org_elem_returns_true_on_new_data(self, server):
+        xml = f'<org id="5" nat="SWE" xmlns="{MOP_NS}"/>'
+        elem = ET.fromstring(xml)
+        assert server._process_org_elem(elem) is True
+
+    def test_process_org_elem_returns_false_on_duplicate(self, server):
+        xml = f'<org id="5" nat="SWE" xmlns="{MOP_NS}"/>'
+        elem = ET.fromstring(xml)
+        server._process_org_elem(elem)
+        assert server._process_org_elem(elem) is False
+
+    def test_process_org_elem_returns_true_on_change(self, server):
+        xml1 = f'<org id="5" nat="SWE" xmlns="{MOP_NS}"/>'
+        xml2 = f'<org id="5" nat="NOR" xmlns="{MOP_NS}"/>'
+        server._process_org_elem(ET.fromstring(xml1))
+        assert server._process_org_elem(ET.fromstring(xml2)) is True
+
+    def test_process_team_elem_returns_true_on_new_team(self, server):
+        xml = (
+            f'<tm id="10" xmlns="{MOP_NS}">'
+            f'<base bib="5">Team A</base>'
+            f"<r>100;101</r>"
+            f"</tm>"
+        )
+        assert server._process_team_elem(ET.fromstring(xml)) is True
+
+    def test_process_team_elem_returns_false_on_duplicate(self, server):
+        xml = (
+            f'<tm id="10" xmlns="{MOP_NS}">'
+            f'<base bib="5">Team A</base>'
+            f"<r>100;101</r>"
+            f"</tm>"
+        )
+        server._process_team_elem(ET.fromstring(xml))
+        assert server._process_team_elem(ET.fromstring(xml)) is False
+
+    def test_process_team_elem_returns_true_on_bib_change(self, server):
+        xml1 = (
+            f'<tm id="10" xmlns="{MOP_NS}">'
+            f'<base bib="5">Team A</base>'
+            f"<r>100;101</r>"
+            f"</tm>"
+        )
+        xml2 = (
+            f'<tm id="10" xmlns="{MOP_NS}">'
+            f'<base bib="99">Team A</base>'
+            f"<r>100;101</r>"
+            f"</tm>"
+        )
+        server._process_team_elem(ET.fromstring(xml1))
+        assert server._process_team_elem(ET.fromstring(xml2)) is True
+
+    def test_process_cmp_elem_returns_true_on_new_card(self, server):
+        xml = (
+            f'<cmp id="100" card="506576" xmlns="{MOP_NS}">'
+            f'<base org="5" cls="1" stat="0" st="0" rt="0">Name</base>'
+            f"</cmp>"
+        )
+        assert server._process_cmp_elem(ET.fromstring(xml)) is True
+
+    def test_process_cmp_elem_returns_false_on_duplicate(self, server):
+        xml = (
+            f'<cmp id="100" card="506576" xmlns="{MOP_NS}">'
+            f'<base org="5" cls="1" stat="0" st="0" rt="0">Name</base>'
+            f"</cmp>"
+        )
+        server._process_cmp_elem(ET.fromstring(xml))
+        assert server._process_cmp_elem(ET.fromstring(xml)) is False
+
+    def test_process_cmp_elem_returns_true_on_card_change(self, server):
+        xml1 = (
+            f'<cmp id="100" card="506576" xmlns="{MOP_NS}">'
+            f'<base org="5" cls="1" stat="0" st="0" rt="0">Name</base>'
+            f"</cmp>"
+        )
+        xml2 = (
+            f'<cmp id="100" card="999999" xmlns="{MOP_NS}">'
+            f'<base org="5" cls="1" stat="0" st="0" rt="0">Name</base>'
+            f"</cmp>"
+        )
+        server._process_cmp_elem(ET.fromstring(xml1))
+        assert server._process_cmp_elem(ET.fromstring(xml2)) is True
+
+    def test_process_cmp_elem_returns_true_on_new_radio_punch(self, server):
+        server._cmp_info[100] = {"card": "506576", "team_id": 10, "leg": 1}
+        server._team_bib[10] = "5"
+        listener = MagicMock(spec=MeosPunchListener)
+        server._listeners.append(listener)
+
+        xml = f'<cmp id="100" xmlns="{MOP_NS}"><radio>31,12340</radio></cmp>'
+        assert server._process_cmp_elem(ET.fromstring(xml)) is True
+
+    def test_process_cmp_elem_returns_false_on_duplicate_radio(self, server):
+        server._cmp_info[100] = {"card": "506576", "team_id": 10, "leg": 1}
+        server._team_bib[10] = "5"
+        listener = MagicMock(spec=MeosPunchListener)
+        server._listeners.append(listener)
+
+        xml = f'<cmp id="100" xmlns="{MOP_NS}"><radio>31,12340</radio></cmp>'
+        server._process_cmp_elem(ET.fromstring(xml))
+        assert server._process_cmp_elem(ET.fromstring(xml)) is False

@@ -98,12 +98,14 @@ class PunchSourceMeos(MeosPunchListener, _PunchSourceBase):
     def start(self) -> None:
         self._running = True
         MeosInfoServer().register_meos_punch_listener(self)
+        MeosInfoServer().register_data_ready_callback(self._on_data_ready)
         MeosInfoServer().start()
         self.logger.debug("Started")
 
     def stop(self) -> None:
         if self._running:
             MeosInfoServer().unregister_meos_punch_listener(self)
+            MeosInfoServer().unregister_data_ready_callback(self._on_data_ready)
             MeosInfoServer().stop()
             self._running = False
             self.logger.debug("Stopped")
@@ -124,6 +126,12 @@ class PunchSourceMeos(MeosPunchListener, _PunchSourceBase):
 
     def reset_tracking(self) -> None:
         MeosInfoServer().reset()
+
+    def _on_data_ready(self) -> None:
+        """Called when MeosInfoServer data is ready or refreshed."""
+        if MeosInfoServer.has_instance():
+            status, message = MeosInfoServer().health_status
+            self._set_health_status(status, message)
 
     def meos_punch_received(self, punch: dict) -> None:
         if not self._running:

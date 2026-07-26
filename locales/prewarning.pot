@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-07-12 19:16+0200\n"
+"POT-Creation-Date: 2026-07-26 19:45+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,19 +17,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: prewarning.py:186 utils/voice_manager_dialog.py:87
+#: prewarning.py:185 utils/voice_manager_dialog.py:87
 msgid "Language"
 msgstr ""
 
-#: prewarning.py:188
+#: prewarning.py:187
 msgid "The language used for the application UI."
 msgstr ""
 
-#: prewarning.py:198
+#: prewarning.py:197
 msgid "Interactive Mode"
 msgstr ""
 
-#: prewarning.py:201
+#: prewarning.py:200
 msgid ""
 "Enables or disables the interactive mode. If this is enabled the default "
 "method of configuration is via the GUI and if errors are detected in the "
@@ -39,444 +39,467 @@ msgid ""
 "written to the log and the program exits."
 msgstr ""
 
-#: prewarning.py:213
+#: prewarning.py:212
 msgid "Announce IP on Startup"
 msgstr ""
 
-#: prewarning.py:216
+#: prewarning.py:215
 msgid "Enables or disables the readout of the current IP address at startup."
 msgstr ""
 
-#: prewarning.py:223
+#: prewarning.py:222
 msgid "Enable Intro Sound"
 msgstr ""
 
-#: prewarning.py:226
+#: prewarning.py:225
 msgid ""
 "Enable or disable the intro sound played before the first team number is "
 "read after a timeout."
 msgstr ""
 
-#: prewarning.py:233
+#: prewarning.py:232
 msgid "Intro Sound Timeout"
 msgstr ""
 
-#: prewarning.py:236
+#: prewarning.py:235
 msgid ""
 "The timeout in seconds after the last announcement before the intro sound"
 " is played again before the next announcement."
 msgstr ""
 
-#: prewarning.py:246
+#: prewarning.py:245
 msgid "Intro Sound"
 msgstr ""
 
-#: prewarning.py:249
+#: prewarning.py:248
 msgid "The path to the sound file to use as the intro sound before announcements."
 msgstr ""
 
-#: prewarning.py:263
+#: prewarning.py:262
 msgid "Test Sound"
 msgstr ""
 
-#: prewarning.py:265
+#: prewarning.py:264
 msgid "The path to the sound file to use as the test sound."
 msgstr ""
 
-#: prewarning.py:272
+#: prewarning.py:271
 msgid "Add Pre-Warnings to Bottom"
 msgstr ""
 
-#: prewarning.py:275
+#: prewarning.py:274
 msgid ""
 "Set to True if new Pre-Warnings should be added to the bottom of the "
 "screen."
 msgstr ""
 
-#: prewarning.py:282
+#: prewarning.py:281
 msgid "Announce Last Leg"
 msgstr ""
 
-#: prewarning.py:285
+#: prewarning.py:284
 msgid ""
 "If disabled, pre-warnings for the last leg are suppressed (not displayed "
 "or announced)."
 msgstr ""
 
-#: prewarning.py:293
+#: prewarning.py:292
 msgid "Prevent Screen Sleep"
 msgstr ""
 
-#: prewarning.py:296
+#: prewarning.py:295
 msgid ""
 "Prevents the display from turning off and the screensaver from activating"
 " while the application is running."
 msgstr ""
 
-#: prewarning.py:304 prewarning.py:479
+#: prewarning.py:303 prewarning.py:478
 msgid "Control Window"
 msgstr ""
 
-#: prewarning.py:307
+#: prewarning.py:306
 msgid ""
 "Open a control window on the secondary landscape display for monitoring "
 "and configuration."
 msgstr ""
 
-#: prewarning.py:315
+#: prewarning.py:314
 msgid "Deduplicate by Card + Control"
 msgstr ""
 
-#: prewarning.py:318
+#: prewarning.py:317
 msgid ""
 "Skip re-announcement when the same SI card punches the same control code "
 "again."
 msgstr ""
 
-#: prewarning.py:325
+#: prewarning.py:324
 msgid "Deduplicate by Bib + Leg"
 msgstr ""
 
-#: prewarning.py:328
+#: prewarning.py:327
 msgid ""
 "Skip re-announcement when the same team bib number appears on the same "
 "relay leg again."
 msgstr ""
 
-#: prewarning.py:335
+#: prewarning.py:334
 msgid "Dedup Timeout (seconds)"
 msgstr ""
 
-#: prewarning.py:337
+#: prewarning.py:336
 msgid "How long a dedup key remains active. 0 = forever (session)."
 msgstr ""
 
-#: prewarning.py:344
+#: prewarning.py:343
 msgid "Common"
 msgstr ""
 
-#: prewarning.py:363
+#: prewarning.py:362
 msgid "Deduplication"
 msgstr ""
 
-#: prewarning.py:374
+#: prewarning.py:373
 msgid "Data Sources"
 msgstr ""
 
-#: prewarning.py:465 prewarning.py:1153 utils/config_dialog.py:1148
-#: utils/control_window.py:171
+#: prewarning.py:464 prewarning.py:1154 utils/config_dialog.py:1136
+#: utils/control_window.py:176
 msgid "Settings"
 msgstr ""
 
-#: prewarning.py:468
+#: prewarning.py:467
 msgid "Opens the Settings Dialog"
 msgstr ""
 
-#: prewarning.py:472 utils/control_window.py:172
-#: utils/voice_manager_dialog.py:346 utils/voice_manager_dialog.py:748
+#: prewarning.py:471 utils/control_window.py:177
+#: utils/voice_manager_dialog.py:346 utils/voice_manager_dialog.py:746
 msgid "Voice Manager"
 msgstr ""
 
-#: prewarning.py:475
+#: prewarning.py:474
 msgid "Opens the Voice Manager dialog"
 msgstr ""
 
-#: prewarning.py:482
+#: prewarning.py:481
 msgid "Shows or hides the control window"
 msgstr ""
 
-#: prewarning.py:486 utils/help_dialog.py:23
+#: prewarning.py:485 utils/help_dialog.py:20
 msgid "Help"
 msgstr ""
 
-#: prewarning.py:489
+#: prewarning.py:488
 msgid "Opens the Help Dialog"
 msgstr ""
 
-#: prewarning.py:496 utils/about_dialog.py:16
+#: prewarning.py:495 utils/about_dialog.py:15
 msgid "About"
 msgstr ""
 
-#: prewarning.py:499
+#: prewarning.py:498
 msgid "Opens the About Dialog"
 msgstr ""
 
-#: prewarning.py:503 prewarning.py:1582 prewarning.py:1591
-#: utils/control_window.py:176
+#: prewarning.py:502 prewarning.py:1675 prewarning.py:1684
+#: utils/control_window.py:181
 msgid "Full Screen"
 msgstr ""
 
-#: prewarning.py:506
+#: prewarning.py:505
 msgid "Switches full screen on and off"
 msgstr ""
 
-#: prewarning.py:510 utils/control_window.py:174
+#: prewarning.py:509 utils/control_window.py:179
 msgid "Fake Punch"
 msgstr ""
 
-#: prewarning.py:513
+#: prewarning.py:512
 msgid "Simulates a pre-warning"
 msgstr ""
 
-#: prewarning.py:520
+#: prewarning.py:519
 msgid "Refresh Display"
 msgstr ""
 
-#: prewarning.py:523
+#: prewarning.py:522
 msgid "Refreshes the display"
 msgstr ""
 
-#: prewarning.py:530 utils/control_window.py:173
+#: prewarning.py:529 utils/control_window.py:178
 msgid "Clear Display"
 msgstr ""
 
-#: prewarning.py:533
+#: prewarning.py:532
 msgid "Clears the display from pre-warning entries"
 msgstr ""
 
-#: prewarning.py:537 utils/control_window.py:175
+#: prewarning.py:536 utils/control_window.py:180
 msgid "Play Testing Sound"
 msgstr ""
 
-#: prewarning.py:540
+#: prewarning.py:539
 msgid "Plays a test sound"
 msgstr ""
 
-#: prewarning.py:544
+#: prewarning.py:543
 msgid "Announce IP Address"
 msgstr ""
 
-#: prewarning.py:547
+#: prewarning.py:546
 msgid "Reads the IP (v4) address aloud section for section"
 msgstr ""
 
-#: prewarning.py:559
+#: prewarning.py:558
 msgid "Increase Font Size"
 msgstr ""
 
-#: prewarning.py:562
+#: prewarning.py:561
 msgid "Increases the font size"
 msgstr ""
 
-#: prewarning.py:569
+#: prewarning.py:568
 msgid "Decrease Font Size"
 msgstr ""
 
-#: prewarning.py:572
+#: prewarning.py:571
 msgid "Decreases the font size"
 msgstr ""
 
-#: prewarning.py:579
+#: prewarning.py:578
 msgid "Restore Font Size"
 msgstr ""
 
-#: prewarning.py:582
+#: prewarning.py:581
 msgid "Restores the font size to default"
 msgstr ""
 
-#: prewarning.py:589 utils/control_window.py:177
+#: prewarning.py:588 utils/control_window.py:182
 msgid "Exit"
 msgstr ""
 
-#: prewarning.py:592
+#: prewarning.py:591
 msgid "Exits the application"
 msgstr ""
 
-#: prewarning.py:773 prewarning.py:1106
+#: prewarning.py:774 prewarning.py:1107
 msgid "Pre-Warning"
 msgstr ""
 
-#: prewarning.py:784 prewarning.py:1366 prewarning.py:1749
+#: prewarning.py:785 prewarning.py:1439 prewarning.py:1842
 msgid "All systems OK"
 msgstr ""
 
-#: prewarning.py:822 prewarning.py:1108 utils/control_window.py:144
-#: utils/control_window.py:375
+#: prewarning.py:823 prewarning.py:1109 utils/control_window.py:149
+#: utils/control_window.py:388
 msgid "Time"
 msgstr ""
 
-#: prewarning.py:823 prewarning.py:1109 utils/control_window.py:145
-#: utils/control_window.py:378 utils/control_window.py:387
+#: prewarning.py:824 prewarning.py:1110 utils/control_window.py:150
+#: utils/control_window.py:391 utils/control_window.py:400
 msgid "Team"
 msgstr ""
 
-#: prewarning.py:824 prewarning.py:1110 utils/control_window.py:146
-#: utils/control_window.py:381 utils/control_window.py:390
+#: prewarning.py:825 prewarning.py:1111 utils/control_window.py:151
+#: utils/control_window.py:394 utils/control_window.py:403
 msgid "Leg"
 msgstr ""
 
-#: prewarning.py:1207
+#: prewarning.py:1208
 msgid "No punch source configured."
 msgstr ""
 
-#: prewarning.py:1215
+#: prewarning.py:1216
 msgid "Punch source is not running."
 msgstr ""
 
-#: prewarning.py:1227
+#: prewarning.py:1226
+#, python-brace-format
+msgid "Punch source error: {message}"
+msgstr ""
+
+#: prewarning.py:1240
 msgid "No start list source configured."
 msgstr ""
 
-#: prewarning.py:1235
+#: prewarning.py:1248
 msgid "Start list source is not running."
 msgstr ""
 
-#: prewarning.py:1260
-msgid "No voices installed."
+#: prewarning.py:1259
+#, python-brace-format
+msgid "Start list source error: {message}"
 msgstr ""
 
 #: prewarning.py:1273
+msgid "Start list has no team data. The competition is probably not a relay."
+msgstr ""
+
+#: prewarning.py:1288
+msgid "Start list has no runners with SI cards registered."
+msgstr ""
+
+#: prewarning.py:1300
+msgid "Start list has no data. The competition may be empty or not loaded."
+msgstr ""
+
+#: prewarning.py:1327
+msgid "No voices installed."
+msgstr ""
+
+#: prewarning.py:1340
 #, python-brace-format
 msgid "Incomplete voices: {names}"
 msgstr ""
 
-#: prewarning.py:1299
+#: prewarning.py:1366
 #, python-brace-format
 msgid "Bib number range ({min} - {max}) not fully covered by voice number ranges."
 msgstr ""
 
-#: prewarning.py:1318 prewarning.py:1328 prewarning.py:1503 prewarning.py:1535
+#: prewarning.py:1385 prewarning.py:1395 prewarning.py:1555 prewarning.py:1598
 msgid "Running"
 msgstr ""
 
-#: prewarning.py:1320 prewarning.py:1330
+#: prewarning.py:1387 prewarning.py:1397 prewarning.py:1557 prewarning.py:1600
 msgid "Stopped"
 msgstr ""
 
-#: prewarning.py:1322 prewarning.py:1490 prewarning.py:1502
+#: prewarning.py:1389 prewarning.py:1570
 msgid "Punch source"
 msgstr ""
 
-#: prewarning.py:1332 prewarning.py:1520 prewarning.py:1534
+#: prewarning.py:1399 prewarning.py:1613
 msgid "Start list source"
 msgstr ""
 
-#: prewarning.py:1338 prewarning.py:1677 prewarning.py:1685 prewarning.py:1711
+#: prewarning.py:1405 prewarning.py:1407 prewarning.py:1770 prewarning.py:1778
+#: prewarning.py:1804
 msgid "Bib range"
 msgstr ""
 
-#: prewarning.py:1341 prewarning.py:1693 prewarning.py:1718
+#: prewarning.py:1410 prewarning.py:1412 prewarning.py:1786 prewarning.py:1811
 msgid "Teams"
 msgstr ""
 
-#: prewarning.py:1344 prewarning.py:1701 prewarning.py:1725
+#: prewarning.py:1415 prewarning.py:1417 prewarning.py:1794 prewarning.py:1818
 msgid "Runners (SI card)"
 msgstr ""
 
-#: prewarning.py:1350 prewarning.py:1738
+#: prewarning.py:1423 prewarning.py:1831
 msgid "Installed voices"
 msgstr ""
 
-#: prewarning.py:1353 prewarning.py:1636
+#: prewarning.py:1426 prewarning.py:1729
 msgid "Punches received"
 msgstr ""
 
-#: prewarning.py:1354 prewarning.py:1643
+#: prewarning.py:1427 prewarning.py:1736
 msgid "Punches matched"
 msgstr ""
 
-#: prewarning.py:1355 prewarning.py:1650
+#: prewarning.py:1428 prewarning.py:1743
 msgid "Announcements"
 msgstr ""
 
-#: prewarning.py:1359 prewarning.py:1361 prewarning.py:1554 prewarning.py:1563
+#: prewarning.py:1432 prewarning.py:1434 prewarning.py:1647 prewarning.py:1656
 msgid "Screen sleep"
 msgstr ""
 
-#: prewarning.py:1359 prewarning.py:1555
+#: prewarning.py:1432 prewarning.py:1648
 msgid "Prevented"
 msgstr ""
 
-#: prewarning.py:1361 prewarning.py:1564
+#: prewarning.py:1434 prewarning.py:1657
 msgid "Normal"
 msgstr ""
 
-#: prewarning.py:1493 prewarning.py:1505
+#: prewarning.py:1573
 msgid "The configured punch source and its current status."
 msgstr ""
 
-#: prewarning.py:1523 prewarning.py:1537
+#: prewarning.py:1616
 msgid "The configured start list source and its current status."
 msgstr ""
 
-#: prewarning.py:1544
+#: prewarning.py:1637
 msgid "IP address"
 msgstr ""
 
-#: prewarning.py:1547
+#: prewarning.py:1640
 msgid "The local network IP address of this computer."
 msgstr ""
 
-#: prewarning.py:1557 prewarning.py:1566
+#: prewarning.py:1650 prewarning.py:1659
 msgid "Whether the display is prevented from turning off."
 msgstr ""
 
-#: prewarning.py:1577
+#: prewarning.py:1670
 #, python-brace-format
 msgid "Whether the main window is in full screen mode. Toggle with {hotkey}."
 msgstr ""
 
-#: prewarning.py:1583
+#: prewarning.py:1676
 msgid "Yes"
 msgstr ""
 
-#: prewarning.py:1592
+#: prewarning.py:1685
 msgid "No"
 msgstr ""
 
-#: prewarning.py:1614 prewarning.py:1623
+#: prewarning.py:1707 prewarning.py:1716
 msgid "Voice check"
 msgstr ""
 
-#: prewarning.py:1617 prewarning.py:1626
+#: prewarning.py:1710 prewarning.py:1719
 msgid "Checks that voices are installed and complete."
 msgstr ""
 
-#: prewarning.py:1624 utils/config_dialog.py:1090 utils/config_dialog.py:1149
+#: prewarning.py:1717 utils/config_dialog.py:1078 utils/config_dialog.py:1137
 msgid "OK"
 msgstr ""
 
-#: prewarning.py:1638
+#: prewarning.py:1731
 msgid "Total number of punches received from the punch source."
 msgstr ""
 
-#: prewarning.py:1645
+#: prewarning.py:1738
 msgid "Punches successfully matched to a team in the start list."
 msgstr ""
 
-#: prewarning.py:1652
+#: prewarning.py:1745
 msgid "Number of pre-warnings announced (displayed and read aloud)."
 msgstr ""
 
-#: prewarning.py:1657
+#: prewarning.py:1750
 msgid "Dedup skipped"
 msgstr ""
 
-#: prewarning.py:1659
+#: prewarning.py:1752
 msgid "Punches skipped by deduplication rules."
 msgstr ""
 
-#: prewarning.py:1664
+#: prewarning.py:1757
 msgid "Last punch received"
 msgstr ""
 
-#: prewarning.py:1668
+#: prewarning.py:1761
 msgid "Time when the last punch was received by the system."
 msgstr ""
 
-#: prewarning.py:1679 prewarning.py:1687 prewarning.py:1713
+#: prewarning.py:1772 prewarning.py:1780 prewarning.py:1806
 msgid "The range of team bib numbers in the start list."
 msgstr ""
 
-#: prewarning.py:1695 prewarning.py:1720
+#: prewarning.py:1788 prewarning.py:1813
 msgid "Number of teams in the start list."
 msgstr ""
 
-#: prewarning.py:1704 prewarning.py:1728
+#: prewarning.py:1797 prewarning.py:1821
 msgid "Number of runners with an SI card registered in the start list."
 msgstr ""
 
-#: prewarning.py:1740
+#: prewarning.py:1833
 msgid "Number of TTS voices installed for announcements."
 msgstr ""
 
@@ -488,11 +511,11 @@ msgstr ""
 msgid "Determines the source from which Punches are fetched."
 msgstr ""
 
-#: punchsources/punch_source_meos.py:29
+#: punchsources/punch_source_meos.py:27
 msgid "MeOS Information Server Punch Source"
 msgstr ""
 
-#: punchsources/punch_source_meos.py:32
+#: punchsources/punch_source_meos.py:30
 msgid ""
 "Fetches electronic punches from a running <a "
 "href=\"https://www.melin.nu/meos/\">MeOS</a> instance via its Information"
@@ -501,12 +524,12 @@ msgid ""
 "receive fast advance information' in MeOS (requires a networked setup)."
 msgstr ""
 
-#: punchsources/punch_source_meos.py:42
-#: punchsources/punch_source_olresultat_se.py:278
+#: punchsources/punch_source_meos.py:40
+#: punchsources/punch_source_olresultat_se.py:276
 msgid "Control Codes"
 msgstr ""
 
-#: punchsources/punch_source_meos.py:45
+#: punchsources/punch_source_meos.py:43
 msgid ""
 "The control codes to use for pre-warning, separated by space. Use the "
 "selector to populate the list from MeOS. The selector shows controls that"
@@ -515,11 +538,11 @@ msgid ""
 "controls in the competition are shown as a fallback."
 msgstr ""
 
-#: punchsources/punch_source_ola_mysql.py:208
+#: punchsources/punch_source_ola_mysql.py:199
 msgid "OLA MySQL Punch Source"
 msgstr ""
 
-#: punchsources/punch_source_ola_mysql.py:211
+#: punchsources/punch_source_ola_mysql.py:202
 msgid ""
 "Fetches electronic punches from the MySQL database used by the <a "
 "href=\"https://www.svenskorientering.se/Arrangera/itochtavlings-"
@@ -529,53 +552,53 @@ msgid ""
 "engine, the built-in database is not supported."
 msgstr ""
 
-#: punchsources/punch_source_ola_mysql.py:220
+#: punchsources/punch_source_ola_mysql.py:211
 msgid "Control Ids"
 msgstr ""
 
-#: punchsources/punch_source_ola_mysql.py:223
+#: punchsources/punch_source_ola_mysql.py:214
 msgid ""
 "The Control IDs to use for Pre-Warning, separated by space. Use the "
 "Control Code (Kodsiffra) from OLA, NOT the punching units (Elektronisk "
 "stämplingskod)."
 msgstr ""
 
-#: punchsources/punch_source_ola_mysql.py:233
-#: punchsources/punch_source_olresultat_se.py:266 utils/meos_info_server.py:228
+#: punchsources/punch_source_ola_mysql.py:224
+#: punchsources/punch_source_olresultat_se.py:264 utils/meos_info_server.py:230
 msgid "Fetch Interval"
 msgstr ""
 
-#: punchsources/punch_source_ola_mysql.py:236
+#: punchsources/punch_source_ola_mysql.py:227
 msgid "The number of seconds between calls to the OLA MySQL database."
 msgstr ""
 
-#: punchsources/punch_source_ola_mysql.py:246
+#: punchsources/punch_source_ola_mysql.py:237
 msgid "Last Modified Time"
 msgstr ""
 
-#: punchsources/punch_source_ola_mysql.py:249
+#: punchsources/punch_source_ola_mysql.py:240
 msgid ""
 "The Modified Time of the last retrieved Punch, used to only fetch Punches"
 " that are newer. On the format of \"YYYY-MM-DD hh:mm:ss.fff\"."
 msgstr ""
 
-#: punchsources/punch_source_ola_mysql.py:259
-#: punchsources/punch_source_olresultat_se.py:231
+#: punchsources/punch_source_ola_mysql.py:250
+#: punchsources/punch_source_olresultat_se.py:229
 msgid "Last Received Punch Id"
 msgstr ""
 
-#: punchsources/punch_source_ola_mysql.py:262
+#: punchsources/punch_source_ola_mysql.py:253
 msgid ""
 "The Id of the last received Punch, used to not process it again. On the "
 "format of `resultRaceIndividualNumber`_`passedCount`_`timingControl` from"
 " the table `SplitTimes`, example \"1_1_1\"."
 msgstr ""
 
-#: punchsources/punch_source_olresultat_se.py:202
+#: punchsources/punch_source_olresultat_se.py:200
 msgid "OLResultat.se Punch Source"
 msgstr ""
 
-#: punchsources/punch_source_olresultat_se.py:205
+#: punchsources/punch_source_olresultat_se.py:203
 msgid ""
 "Fetches electronic punches from the site <a "
 "href=\"https://roc.olresultat.se/\">roc.olresultat.se</a>. These punches "
@@ -584,53 +607,53 @@ msgid ""
 " ROC</a> app."
 msgstr ""
 
-#: punchsources/punch_source_olresultat_se.py:213 utils/meos_info_server.py:216
+#: punchsources/punch_source_olresultat_se.py:211 utils/meos_info_server.py:218
 msgid "URL"
 msgstr ""
 
-#: punchsources/punch_source_olresultat_se.py:215
+#: punchsources/punch_source_olresultat_se.py:213
 msgid "The URL to the resource that provides the Punches."
 msgstr ""
 
-#: punchsources/punch_source_olresultat_se.py:222
+#: punchsources/punch_source_olresultat_se.py:220
 msgid "Competition or Device Id"
 msgstr ""
 
-#: punchsources/punch_source_olresultat_se.py:224
+#: punchsources/punch_source_olresultat_se.py:222
 msgid "The Competition Id or Device Id to fetch Punches from."
 msgstr ""
 
-#: punchsources/punch_source_olresultat_se.py:234
+#: punchsources/punch_source_olresultat_se.py:232
 msgid ""
 "The Id of the last received Punch, used to only fetch Punches with a "
 "higher Id."
 msgstr ""
 
-#: punchsources/punch_source_olresultat_se.py:242
+#: punchsources/punch_source_olresultat_se.py:240
 msgid "From Date"
 msgstr ""
 
-#: punchsources/punch_source_olresultat_se.py:245
+#: punchsources/punch_source_olresultat_se.py:243
 msgid ""
 "The date to fetch Punches from, used to only fetch newer Punches. ISO "
 "8601 format (YYYY-MM-DD)"
 msgstr ""
 
-#: punchsources/punch_source_olresultat_se.py:253
+#: punchsources/punch_source_olresultat_se.py:251
 msgid "From Time"
 msgstr ""
 
-#: punchsources/punch_source_olresultat_se.py:256
+#: punchsources/punch_source_olresultat_se.py:254
 msgid ""
 "The time to fetch Punches from, used to only fetch newer Punches. ISO "
 "8601 format (hh:mm:ss)"
 msgstr ""
 
-#: punchsources/punch_source_olresultat_se.py:269
+#: punchsources/punch_source_olresultat_se.py:267
 msgid "The number of seconds between calls to the Punch Source URL."
 msgstr ""
 
-#: punchsources/punch_source_olresultat_se.py:280
+#: punchsources/punch_source_olresultat_se.py:278
 msgid "The Control Codes to use for Pre-Warning, separated by space."
 msgstr ""
 
@@ -642,11 +665,11 @@ msgstr ""
 msgid "Determines the source of the Start List to look up team information from."
 msgstr ""
 
-#: startlistsources/start_list_source_file.py:241
+#: startlistsources/start_list_source_file.py:240
 msgid "File Start List Source"
 msgstr ""
 
-#: startlistsources/start_list_source_file.py:244
+#: startlistsources/start_list_source_file.py:243
 msgid ""
 "Reads a start list file following the <a "
 "href=\"https://orienteering.sport/iof/it/data-standard-3-0/\">IOF 3.0 "
@@ -657,27 +680,27 @@ msgid ""
 "been tested.The file will be monitored and re-read if it changes."
 msgstr ""
 
-#: startlistsources/start_list_source_file.py:254
+#: startlistsources/start_list_source_file.py:253
 msgid "Start List File"
 msgstr ""
 
-#: startlistsources/start_list_source_file.py:257
+#: startlistsources/start_list_source_file.py:256
 msgid "The path on the file system where the start list file is located."
 msgstr ""
 
-#: startlistsources/start_list_source_file.py:265
+#: startlistsources/start_list_source_file.py:264
 msgid "Start List Update Sound"
 msgstr ""
 
-#: startlistsources/start_list_source_file.py:268
+#: startlistsources/start_list_source_file.py:267
 msgid "The path to the sound file to use when the start list is updated."
 msgstr ""
 
-#: startlistsources/start_list_source_meos.py:24
+#: startlistsources/start_list_source_meos.py:22
 msgid "MeOS Information Server Start List Source"
 msgstr ""
 
-#: startlistsources/start_list_source_meos.py:27
+#: startlistsources/start_list_source_meos.py:25
 msgid ""
 "Looks up team bib number and relay leg from a running <a "
 "href=\"https://www.melin.nu/meos/\">MeOS</a> instance via its Information"
@@ -686,11 +709,11 @@ msgid ""
 "bib number and leg, no operation will be performed."
 msgstr ""
 
-#: startlistsources/start_list_source_ola_mysql.py:22
+#: startlistsources/start_list_source_ola_mysql.py:21
 msgid "OLA MySQL Start List Source"
 msgstr ""
 
-#: startlistsources/start_list_source_ola_mysql.py:25
+#: startlistsources/start_list_source_ola_mysql.py:24
 msgid ""
 "Looks up the team bib number and relay leg from the MySQL database used "
 "by the <a href=\"https://www.svenskorientering.se/Arrangera"
@@ -700,208 +723,208 @@ msgid ""
 "already contains the bib number and leg no operation will be performed."
 msgstr ""
 
-#: utils/about_dialog.py:46
+#: utils/about_dialog.py:43
 msgid "Author:"
 msgstr ""
 
-#: utils/about_dialog.py:52
+#: utils/about_dialog.py:49
 msgid ""
 "PreWarning is intended to be used to perform pre-warning for an "
 "Orienteering Relay event."
 msgstr ""
 
-#: utils/about_dialog.py:57
+#: utils/about_dialog.py:54
 msgid "System"
 msgstr ""
 
-#: utils/about_dialog.py:63
+#: utils/about_dialog.py:59
 msgid "Dependencies"
 msgstr ""
 
-#: utils/config_dialog.py:49
+#: utils/config_dialog.py:50
 msgid "Verification failed."
 msgstr ""
 
-#: utils/config_dialog.py:50
+#: utils/config_dialog.py:51
 msgid "Success"
 msgstr ""
 
-#: utils/config_dialog.py:51
+#: utils/config_dialog.py:52
 #, python-brace-format
 msgid "Success: {}"
 msgstr ""
 
-#: utils/config_dialog.py:52
+#: utils/config_dialog.py:53
 msgid "Valid Values"
 msgstr ""
 
-#: utils/config_dialog.py:53
+#: utils/config_dialog.py:54
 msgid "Select a Value:"
 msgstr ""
 
-#: utils/config_dialog.py:54
+#: utils/config_dialog.py:55
 msgid "Values"
 msgstr ""
 
-#: utils/config_dialog.py:55
+#: utils/config_dialog.py:56
 msgid "Select value(s)"
 msgstr ""
 
-#: utils/config_dialog.py:57
+#: utils/config_dialog.py:58
 msgid "No options available."
 msgstr ""
 
-#: utils/config_dialog.py:58
+#: utils/config_dialog.py:59
 #, python-brace-format
 msgid "Depends on: {}"
 msgstr ""
 
-#: utils/config_dialog.py:59
+#: utils/config_dialog.py:60
 msgid "Type to filter..."
 msgstr ""
 
-#: utils/config_dialog.py:103
+#: utils/config_dialog.py:104
 msgid "Reset to the default value."
 msgstr ""
 
-#: utils/config_dialog.py:104
+#: utils/config_dialog.py:105
 msgid "Test the value(s)."
 msgstr ""
 
-#: utils/config_dialog.py:105
+#: utils/config_dialog.py:106
 msgid "Select a value."
 msgstr ""
 
-#: utils/config_dialog.py:107
+#: utils/config_dialog.py:108
 msgid "Working..."
 msgstr ""
 
-#: utils/config_dialog.py:1094 utils/config_dialog.py:1150
+#: utils/config_dialog.py:1082 utils/config_dialog.py:1138
 msgid "Save"
 msgstr ""
 
-#: utils/config_dialog.py:1098 utils/config_dialog.py:1151
+#: utils/config_dialog.py:1086 utils/config_dialog.py:1139
 msgid "Cancel"
 msgstr ""
 
-#: utils/control_window.py:36 utils/control_window.py:365
+#: utils/control_window.py:34 utils/control_window.py:378
 msgid "Control"
 msgstr ""
 
-#: utils/control_window.py:85 utils/control_window.py:368
+#: utils/control_window.py:90 utils/control_window.py:381
 msgid "Health Status"
 msgstr ""
 
-#: utils/control_window.py:124 utils/control_window.py:369
+#: utils/control_window.py:129 utils/control_window.py:382
 msgid "Statistics"
 msgstr ""
 
-#: utils/control_window.py:138 utils/control_window.py:370
+#: utils/control_window.py:143 utils/control_window.py:383
 msgid "Recent Pre-Warnings"
 msgstr ""
 
-#: utils/control_window.py:161 utils/control_window.py:371
+#: utils/control_window.py:166 utils/control_window.py:384
 msgid "Actions"
 msgstr ""
 
-#: utils/help_dialog.py:41
+#: utils/help_dialog.py:38
 #, python-brace-format
 msgid "Help for PreWarning {app_version}"
 msgstr ""
 
-#: utils/help_dialog.py:47
+#: utils/help_dialog.py:44
 msgid ""
 "The PreWarning application is intended to be used to perform pre-warning "
 "for an Orienteering Relay event."
 msgstr ""
 
-#: utils/help_dialog.py:52
+#: utils/help_dialog.py:49
 msgid ""
 "It can be used with a display and a speaker to give both visual and "
 "audible pre-warnings. Either can be omitted to use only one of them."
 msgstr ""
 
-#: utils/help_dialog.py:57
+#: utils/help_dialog.py:54
 msgid ""
 "When using a display it is best used in the portrait orientation, but "
 "both orientations are supported. A TV can be used to get a bigger screen."
 msgstr ""
 
-#: utils/help_dialog.py:65
+#: utils/help_dialog.py:62
 msgid "The application fetches electronic punches from a <b>Punch Source</b>."
 msgstr ""
 
-#: utils/help_dialog.py:70
+#: utils/help_dialog.py:67
 msgid ""
 "Looks up the teams' bib number and which relay leg that punch belongs to "
 "from a <b>Start List Source</b>."
 msgstr ""
 
-#: utils/help_dialog.py:76
+#: utils/help_dialog.py:73
 msgid ""
 "Displays the punch time, bib number and relay leg on the display and "
 "reads out the bib number in the speakers."
 msgstr ""
 
-#: utils/help_dialog.py:83
+#: utils/help_dialog.py:80
 msgid "There are multiple choices for both Punch Sources and Start List Sources."
 msgstr ""
 
-#: utils/help_dialog.py:88
+#: utils/help_dialog.py:85
 msgid ""
 "The application can be controlled interactively or driven entirely from "
 "the configuration file."
 msgstr ""
 
-#: utils/help_dialog.py:92
+#: utils/help_dialog.py:89
 msgid "In the interactive mode the right click menu or hotkeys can be used."
 msgstr ""
 
-#: utils/help_dialog.py:98
+#: utils/help_dialog.py:95
 msgid "Punch Sources"
 msgstr ""
 
-#: utils/help_dialog.py:101
+#: utils/help_dialog.py:98
 msgid ""
 "One of these Punch Sources is selected to be used to fetch the electronic"
 " punches."
 msgstr ""
 
-#: utils/help_dialog.py:114
+#: utils/help_dialog.py:108
 msgid "Start List Sources"
 msgstr ""
 
-#: utils/help_dialog.py:117
+#: utils/help_dialog.py:111
 msgid ""
 "One of these Start List Sources is selected to be used to look up the bib"
 " number and relay leg for the punches."
 msgstr ""
 
-#: utils/help_dialog.py:132
+#: utils/help_dialog.py:123
 msgid "Hotkeys"
 msgstr ""
 
-#: utils/help_dialog.py:135
+#: utils/help_dialog.py:126
 msgid "Hotkey (Alternate hotkeys)"
 msgstr ""
 
-#: utils/help_dialog.py:137
+#: utils/help_dialog.py:128
 msgid "Description"
 msgstr ""
 
-#: utils/meos_info_server.py:219
+#: utils/meos_info_server.py:221
 msgid "Base URL of the MeOS Information Server, e.g. http://localhost:2009."
 msgstr ""
 
-#: utils/meos_info_server.py:230
+#: utils/meos_info_server.py:232
 msgid "Seconds between polls of the MeOS Information Server."
 msgstr ""
 
-#: utils/meos_info_server.py:237
+#: utils/meos_info_server.py:239
 msgid "Use UDP"
 msgstr ""
 
-#: utils/meos_info_server.py:240
+#: utils/meos_info_server.py:242
 msgid ""
 "Enable UDP listener for real-time punch notifications. Requires MeOS to "
 "be running in a networked setup with 'Send and receive fast advance "
@@ -910,11 +933,11 @@ msgid ""
 "always runs as a fallback regardless of this setting."
 msgstr ""
 
-#: utils/meos_info_server.py:252
+#: utils/meos_info_server.py:254
 msgid "UDP Port"
 msgstr ""
 
-#: utils/meos_info_server.py:255
+#: utils/meos_info_server.py:257
 msgid ""
 "UDP broadcast port for MeOS fast advance information. Must match the "
 "DirectPort setting in MeOS Local Settings (default 21338). When running "
@@ -922,79 +945,79 @@ msgid ""
 "each MeOS instance to avoid receiving packets from the wrong competition."
 msgstr ""
 
-#: utils/meos_info_server.py:266
+#: utils/meos_info_server.py:268
 msgid "Next Difference"
 msgstr ""
 
-#: utils/meos_info_server.py:268
+#: utils/meos_info_server.py:270
 msgid "MOP diff token, persisted across restarts."
 msgstr ""
 
-#: utils/meos_info_server.py:275
+#: utils/meos_info_server.py:277
 msgid "MeOS Information Server"
 msgstr ""
 
-#: utils/ola_mysql.py:767
+#: utils/ola_mysql.py:749
 msgid "Host"
 msgstr ""
 
-#: utils/ola_mysql.py:769
+#: utils/ola_mysql.py:751
 msgid "Host where the database server is located."
 msgstr ""
 
-#: utils/ola_mysql.py:776
+#: utils/ola_mysql.py:758
 msgid "User"
 msgstr ""
 
-#: utils/ola_mysql.py:778
+#: utils/ola_mysql.py:760
 msgid "The username to log in as."
 msgstr ""
 
-#: utils/ola_mysql.py:784
+#: utils/ola_mysql.py:766
 msgid "Password"
 msgstr ""
 
-#: utils/ola_mysql.py:786
+#: utils/ola_mysql.py:768
 msgid "The password to use."
 msgstr ""
 
-#: utils/ola_mysql.py:791
+#: utils/ola_mysql.py:773
 msgid "Database"
 msgstr ""
 
-#: utils/ola_mysql.py:793
+#: utils/ola_mysql.py:775
 msgid "The database to use."
 msgstr ""
 
-#: utils/ola_mysql.py:799
+#: utils/ola_mysql.py:781
 msgid "Event Id"
 msgstr ""
 
-#: utils/ola_mysql.py:801
+#: utils/ola_mysql.py:783
 msgid "The Event in the Database to use."
 msgstr ""
 
-#: utils/ola_mysql.py:807
+#: utils/ola_mysql.py:789
 msgid "Event Race Id"
 msgstr ""
 
-#: utils/ola_mysql.py:809
+#: utils/ola_mysql.py:791
 msgid "The Event Race in the Database to use."
 msgstr ""
 
-#: utils/ola_mysql.py:815
+#: utils/ola_mysql.py:797
 msgid "OLA MySQL Database"
 msgstr ""
 
-#: utils/sound.py:203
+#: utils/sound.py:199
 msgid "Enable Sound"
 msgstr ""
 
-#: utils/sound.py:205
+#: utils/sound.py:201
 msgid "Enables or disables the playback of sounds."
 msgstr ""
 
-#: utils/sound.py:211
+#: utils/sound.py:207
 msgid "Sound"
 msgstr ""
 
@@ -1130,204 +1153,204 @@ msgstr ""
 msgid "Comma-separated list of extra number ranges (e.g. {default_extra_range})."
 msgstr ""
 
-#: utils/voice_manager_dialog.py:459
+#: utils/voice_manager_dialog.py:457
 msgid "Voice directory not found"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:463
+#: utils/voice_manager_dialog.py:461
 msgid "Could not read voice directory"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:479
+#: utils/voice_manager_dialog.py:477
 #, python-brace-format
 msgid "Complete: {present} files present"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:482
+#: utils/voice_manager_dialog.py:480
 #, python-brace-format
 msgid "Incomplete: {present}/{expected} files present, missing {missing_files}"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:489
+#: utils/voice_manager_dialog.py:487
 #, python-brace-format
 msgid ""
 "Incomplete: {present}/{expected} files present, missing {missing_count} "
 "files (e.g. {examples}...)"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:527
+#: utils/voice_manager_dialog.py:525
 msgid "Unknown"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:831
+#: utils/voice_manager_dialog.py:829
 msgid "Number Ranges to Generate"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:842 utils/voice_manager_dialog.py:951
+#: utils/voice_manager_dialog.py:840 utils/voice_manager_dialog.py:949
 msgid "Add Range"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:864
+#: utils/voice_manager_dialog.py:862
 msgid "(always generated)"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:898 utils/voice_manager_dialog.py:1363
+#: utils/voice_manager_dialog.py:896 utils/voice_manager_dialog.py:1361
 msgid "Remove"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:938
+#: utils/voice_manager_dialog.py:936
 #, python-brace-format
 msgid "Start list bibs: {min} - {max}"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:989 utils/voice_manager_dialog.py:1002
+#: utils/voice_manager_dialog.py:987 utils/voice_manager_dialog.py:1000
 msgid "Covered by:"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:995
+#: utils/voice_manager_dialog.py:993
 msgid "Not covered:"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1007
+#: utils/voice_manager_dialog.py:1005
 msgid "Covered"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1012
+#: utils/voice_manager_dialog.py:1010
 msgid "Not fully covered"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1131
+#: utils/voice_manager_dialog.py:1129
 msgid "start"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1133
+#: utils/voice_manager_dialog.py:1131
 msgid "must be >= 0 and less than or equal to end"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1156 utils/voice_manager_dialog.py:1161
+#: utils/voice_manager_dialog.py:1154 utils/voice_manager_dialog.py:1159
 msgid "extra range"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1164 utils/voice_manager_dialog.py:1167
+#: utils/voice_manager_dialog.py:1162 utils/voice_manager_dialog.py:1165
 msgid "overlaps with"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1225
+#: utils/voice_manager_dialog.py:1223
 msgid "Language:"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1239
+#: utils/voice_manager_dialog.py:1237
 msgid "Gender:"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1275
+#: utils/voice_manager_dialog.py:1273
 msgid "Discovered Voices"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1303
+#: utils/voice_manager_dialog.py:1301
 msgid "No voices match the current filters."
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1314
+#: utils/voice_manager_dialog.py:1312
 msgid "Install Selected"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1323
+#: utils/voice_manager_dialog.py:1321
 msgid "Installed Voices"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1359
+#: utils/voice_manager_dialog.py:1357
 msgid "Repair"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1411
+#: utils/voice_manager_dialog.py:1409
 msgid "Close"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1419 utils/voice_manager_dialog.py:1466
+#: utils/voice_manager_dialog.py:1417 utils/voice_manager_dialog.py:1464
 msgid "Loading voices from edge-tts..."
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1459
+#: utils/voice_manager_dialog.py:1457
 msgid "Could not fetch voices from edge-tts. Check your internet connection."
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1460
+#: utils/voice_manager_dialog.py:1458
 msgid "Error"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1936
+#: utils/voice_manager_dialog.py:1934
 msgid ""
 "Cannot remove the current default or fallback voice. Set a different "
 "voice as default/fallback first."
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1939
+#: utils/voice_manager_dialog.py:1937
 msgid "Remove Disabled"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1945
+#: utils/voice_manager_dialog.py:1943
 msgid "An install or repair is currently in progress."
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1947
+#: utils/voice_manager_dialog.py:1945
 #, python-brace-format
 msgid "Removing voice '{shortname}' will cancel the operation."
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1951
+#: utils/voice_manager_dialog.py:1949
 msgid "Continue?"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1952
+#: utils/voice_manager_dialog.py:1950
 msgid "Cancel Operation"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1962
+#: utils/voice_manager_dialog.py:1960
 #, python-brace-format
 msgid "Remove voice '{shortname}'?"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1964
+#: utils/voice_manager_dialog.py:1962
 #, python-brace-format
 msgid "All files under sounds/{shortname}/ will be deleted."
 msgstr ""
 
-#: utils/voice_manager_dialog.py:1967
+#: utils/voice_manager_dialog.py:1965
 msgid "Confirm Remove"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:2025
+#: utils/voice_manager_dialog.py:2023
 msgid "Repairing"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:2025
+#: utils/voice_manager_dialog.py:2023
 msgid "Installing"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:2034
+#: utils/voice_manager_dialog.py:2032
 msgid "Finished"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:2061
+#: utils/voice_manager_dialog.py:2059
 msgid ""
 "An install or repair is currently in progress. Closing will cancel the "
 "operation."
 msgstr ""
 
-#: utils/voice_manager_dialog.py:2068
+#: utils/voice_manager_dialog.py:2066
 msgid ""
 "One or more extra ranges have invalid values. These ranges will be "
 "discarded when closing."
 msgstr ""
 
-#: utils/voice_manager_dialog.py:2075
+#: utils/voice_manager_dialog.py:2073
 msgid ""
 "One or more extra ranges overlap with another range. These ranges will "
 "still be saved, but may generate files that already exist."
 msgstr ""
 
-#: utils/voice_manager_dialog.py:2084
+#: utils/voice_manager_dialog.py:2082
 #, python-brace-format
 msgid ""
 "The following installed voices are incomplete: {names}. They will not "
@@ -1336,7 +1359,7 @@ msgid ""
 " files."
 msgstr ""
 
-#: utils/voice_manager_dialog.py:2094
+#: utils/voice_manager_dialog.py:2092
 #, python-brace-format
 msgid ""
 "The start list bib number range ({min} - {max}) is not fully covered by "
@@ -1344,15 +1367,15 @@ msgid ""
 "and will fall back to the default ding sound when announced."
 msgstr ""
 
-#: utils/voice_manager_dialog.py:2103
+#: utils/voice_manager_dialog.py:2101
 msgid "There are issues that may affect voice playback."
 msgstr ""
 
-#: utils/voice_manager_dialog.py:2107
+#: utils/voice_manager_dialog.py:2105
 msgid "Close anyway?"
 msgstr ""
 
-#: utils/voice_manager_dialog.py:2111
+#: utils/voice_manager_dialog.py:2109
 msgid "Confirm Close"
 msgstr ""
 
