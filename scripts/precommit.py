@@ -22,7 +22,16 @@ def _yamllint_cmd() -> list[str]:
     base_config = YAMLLINT_CONFIG.read_text("utf-8")
     newline_type = "dos" if sys.platform == "win32" else "unix"
     config = base_config + f"  new-lines:\n    type: {newline_type}\n"
-    return ["uvx", "yamllint", "--config-data", config, ".github/workflows/"]
+    return [
+        "uv",
+        "run",
+        "--only-group",
+        "lint",
+        "yamllint",
+        "--config-data",
+        config,
+        ".github/workflows/",
+    ]
 
 
 def main():
@@ -35,14 +44,27 @@ def main():
         "Spelling",
         success_msg="No spelling mistakes found.",
         cmd=[
-            "uvx",
+            "uv",
+            "run",
+            "--only-group",
+            "lint",
             "codespell",
             "--skip=.git,uv.lock,dist,__pycache__,logs,build,startlists,test_data,**country_dict_by_ioc*,locales",
             "--ignore-words-list=datas",
         ],
     )
-    _run_step(3, total, "Ruff Check", ["uvx", "ruff", "check", "."])
-    _run_step(4, total, "Ruff Format", ["uvx", "ruff", "format", "--check", "."])
+    _run_step(
+        3,
+        total,
+        "Ruff Check",
+        ["uv", "run", "--only-group", "lint", "ruff", "check", "."],
+    )
+    _run_step(
+        4,
+        total,
+        "Ruff Format",
+        ["uv", "run", "--only-group", "lint", "ruff", "format", "--check", "."],
+    )
     _run_step(
         5, total, "Security Audit", ["uv", "audit", "--preview-features", "audit"]
     )

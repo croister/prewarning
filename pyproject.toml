@@ -28,6 +28,12 @@ dev = [
     "types-decorator>=5.2.0.20260508",
     "types-pymysql>=1.1.0.20260508",
 ]
+lint = [
+    "babel>=2.16.0",
+    "codespell>=2.0",
+    "ruff>=0.11.0",
+    "yamllint>=1.0",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
