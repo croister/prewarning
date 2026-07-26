@@ -1,15 +1,15 @@
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 from urllib.error import HTTPError, URLError
+
 import pytest
 
 from punchsources.punch_source_olresultat_se import (
-    _fetch_punches,
-    _verify_last_id,
-    _verify_date_time,
-    _verify_control_codes,
     PunchSourceOlresultatSe,
+    _fetch_punches,
+    _verify_control_codes,
+    _verify_date_time,
+    _verify_last_id,
 )
-
 
 MODULE = "punchsources.punch_source_olresultat_se"
 
@@ -87,18 +87,16 @@ class TestFetchPunches:
             "http://example.com", 404, "Not Found", {}, None
         )
 
-        with patch(f"{MODULE}.urlopen", return_value=resp):
-            with pytest.raises(HTTPError):
-                _fetch_punches("http://example.com", "u1", 0)
+        with patch(f"{MODULE}.urlopen", return_value=resp), pytest.raises(HTTPError):
+            _fetch_punches("http://example.com", "u1", 0)
 
     def test_raises_url_error(self):
         resp = MagicMock()
         resp.info.return_value.get_content_charset.return_value = "utf-8"
         resp.read.side_effect = URLError("connection failed")
 
-        with patch(f"{MODULE}.urlopen", return_value=resp):
-            with pytest.raises(URLError):
-                _fetch_punches("http://example.com", "u1", 0)
+        with patch(f"{MODULE}.urlopen", return_value=resp), pytest.raises(URLError):
+            _fetch_punches("http://example.com", "u1", 0)
 
     def test_uses_default_encoding_when_missing(self):
         csv_data = "1;101;1001;12:00:00"
@@ -125,9 +123,11 @@ class TestFetchPunches:
         resp.info.return_value.get_content_charset.return_value = "utf-8"
         resp.read.side_effect = Exception("something went wrong")
 
-        with patch(f"{MODULE}.urlopen", return_value=resp):
-            with pytest.raises(Exception, match="something went wrong"):
-                _fetch_punches("http://example.com", "u1", 0)
+        with (
+            patch(f"{MODULE}.urlopen", return_value=resp),
+            pytest.raises(Exception, match="something went wrong"),
+        ):
+            _fetch_punches("http://example.com", "u1", 0)
 
 
 class TestVerifyLastId:

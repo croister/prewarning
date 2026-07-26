@@ -10,7 +10,7 @@ def _run_step(
     step: int, total: int, title: str, cmd: list[str], success_msg: str | None = None
 ) -> None:
     print(f"\n=== {step}/{total} {title} ===")
-    result = subprocess.run(cmd, cwd=str(PROJECT_DIR))
+    result = subprocess.run(cmd, cwd=str(PROJECT_DIR), check=False)
     if result.returncode != 0:
         print(f"FAILED: {title}")
         sys.exit(result.returncode)

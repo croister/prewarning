@@ -1,4 +1,5 @@
 from unittest.mock import MagicMock, patch
+
 import pytest
 from pymysql import OperationalError
 
@@ -11,13 +12,13 @@ def _patch_deps():
     with patch("watchdog.observers.Observer") as mock_obs:
         mock_obs.return_value.is_alive.return_value = False
         mock_obs.return_value.name = "MockedObserver"
-        with patch.object(Config, "register_config_section_listener"):
-            with patch(
-                "startlistsources.start_list_source_ola_mysql.OlaMySql"
-            ) as mock_ola:
-                mock_ola_instance = MagicMock()
-                mock_ola.return_value = mock_ola_instance
-                yield mock_ola_instance
+        with (
+            patch.object(Config, "register_config_section_listener"),
+            patch("startlistsources.start_list_source_ola_mysql.OlaMySql") as mock_ola,
+        ):
+            mock_ola_instance = MagicMock()
+            mock_ola.return_value = mock_ola_instance
+            yield mock_ola_instance
 
 
 class TestStartListSourceOlaMySql:

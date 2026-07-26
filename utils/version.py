@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import re
 from importlib.metadata import version as _metadata_version
 from pathlib import Path
@@ -14,7 +12,7 @@ def _get_commit_sha(git_dir: Path | None = None) -> str | None:
             ref_path = head[5:]
             return git_dir.joinpath(ref_path).read_text("utf-8").strip()[:7]
         return head[:7]
-    except Exception:
+    except Exception:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
         return None
 
 

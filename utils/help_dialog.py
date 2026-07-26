@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-
 import webbrowser
-from typing import List
 
 import wx
 import wx.html
@@ -17,7 +14,7 @@ class HelpDialog(wx.Frame):
         self,
         parent,
         app_version: str,
-        hotkey_bindings: List[HotKeyBindingDefinition] | None = None,
+        hotkey_bindings: list[HotKeyBindingDefinition] | None = None,
     ):
         wx.Frame.__init__(
             self, parent, wx.ID_ANY, title=_("Help"), size=wx.Size(600, 800)
@@ -105,10 +102,7 @@ class HelpDialog(wx.Frame):
 
         for punch_source_name in PUNCH_SOURCES:
             punch_source = PUNCH_SOURCES[punch_source_name]
-            contents += "<h4>{name}</h4><p>{description}</p>".format(
-                name=_(str(punch_source.display_name)),
-                description=_(str(punch_source.description)),
-            )
+            contents += f"<h4>{_(str(punch_source.display_name))}</h4><p>{_(str(punch_source.description))}</p>"
 
         contents += (
             "<h3>" + _("Start List Sources") + "</h3>"
@@ -122,10 +116,7 @@ class HelpDialog(wx.Frame):
 
         for start_list_source_name in START_LIST_SOURCES:
             start_list_source = START_LIST_SOURCES[start_list_source_name]
-            contents += "<h4>{name}</h4><p>{description}</p>".format(
-                name=_(str(start_list_source.display_name)),
-                description=_(str(start_list_source.description)),
-            )
+            contents += f"<h4>{_(str(start_list_source.display_name))}</h4><p>{_(str(start_list_source.description))}</p>"
 
         if len(hotkey_bindings):
             contents += (
@@ -142,16 +133,14 @@ class HelpDialog(wx.Frame):
                 if key_binding.hidden:
                     continue
 
-                contents += "<tr><td>{hotkey}".format(hotkey=key_binding.hotkey)
+                contents += f"<tr><td>{key_binding.hotkey}"
                 if len(key_binding.alternate_hotkeys):
                     contents += " ({alternate_hotkeys})".format(
                         alternate_hotkeys=", ".join(
                             [str(ahk) for ahk in key_binding.alternate_hotkeys]
                         )
                     )
-                contents += "</td><td>{description}</td></tr>".format(
-                    description=_(key_binding.description)
-                )
+                contents += f"</td><td>{_(key_binding.description)}</td></tr>"
 
             contents += "</table>"
 

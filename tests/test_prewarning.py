@@ -1,8 +1,8 @@
 from unittest.mock import MagicMock, patch
+
 import wx
 
-from prewarning import _filter_logging_configuration
-from prewarning import PreWarning
+from prewarning import PreWarning, _filter_logging_configuration
 
 
 class TestFilterLoggingConfiguration:

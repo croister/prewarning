@@ -1,7 +1,8 @@
 from unittest.mock import MagicMock, patch
+
 import pytest
 
-from punchsources._base import PunchListener, _PunchSourceBase, _NOT_OVERRIDDEN
+from punchsources._base import _NOT_OVERRIDDEN, PunchListener, _PunchSourceBase
 
 
 class TestPunchListener:

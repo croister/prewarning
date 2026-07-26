@@ -1,11 +1,8 @@
-# -*- coding: utf-8 -*-
-
 import logging
 import sys
 
 from validators import LOGGER_NAME
 from validators.validator_decorator import validator
-
 
 MAX_SIZE = sys.maxsize
 MIN_SIZE = -sys.maxsize - 1

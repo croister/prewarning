@@ -15,11 +15,11 @@ import wx.lib.scrolledpanel
 from edge_tts.typing import Voice
 from gpytranslate import Translator as GpyTranslator
 
-from utils.config import Config, ConfigSectionDefinition, ConfigOptionDefinition
+from utils.config import Config, ConfigOptionDefinition, ConfigSectionDefinition
 from utils.config_definitions import (
-    ConfigVerifierDefinition,
     ConfigSectionOptionDefinition,
     ConfigSelectorDefinition,
+    ConfigVerifierDefinition,
     SelectionData,
     SelectionResult,
     SelectionType,
@@ -27,8 +27,6 @@ from utils.config_definitions import (
 )
 from utils.constants import AUDIO_EXTENSION, TESTING_FILENAME
 from utils.country_dict_by_ioc import COUNTRIES
-from utils.i18n import _, N_
-from validators.validation_error import ValidationError
 from utils.edge_tts import (
     EdgeTTSError,
     VoiceFile,
@@ -38,7 +36,9 @@ from utils.edge_tts import (
     list_voices,
     run_coro,
 )
+from utils.i18n import N_, _
 from utils.sound import Sound
+from validators.validation_error import ValidationError
 
 logger = logging.getLogger(__name__)
 
@@ -449,9 +449,7 @@ def _is_voice_complete(voice_dir: Path, extra_ranges: list[tuple[int, int]]) -> 
         for n in range(start, end + 1):
             if f"{n}{AUDIO_EXTENSION}" not in files:
                 return False
-    if TESTING_FILENAME not in files:
-        return False
-    return True
+    return TESTING_FILENAME in files
 
 
 def _voice_status_detail(voice_dir: Path, extra_ranges: list[tuple[int, int]]) -> str:
@@ -648,7 +646,7 @@ def _translate_testing_text(shortname: str) -> str:
             return result.text
         except AttributeError:
             return str(result)
-    except Exception:
+    except Exception:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
         logger.warning("Translation failed for '%s', using English fallback.", lang)
         return TESTING_TEXT
 
@@ -1441,7 +1439,7 @@ class VoiceManagerDialog(wx.Dialog):
     def _fetch_discovered_thread(self):
         try:
             voices = list_voices()
-        except Exception:
+        except Exception:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
             wx.CallAfter(self._on_voice_load_error)
             return
         wx.CallAfter(self._on_voices_loaded, voices)
@@ -1610,7 +1608,7 @@ class VoiceManagerDialog(wx.Dialog):
 
     def _on_discovered_left_down(self, event):
         pos = event.GetPosition()
-        row, flags = self.discovered_list.HitTest(pos)
+        row, _flags = self.discovered_list.HitTest(pos)
         if row == -1:
             event.Skip()
             return
@@ -1671,7 +1669,7 @@ class VoiceManagerDialog(wx.Dialog):
 
     def _on_discovered_motion(self, event):
         pos = event.GetPosition()
-        row, flags = self.discovered_list.HitTest(pos)
+        row, _flags = self.discovered_list.HitTest(pos)
         if row == -1:
             if self._showing_play_tooltip:
                 self.discovered_list.SetToolTip(TOOLTIP_DEFAULT)
@@ -1852,7 +1850,7 @@ class VoiceManagerDialog(wx.Dialog):
 
     def _on_installed_motion(self, event):
         pos = event.GetPosition()
-        row, flags = self.installed_list.HitTest(pos)
+        row, _flags = self.installed_list.HitTest(pos)
         if row == -1:
             if self._installed_tooltip_key != NO_TOOLTIP_KEY:
                 self.installed_list.SetToolTip(TOOLTIP_DEFAULT)

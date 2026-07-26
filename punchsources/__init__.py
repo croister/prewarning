@@ -1,7 +1,7 @@
 import inspect
-
 from typing import TYPE_CHECKING
-from punchsources._base import _PunchSourceBase, _NOT_OVERRIDDEN
+
+from punchsources._base import _NOT_OVERRIDDEN, _PunchSourceBase
 from punchsources.punch_source_olresultat_se import PunchSourceOlresultatSe
 from utils.config import Config
 from utils.config_definitions import ConfigOptionDefinition
@@ -49,7 +49,7 @@ def _import_all_modules():
             "pyo",
         ):
             modulename = filename.split(".")[0]
-            package_module = ".".join([__name__, modulename])
+            package_module = f"{__name__}.{modulename}"
             try:
                 module = importlib.import_module(package_module)
             except Exception:
@@ -63,7 +63,7 @@ def _import_all_modules():
 
 def _populate_punch_sources():
     global PUNCH_SOURCES
-    PUNCH_SOURCES = dict()
+    PUNCH_SOURCES = {}
     __all__.append("PUNCH_SOURCES")
 
     def add_punch_sources(classes):

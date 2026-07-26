@@ -1,14 +1,14 @@
 from unittest.mock import patch
 
 from utils.voice_manager_dialog import (
-    parse_extra_ranges,
-    get_installed_voice_shortnames,
-    validate_extra_ranges,
     _is_valid_extra_ranges_format,
-    _verify_default_country,
-    _verify_voice,
-    _verify_extra_ranges,
     _select_default_country,
+    _verify_default_country,
+    _verify_extra_ranges,
+    _verify_voice,
+    get_installed_voice_shortnames,
+    parse_extra_ranges,
+    validate_extra_ranges,
 )
 
 
@@ -109,12 +109,14 @@ class TestGetInstalledVoiceShortnames:
         bad_dir = sounds_dir / "invalid"
         bad_dir.mkdir()
         (bad_dir / "voice.json").write_text("{}")
-        with patch("utils.voice_manager_dialog.SOUNDS_DIR", sounds_dir):
-            with patch(
+        with (
+            patch("utils.voice_manager_dialog.SOUNDS_DIR", sounds_dir),
+            patch(
                 "utils.voice_manager_dialog._is_valid_voice_dirname",
                 return_value=False,
-            ):
-                assert get_installed_voice_shortnames() == []
+            ),
+        ):
+            assert get_installed_voice_shortnames() == []
 
     def test_skips_files_not_directories(self, tmp_path):
         sounds_dir = tmp_path / "sounds"
@@ -130,17 +132,19 @@ class TestGetInstalledVoiceShortnames:
             d = sounds_dir / name
             d.mkdir()
             (d / "voice.json").write_text("{}")
-        with patch("utils.voice_manager_dialog.SOUNDS_DIR", sounds_dir):
-            with patch(
+        with (
+            patch("utils.voice_manager_dialog.SOUNDS_DIR", sounds_dir),
+            patch(
                 "utils.voice_manager_dialog._is_valid_voice_dirname",
                 return_value=True,
-            ):
-                result = get_installed_voice_shortnames()
-                assert result == [
-                    "de-DE-KatjaNeural",
-                    "en-GB-SoniaNeural",
-                    "en-US-JennyNeural",
-                ]
+            ),
+        ):
+            result = get_installed_voice_shortnames()
+            assert result == [
+                "de-DE-KatjaNeural",
+                "en-GB-SoniaNeural",
+                "en-US-JennyNeural",
+            ]
 
 
 class TestIsValidExtraRangesFormat:

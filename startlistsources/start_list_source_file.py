@@ -1,25 +1,23 @@
-# -*- coding: utf-8 -*-
-
 import logging
 from pathlib import Path
 from threading import Lock, RLock
-from typing import Any, List, Dict
+from typing import Any
 from xml.etree import ElementTree
 from zipfile import ZipFile
 
+import wx
 from natsort import natsorted
 from watchdog.events import LoggingEventHandler
 from watchdog.observers import Observer
-import wx
 
-from utils.config import ConfigSectionDefinition, ConfigOptionDefinition, Config
+from utils.config import Config, ConfigOptionDefinition, ConfigSectionDefinition
 from utils.config_definitions import (
     ConfigSectionEnableType,
-    ConfigVerifierDefinition,
     ConfigSectionOptionDefinition,
     ConfigSelectorDefinition,
-    SelectionResult,
+    ConfigVerifierDefinition,
     SelectionData,
+    SelectionResult,
     VerificationResult,
 )
 from utils.config_selection import select_file
@@ -30,10 +28,10 @@ from utils.constants import (
     PUNCH_KEY_RELAY_LEG,
 )
 from utils.i18n import N_
-from utils.sound import Sound, verify_sound, get_all_sounds
+from utils.sound import Sound, get_all_sounds, verify_sound
 from validators.path_validators import file_exists
-from ._base import _StartListSourceBase
 
+from ._base import _StartListSourceBase
 
 _MODULE_LOGGER_NAME = "StartListSourceFile"
 
@@ -119,8 +117,8 @@ def _read_start_list(start_list_file: str):
         archive = ZipFile(start_list_file, "r")
         data = archive.read("SOFTSTRT.XML")
     else:
-        f = open(start_list_file, "rb")
-        data = f.read()
+        with open(start_list_file, "rb") as f:
+            data = f.read()
 
     start_list = ElementTree.fromstring(data)
 
@@ -145,9 +143,9 @@ def _read_start_list(start_list_file: str):
         "_read_start_list - Organiser: %s (%s)", str(organiser_name), str(organiser_id)
     )
 
-    team_names = dict()
-    teams = dict()
-    runners = dict()
+    team_names = {}
+    teams = {}
+    runners = {}
 
     xml_teams = start_list.findall("ns:ClassStart/ns:TeamStart", ns)
     for xml_team in xml_teams:
@@ -155,7 +153,7 @@ def _read_start_list(start_list_file: str):
         team_bib_number = _get_data(xml_team, "ns:BibNumber", ns)
         team_names[team_bib_number] = team_name
 
-        team: dict[str, Any] = dict()
+        team: dict[str, Any] = {}
         team_members = xml_team.findall("ns:TeamMemberStart", ns)
         for team_member in team_members:
             team_member_id = _get_data(team_member, "ns:Person/ns:Id", ns)
@@ -185,7 +183,7 @@ def _read_start_list(start_list_file: str):
                     _RUNNER_KEY_COUNTRY: country,
                 }
                 if team_member_leg not in team:
-                    team[team_member_leg] = dict()
+                    team[team_member_leg] = {}
                 leg = team[team_member_leg]
                 leg[team_member_leg_order] = runners[team_member_control_card]
 
@@ -216,7 +214,7 @@ def _verify_start_list_file(start_list_file: Path):
         if not start_list_file.is_absolute():
             start_list_file = DEFAULT_START_LIST_FILE_FOLDER / start_list_file
 
-        (team_names, teams, runners) = _read_start_list(
+        (team_names, _teams, _runners) = _read_start_list(
             start_list_file=start_list_file.as_posix()
         )
 
@@ -226,7 +224,7 @@ def _verify_start_list_file(start_list_file: Path):
         return VerificationResult(
             message=f"{len(team_names)} Teams in the Start List File."
         )
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
         logging.getLogger(_MODULE_LOGGER_NAME).debug("_verify_start_list_file: %s", e)
         return VerificationResult(message=str(e), status=False)
 
@@ -350,9 +348,7 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
 
         if _MODULE_LOGGER_NAME != self.__class__.__name__:
             raise ValueError(
-                "_MODULE_LOGGER_NAME not correct: {} vs {}".format(
-                    _MODULE_LOGGER_NAME, self.__class__.__name__
-                )
+                f"_MODULE_LOGGER_NAME not correct: {_MODULE_LOGGER_NAME} vs {self.__class__.__name__}"
             )
 
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -366,9 +362,9 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
 
         self._observer_lock = Lock()
 
-        self.team_names = dict()
-        self.teams = dict()
-        self.runners = dict()
+        self.team_names = {}
+        self.teams = {}
+        self.runners = {}
 
         self._running = False
 
@@ -386,16 +382,15 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
 
     def stop(self):
         self._running = False
-        if self.observer is not None:
-            if self.observer.is_alive():
-                self.observer.stop()
-                self.observer.join()
+        if self.observer is not None and self.observer.is_alive():
+            self.observer.stop()
+            self.observer.join()
 
     def is_running(self) -> bool:
         return self._running
 
     @classmethod
-    def get_config_section_definitions(cls) -> List[ConfigSectionDefinition]:
+    def get_config_section_definitions(cls) -> list[ConfigSectionDefinition]:
         definitions = super().get_config_section_definitions()
         definitions.append(cls.START_LIST_SOURCE_FILE_CONFIG_SECTION_DEFINITION)
         return definitions
@@ -414,7 +409,7 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
             if is_current_file:
                 self._read_start_list()
 
-    def config_updated(self, section_names: List[str]):
+    def config_updated(self, section_names: list[str]):
         self.update()
 
     def update(self):
@@ -436,9 +431,7 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
                 'The Start List file "%s" could not be found.', str(start_list_file)
             )
             raise ValueError(
-                'The Start List file "{}" could not be found.'.format(
-                    str(start_list_file)
-                )
+                f'The Start List file "{start_list_file!s}" could not be found.'
             )
 
         with self._data_lock:
@@ -478,9 +471,7 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
                     self.start_list_file.as_posix(),
                 )
                 raise ValueError(
-                    "The Start List File ({}) is not a valid IOFv3 Start List.".format(
-                        self.start_list_file.as_posix()
-                    )
+                    f"The Start List File ({self.start_list_file.as_posix()}) is not a valid IOFv3 Start List."
                 )
 
             ns = {"ns": "http://www.orienteering.org/datastandard/3.0"}
@@ -511,7 +502,7 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
                 team_bib_number = int(_get_data(xml_team, "ns:BibNumber", ns))
                 self.team_names[team_bib_number] = team_name
 
-                team: dict[int, dict[str, dict[str, str | bool]]] = dict()
+                team: dict[int, dict[str, dict[str, str | bool]]] = {}
                 last_leg = 0
                 team_members = xml_team.findall("ns:TeamMemberStart", ns)
                 for team_member in team_members:
@@ -548,7 +539,7 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
                             _RUNNER_KEY_IS_LAST_LEG: False,
                         }
                         if team_member_leg not in team:
-                            team[team_member_leg] = dict()
+                            team[team_member_leg] = {}
                         leg = team[team_member_leg]
                         leg[team_member_leg_order] = self.runners[
                             team_member_control_card
@@ -577,7 +568,7 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
             assert self.start_list_update_sound_file is not None
             Sound.play(self.start_list_update_sound_file)
 
-    def lookup_from_card_number(self, card_number: str) -> Dict[str, str] | None:
+    def lookup_from_card_number(self, card_number: str) -> dict[str, str] | None:
         """Returns Bib-Number and Relay Leg for the provided Card Number.
 
         :param str card_number: The Card Number to look up.
@@ -614,7 +605,7 @@ class StartListSourceFile(_StartListSourceBase, LoggingEventHandler):
         with self._data_lock:
             if not self.team_names:
                 return None
-            bibs = [b for b in self.team_names.keys() if isinstance(b, int)]
+            bibs = [b for b in self.team_names if isinstance(b, int)]
             if not bibs:
                 return None
             return (min(bibs), max(bibs))

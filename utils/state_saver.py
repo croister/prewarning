@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
-from abc import abstractmethod, ABC
-from configparser import ConfigParser, SectionProxy
 import logging
+from abc import ABC, abstractmethod
+from configparser import ConfigParser, SectionProxy
 from pathlib import Path
-from typing import List, Any, Dict
+from typing import Any
 
-from utils.config_definitions import RuntimeStateOptionDefinition, RuntimeStateGroup
+from utils.config_definitions import RuntimeStateGroup, RuntimeStateOptionDefinition
 from utils.constants import DATA_DIR
 
 
@@ -40,10 +39,8 @@ class _StateSaverGroup:
             data_dir = DATA_DIR
         self._state_file_location = data_dir / runtime_state_group.state_file_name
 
-        self._data_read_state = dict()
-        for (
-            option_definition_name
-        ) in self.runtime_state_group.option_definitions.keys():
+        self._data_read_state = {}
+        for option_definition_name in self.runtime_state_group.option_definitions:
             self._data_read_state[option_definition_name] = False
 
         self._config = ConfigParser()
@@ -73,9 +70,7 @@ class _StateSaverGroup:
             )
             self.__create_initial_config_section()
         else:
-            for (
-                option_definition_name
-            ) in self.runtime_state_group.option_definitions.keys():
+            for option_definition_name in self.runtime_state_group.option_definitions:
                 self._data_read_state[option_definition_name] = True
 
         for option_definition in self.runtime_state_group.option_definitions.values():
@@ -113,7 +108,7 @@ class _StateSaverGroup:
             'Creating initial state file "%s" with default values.',
             self._state_file_location,
         )
-        initial_config_section = dict()
+        initial_config_section = {}
         for option_definition in self.runtime_state_group.option_definitions.values():
             initial_config_section[option_definition.name] = (
                 option_definition.get_initial_option_value()
@@ -176,11 +171,11 @@ class _StateSaverGroup:
         option_definition.set_value(self._config_section, value)
         self.__write()
 
-    def _save_values(self, values: Dict[RuntimeStateOptionDefinition, Any]):
+    def _save_values(self, values: dict[RuntimeStateOptionDefinition, Any]):
         self.logger.debug("_save_values: %s", str(values))
         assert self._config_section is not None
-        for option_definition in values.keys():
-            option_definition.set_value(self._config_section, values[option_definition])
+        for option_definition, value in values.items():
+            option_definition.set_value(self._config_section, value)
         self.__write()
 
 
@@ -198,7 +193,7 @@ class StateSaverMixin(ABC):
     def __init__(
         self,
         config_section_name: str,
-        runtime_state_groups: List[RuntimeStateGroup],
+        runtime_state_groups: list[RuntimeStateGroup],
         data_dir: Path | None = None,
     ):
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -209,14 +204,12 @@ class StateSaverMixin(ABC):
         if not data_dir.is_dir():
             data_dir.mkdir()
 
-        self.state_saver_groups = dict(
-            {
-                runtime_state_group.state_file_name: _StateSaverGroup(
-                    config_section_name, runtime_state_group, data_dir
-                )
-                for runtime_state_group in runtime_state_groups
-            }
-        )
+        self.state_saver_groups = {
+            runtime_state_group.state_file_name: _StateSaverGroup(
+                config_section_name, runtime_state_group, data_dir
+            )
+            for runtime_state_group in runtime_state_groups
+        }
 
     def _cleanup(self):
         for state_saver_group in self.state_saver_groups.values():
@@ -259,16 +252,16 @@ class StateSaverMixin(ABC):
             self.__state_saver_groups_key(option_definition)
         ]._save_value(option_definition, value)
 
-    def _save_values(self, values: Dict[RuntimeStateOptionDefinition, Any]):
+    def _save_values(self, values: dict[RuntimeStateOptionDefinition, Any]):
         """Saves the values for the ConfigOptionDefinitions to the state file
 
         :param Dict[ConfigOptionDefinition, Any] values: The values to write
         """
-        state_saver_groups: dict[str, dict[RuntimeStateOptionDefinition, Any]] = dict()
+        state_saver_groups: dict[str, dict[RuntimeStateOptionDefinition, Any]] = {}
         for option_definition, value in values.items():
             state_saver_groups_key = self.__state_saver_groups_key(option_definition)
             if state_saver_groups_key not in state_saver_groups:
-                state_saver_groups[state_saver_groups_key] = dict()
+                state_saver_groups[state_saver_groups_key] = {}
             state_saver_groups[state_saver_groups_key][option_definition] = value
 
         for state_saver_group_key, group_values in state_saver_groups.items():

@@ -1,12 +1,10 @@
-# -*- coding: utf-8 -*-
-
 import logging
-from typing import Dict, List
 
 from utils.config import Config, ConfigSectionDefinition
 from utils.config_definitions import ConfigSectionEnableType
 from utils.i18n import N_
 from utils.meos_info_server import MeosInfoServer
+
 from ._base import _StartListSourceBase
 
 _MODULE_LOGGER_NAME = "StartListSourceMeos"
@@ -74,10 +72,10 @@ class StartListSourceMeos(_StartListSourceBase):
     def is_running(self) -> bool:
         return self._running
 
-    def config_updated(self, section_names: List[str]) -> None:
+    def config_updated(self, section_names: list[str]) -> None:
         pass
 
-    def lookup_from_card_number(self, card_number: str) -> Dict[str, str] | None:
+    def lookup_from_card_number(self, card_number: str) -> dict[str, str] | None:
         if not self._running:
             self.logger.debug("NOT started, ignoring request!")
             return None

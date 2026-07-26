@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from typing import Any
 
 
@@ -8,11 +6,11 @@ class _Singleton(type):
     Defines a metaclass for singleton classes.
     """
 
-    _instances: dict[type, Any] = {}
+    _instances: dict[type, Any] = {}  # noqa: RUF012 - Enum/class-level registry, ClassVar is incorrect here
 
     def __call__(cls, *args, **kwargs):
         if cls not in cls._instances:
-            cls._instances[cls] = super(_Singleton, cls).__call__(*args, **kwargs)
+            cls._instances[cls] = super().__call__(*args, **kwargs)
         return cls._instances[cls]
 
     def has_instance(cls) -> bool:

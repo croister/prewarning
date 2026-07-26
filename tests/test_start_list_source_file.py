@@ -1,13 +1,14 @@
-from unittest.mock import patch, MagicMock, mock_open
 from pathlib import Path
-import wx
+from unittest.mock import MagicMock, mock_open, patch
+
 import pytest
+import wx
 
 from startlistsources.start_list_source_file import (
-    _select_start_list_file,
-    _read_start_list,
-    _verify_start_list_file,
     DEFAULT_START_LIST_FILE_FOLDER,
+    _read_start_list,
+    _select_start_list_file,
+    _verify_start_list_file,
 )
 
 
@@ -56,7 +57,7 @@ class TestSelectStartListFile:
             mock_select.return_value = "/some/path/file.xml"
             _select_start_list_file(wx.Frame(None), prev_file=Path("/prev/dir/old.xml"))
 
-            args, kwargs = mock_select.call_args
+            _args, kwargs = mock_select.call_args
             default_dir = kwargs.get("default_dir", "")
             assert ("/prev/dir/" in default_dir) or ("prev" in default_dir)
 
@@ -67,7 +68,7 @@ class TestSelectStartListFile:
             mock_select.return_value = "/some/path/file.xml"
             _select_start_list_file(wx.Frame(None))
 
-            args, kwargs = mock_select.call_args
+            _args, kwargs = mock_select.call_args
             assert kwargs["default_dir"] == DEFAULT_START_LIST_FILE_FOLDER.as_posix()
 
 
@@ -112,7 +113,7 @@ SAMPLE_XML = """<?xml version="1.0" encoding="windows-1252"?>
 class TestReadStartList:
     def test_reads_xml_file(self):
         with patch("builtins.open", mock_open(read_data=SAMPLE_XML)):
-            team_names, teams, runners = _read_start_list("/path/file.xml")
+            team_names, _teams, runners = _read_start_list("/path/file.xml")
 
             assert team_names == {"101": "Team Alpha"}
             assert "12345" in runners
@@ -128,7 +129,7 @@ class TestReadStartList:
         with patch(
             "startlistsources.start_list_source_file.ZipFile", return_value=mock_zip
         ):
-            team_names, teams, runners = _read_start_list("/path/file.zip")
+            team_names, _teams, runners = _read_start_list("/path/file.zip")
 
             assert team_names == {"101": "Team Alpha"}
             assert "12345" in runners
@@ -136,9 +137,11 @@ class TestReadStartList:
 
     def test_raises_on_invalid_root_tag(self):
         bad_xml = "<WrongRoot><Data/></WrongRoot>"
-        with patch("builtins.open", mock_open(read_data=bad_xml)):
-            with pytest.raises(ValueError, match="valid IOFv3"):
-                _read_start_list("/path/file.xml")
+        with (
+            patch("builtins.open", mock_open(read_data=bad_xml)),
+            pytest.raises(ValueError, match="valid IOFv3"),
+        ):
+            _read_start_list("/path/file.xml")
 
     def test_empty_xml_returns_empty(self):
         empty = """<?xml version="1.0"?>

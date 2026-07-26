@@ -1,27 +1,28 @@
-# -*- coding: utf-8 -*-
-
 import logging
 import threading
+from collections.abc import Callable
 from configparser import SectionProxy
 from pathlib import Path
-from typing import Any, Callable, Dict, List
+from typing import Any
 
 import wx
 import wx.lib.scrolledpanel
 
+_logger = logging.getLogger(__name__)
+
 from utils.config import Config
 from utils.config_definitions import (
-    ConfigSectionDefinition,
     ConfigOptionDefinition,
+    ConfigSectionDefinition,
+    RuntimeStateOptionDefinition,
+    SelectionData,
     SelectionError,
-    SelectionType,
     SelectionResult,
+    SelectionType,
     VerificationError,
     VerificationResult,
-    SelectionData,
-    RuntimeStateOptionDefinition,
 )
-from utils.i18n import _, N_
+from utils.i18n import N_, _
 
 
 def _default_value(option_definition: ConfigOptionDefinition):
@@ -115,7 +116,7 @@ def _default_tooltip(function: str) -> str:
     elif function == "select":
         return _(TOOLTIP_SELECT)
     else:
-        logging.error('_default_tooltip: Invalid function "%s".', function)
+        _logger.error('_default_tooltip: Invalid function "%s".', function)
         raise ValueError(TOOLTIP_ERR_INVALID_FUNCTION.format(function))
 
 
@@ -297,8 +298,8 @@ class ConfigSectionPanel(wx.Panel):
 
         self.options_sizer = None
 
-        self._tracking_controls: Dict[str, wx.Window] = {}
-        self._tracking_dirty: Dict[str, bool] = {}
+        self._tracking_controls: dict[str, wx.Window] = {}
+        self._tracking_dirty: dict[str, bool] = {}
         self._destroyed = False
 
         self.Bind(wx.EVT_WINDOW_DESTROY, self._on_window_destroy)
@@ -339,7 +340,7 @@ class ConfigSectionPanel(wx.Panel):
             self.state_provider.unregister_tracking_listener(self._on_tracking_update)
         event.Skip()
 
-    def _on_tracking_update(self, state: Dict[str, str]):
+    def _on_tracking_update(self, state: dict[str, str]):
         if self._destroyed:
             return
         for option_name, value in state.items():
@@ -482,23 +483,11 @@ class ConfigSectionPanel(wx.Panel):
                     or option_definition.read_only
                 ):
                     text_ctrl_style |= wx.TE_READONLY
-                if option_definition.value_type is str:
-                    option_input = wx.TextCtrl(
-                        self,
-                        validator=validator,
-                        name=option_definition_name,
-                        style=text_ctrl_style,
-                    )
-                    option_input.Bind(wx.EVT_TEXT, self.on_text_ctrl_changed)
-                elif option_definition.value_type is int:
-                    option_input = wx.TextCtrl(
-                        self,
-                        validator=validator,
-                        name=option_definition_name,
-                        style=text_ctrl_style,
-                    )
-                    option_input.Bind(wx.EVT_TEXT, self.on_text_ctrl_changed)
-                elif option_definition.value_type is float:
+                if (
+                    option_definition.value_type is str
+                    or option_definition.value_type is int
+                    or option_definition.value_type is float
+                ):
                     option_input = wx.TextCtrl(
                         self,
                         validator=validator,
@@ -622,18 +611,18 @@ class ConfigSectionPanel(wx.Panel):
         return SELECT_BUTTON_NAME_FMT.format(option_name)
 
     @staticmethod
-    def _too_large_for_combo_box(valid_values: List[Any]) -> bool:
+    def _too_large_for_combo_box(valid_values: list[Any]) -> bool:
         return len(valid_values) > 20
 
     @staticmethod
-    def _use_combo_box_for(valid_values: List[Any] | None) -> bool:
+    def _use_combo_box_for(valid_values: list[Any] | None) -> bool:
         return (
             valid_values is not None
             and not ConfigSectionPanel._too_large_for_combo_box(valid_values)
         )
 
     @staticmethod
-    def _use_selector_for(valid_values: List[Any] | None) -> bool:
+    def _use_selector_for(valid_values: list[Any] | None) -> bool:
         return valid_values is not None and ConfigSectionPanel._too_large_for_combo_box(
             valid_values
         )
@@ -889,9 +878,8 @@ class ConfigSectionPanel(wx.Panel):
             button.Refresh()
         else:
             message = _(MSG_SUCCESS)
-            if isinstance(result, VerificationResult):
-                if result.message is not None:
-                    message = _(MSG_SUCCESS_FMT).format(result.message)
+            if isinstance(result, VerificationResult) and result.message is not None:
+                message = _(MSG_SUCCESS_FMT).format(result.message)
             button.SetBackgroundColour(wx.GREEN)
             button.SetToolTip(message)
             button.Refresh()
@@ -999,10 +987,10 @@ class ConfigSectionPanel(wx.Panel):
     def Validate(self) -> bool:
         for child in self.GetChildren():
             if isinstance(child, wx.Button) and "_button_name" in child.GetName():
-                (name, function) = child.GetName().split("_")[0:2]
+                (_name, function) = child.GetName().split("_")[0:2]
                 child.SetBackgroundColour(wx.NullColour)
                 child.SetToolTip(_default_tooltip(function))
-        return super(ConfigSectionPanel, self).Validate()
+        return super().Validate()
 
 
 class ConfigDialog(wx.Dialog):
@@ -1016,7 +1004,7 @@ class ConfigDialog(wx.Dialog):
         self,
         config: Config,
         *args,
-        state_providers: Dict[str, Any] | None = None,
+        state_providers: dict[str, Any] | None = None,
         on_save: Callable[[], None] | None = None,
         **kwargs,
     ):

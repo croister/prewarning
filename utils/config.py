@@ -1,22 +1,20 @@
-# -*- coding: utf-8 -*-
-
-from configparser import ConfigParser, SectionProxy
 import logging
+from configparser import ConfigParser, SectionProxy
 from pathlib import Path
 from threading import RLock
-from typing import List, Dict, Any
+from typing import Any
 
 from natsort import natsorted
-from watchdog.events import LoggingEventHandler, DirModifiedEvent, FileModifiedEvent
+from watchdog.events import DirModifiedEvent, FileModifiedEvent, LoggingEventHandler
 from watchdog.observers import Observer
 
 from utils.config_consumer import ConfigConsumer
 from utils.config_definitions import (
-    ConfigSectionDefinition,
     ConfigOptionDefinition,
+    ConfigSectionDefinition,
     ConfigSectionOptionDefinition,
-    config_section_definitions_sort_key,
     RuntimeStateOptionDefinition,
+    config_section_definitions_sort_key,
 )
 from utils.singleton import Singleton
 
@@ -36,7 +34,7 @@ class Config(LoggingEventHandler, Singleton):
     SECTION_DEDUPLICATION = "Deduplication"
     SECTION_DATA_SOURCES = "DataSources"
 
-    CONFIG_SECTION_DEFINITIONS: dict[str, ConfigSectionDefinition] = dict()
+    CONFIG_SECTION_DEFINITIONS: dict[str, ConfigSectionDefinition] = {}  # noqa: RUF012 - Enum/class-level registry, ClassVar is incorrect here
 
     @classmethod
     def register_config_section_definition(
@@ -44,12 +42,10 @@ class Config(LoggingEventHandler, Singleton):
     ):
         if config_section_definition.name in cls.CONFIG_SECTION_DEFINITIONS:
             raise ValueError(
-                'Duplicate config section definition "{}".'.format(
-                    config_section_definition.name
-                )
+                f'Duplicate config section definition "{config_section_definition.name}".'
             )
 
-        temp_config_section_name = "_{}".format(config_section_definition.name)
+        temp_config_section_name = f"_{config_section_definition.name}"
         if temp_config_section_name in cls.CONFIG_SECTION_DEFINITIONS:
             config_section_definition.copy_from(
                 cls.CONFIG_SECTION_DEFINITIONS[temp_config_section_name]
@@ -117,24 +113,22 @@ class Config(LoggingEventHandler, Singleton):
     ) -> str:
         # Add it to a temporary config section definition if the config section definition is not already defined
         if config_section_name not in cls.CONFIG_SECTION_DEFINITIONS:
-            config_section_name = "_{}".format(config_section_name)
+            config_section_name = f"_{config_section_name}"
             if config_section_name not in cls.CONFIG_SECTION_DEFINITIONS:
                 cls.CONFIG_SECTION_DEFINITIONS[config_section_name] = (
                     ConfigSectionDefinition(config_section_name, config_section_name)
                 )
         return config_section_name
 
-    CONFIG_SECTION_LISTENERS: dict[str, list[ConfigConsumer]] = dict()
+    CONFIG_SECTION_LISTENERS: dict[str, list[ConfigConsumer]] = {}  # noqa: RUF012 - Enum/class-level registry, ClassVar is incorrect here
 
     @classmethod
     def register_config_section_listener(
         cls, config_section_name: str, config_section_listener: ConfigConsumer
     ):
-        if config_section_name not in cls.CONFIG_SECTION_DEFINITIONS.keys():
+        if config_section_name not in cls.CONFIG_SECTION_DEFINITIONS:
             raise ValueError(
-                'The Config Section Definition "{}" is not registered.'.format(
-                    config_section_name
-                )
+                f'The Config Section Definition "{config_section_name}" is not registered.'
             )
 
         if config_section_name not in cls.CONFIG_SECTION_LISTENERS:
@@ -184,8 +178,8 @@ class Config(LoggingEventHandler, Singleton):
 
         self.config = ConfigParser()
 
-        self.config_sections: dict[str, SectionProxy] = dict()
-        self.prev_config_sections: dict[str, dict[str, str]] = dict()
+        self.config_sections: dict[str, SectionProxy] = {}
+        self.prev_config_sections: dict[str, dict[str, str]] = {}
 
         self.observer = Observer()
         self.observer.name = "ConfigFileObserverThread"
@@ -216,16 +210,16 @@ class Config(LoggingEventHandler, Singleton):
                 validation_errors = self.validate()
                 if len(validation_errors):
                     raise ValueError(
-                        "The configuration contains the following errors: {}.".format(
-                            str(validation_errors)
-                        )
+                        f"The configuration contains the following errors: {validation_errors!s}."
                     )
         except PermissionError as e:
-            logging.error('PermissionError in accessing the file: "%s" %s', src_path, e)
+            self.logger.error(
+                'PermissionError in accessing the file: "%s" %s', src_path, e
+            )
         except OSError as e:
-            logging.error('OSError in accessing the file: "%s" %s', src_path, e)
-        except Exception as e:
-            logging.error('Exception in accessing the file: "%s" %s', src_path, e)
+            self.logger.error('OSError in accessing the file: "%s" %s', src_path, e)
+        except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
+            self.logger.error('Exception in accessing the file: "%s" %s', src_path, e)
 
     def start(self):
         self.read_config()
@@ -234,9 +228,7 @@ class Config(LoggingEventHandler, Singleton):
         with self._config_lock:
             if name not in self.config:
                 self.logger.error('The config section "%s" is not available.', name)
-                raise ValueError(
-                    'The config section "{}" is not available.'.format(name)
-                )
+                raise ValueError(f'The config section "{name}" is not available.')
             return self.config[name]
 
     def update_live_section_option(
@@ -248,18 +240,14 @@ class Config(LoggingEventHandler, Singleton):
                     'The config section "%s" is not available in active config.', name
                 )
                 raise ValueError(
-                    'The config section "{}" is not available in active config.'.format(
-                        name
-                    )
+                    f'The config section "{name}" is not available in active config.'
                 )
             if name not in self.prev_config_sections:
                 self.logger.error(
                     'The config section "%s" is not available in prev config.', name
                 )
                 raise ValueError(
-                    'The config section "{}" is not available in prev config.'.format(
-                        name
-                    )
+                    f'The config section "{name}" is not available in prev config.'
                 )
             option_definition.set_value(self.config[name], value)
             self.prev_config_sections[name][option_definition.name] = str(value)
@@ -385,8 +373,8 @@ class Config(LoggingEventHandler, Singleton):
         )
         self.write()
 
-    def _notify_updates(self, updated_sections: List[str]):
-        notifications: dict[ConfigConsumer, list[str]] = dict()
+    def _notify_updates(self, updated_sections: list[str]):
+        notifications: dict[ConfigConsumer, list[str]] = {}
         for updated_section in updated_sections:
             if updated_section in self.CONFIG_SECTION_LISTENERS:
                 listeners = self.CONFIG_SECTION_LISTENERS[updated_section]
@@ -400,13 +388,13 @@ class Config(LoggingEventHandler, Singleton):
 
     def validate(
         self,
-    ) -> Dict[ConfigSectionDefinition, Dict[ConfigOptionDefinition, List[str]]]:
+    ) -> dict[ConfigSectionDefinition, dict[ConfigOptionDefinition, list[str]]]:
         """Validate the configuration
 
         :return: The validation errors detected for this configuration
         :rtype: Dict[ConfigSectionDefinition, Dict[ConfigOptionDefinition, List[str]]]
         """
-        validation_errors = dict()
+        validation_errors = {}
         for config_section_definition in self.CONFIG_SECTION_DEFINITIONS.values():
             section_name = config_section_definition.name
             config_section = self.config_sections[section_name]
@@ -423,7 +411,7 @@ class Config(LoggingEventHandler, Singleton):
         self,
         config_section: SectionProxy,
         config_section_definition: ConfigSectionDefinition,
-    ) -> Dict[ConfigOptionDefinition, List[str]]:
+    ) -> dict[ConfigOptionDefinition, list[str]]:
         """Validate a configuration section
 
         :param SectionProxy config_section: The config section to validate
@@ -431,7 +419,7 @@ class Config(LoggingEventHandler, Singleton):
         :return: The validation errors detected for this config section
         :rtype: Dict[ConfigOptionDefinition, List[str]]
         """
-        validation_errors: dict[ConfigOptionDefinition, list[str]] = dict()
+        validation_errors: dict[ConfigOptionDefinition, list[str]] = {}
         if self._is_config_section_enabled(config_section_definition):
             for (
                 option_definition
@@ -447,15 +435,16 @@ class Config(LoggingEventHandler, Singleton):
         config_section_definition: ConfigSectionDefinition,
         option_definition: ConfigOptionDefinition,
     ) -> dict[ConfigOptionDefinition, list[str]]:
-        validation_errors: dict[ConfigOptionDefinition, list[str]] = dict()
-        if not isinstance(option_definition, RuntimeStateOptionDefinition):
-            if self._is_config_option_enabled(
-                config_section_definition, option_definition
-            ):
-                value = option_definition.get_value(config_section)
-                option_validation_errors = option_definition.validate(value)
-                if len(option_validation_errors):
-                    validation_errors[option_definition] = option_validation_errors
+        validation_errors: dict[ConfigOptionDefinition, list[str]] = {}
+        if not isinstance(
+            option_definition, RuntimeStateOptionDefinition
+        ) and self._is_config_option_enabled(
+            config_section_definition, option_definition
+        ):
+            value = option_definition.get_value(config_section)
+            option_validation_errors = option_definition.validate(value)
+            if len(option_validation_errors):
+                validation_errors[option_definition] = option_validation_errors
         return validation_errors
 
     def _is_config_section_enabled(

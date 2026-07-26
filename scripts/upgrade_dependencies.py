@@ -15,6 +15,7 @@ def main() -> int:
     result = subprocess.run(
         ["uv", "python", "install", pinned],
         cwd=str(PROJECT_DIR),
+        check=False,
     )
     if result.returncode != 0:
         print("Failed to upgrade Python.")
@@ -24,6 +25,7 @@ def main() -> int:
     result = subprocess.run(
         ["uv", "lock", "--upgrade"],
         cwd=str(PROJECT_DIR),
+        check=False,
     )
     if result.returncode != 0:
         print("Failed to upgrade lockfile.")
@@ -33,6 +35,7 @@ def main() -> int:
     result = subprocess.run(
         ["uv", "sync"],
         cwd=str(PROJECT_DIR),
+        check=False,
     )
     if result.returncode != 0:
         print("Failed to sync environment.")

@@ -77,8 +77,9 @@ class TestAboutDialog:
         parent.Destroy()
 
     def test_html_link_click_opens_browser(self, wx_app, monkeypatch):
-        from utils.about_dialog import WxHTML
         import webbrowser
+
+        from utils.about_dialog import WxHTML
 
         opened = []
         monkeypatch.setattr(webbrowser, "open", lambda url: opened.append(url))

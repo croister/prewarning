@@ -1,12 +1,12 @@
 from unittest.mock import MagicMock, patch
 
 from punchsources.punch_source_ola_mysql import (
-    _split_time_control_name,
-    _split_time_control_description,
+    PunchSourceOlaMySql,
     _select_control_ids,
+    _split_time_control_description,
+    _split_time_control_name,
     _verify_control_ids,
     _verify_fetch,
-    PunchSourceOlaMySql,
 )
 
 

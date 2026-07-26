@@ -1,13 +1,14 @@
 from unittest.mock import patch
+
 import pytest
 
+from utils.config_definitions import VerificationResult
 from utils.sound import (
     Sound,
     SoundFolder,
-    verify_sound,
     get_all_sounds,
+    verify_sound,
 )
-from utils.config_definitions import VerificationResult
 
 
 @pytest.fixture(autouse=True)

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 Internationalization (i18n) support using gettext.
 

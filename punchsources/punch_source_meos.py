@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-
 import logging
-from typing import Dict, List
 
 from utils.config import Config, ConfigOptionDefinition, ConfigSectionDefinition
 from utils.config_definitions import (
@@ -13,6 +10,7 @@ from utils.constants import PUNCH_KEY_CONTROL_CODE
 from utils.i18n import N_
 from utils.meos_info_server import MeosInfoServer, MeosPunchListener, _select_controls
 from validators.regex_validators import is_control_ids
+
 from ._base import _PunchSourceBase
 
 _MODULE_LOGGER_NAME = "PunchSourceMeos"
@@ -89,7 +87,7 @@ class PunchSourceMeos(MeosPunchListener, _PunchSourceBase):
     def __init__(self) -> None:
         _PunchSourceBase.__init__(self)
         self.logger = logging.getLogger(_MODULE_LOGGER_NAME)
-        self._control_codes: List[str] = []
+        self._control_codes: list[str] = []
         self._running = False
         self.update()
         self.logger.debug(self)
@@ -113,7 +111,7 @@ class PunchSourceMeos(MeosPunchListener, _PunchSourceBase):
     def is_running(self) -> bool:
         return self._running
 
-    def config_updated(self, section_names: List[str]) -> None:
+    def config_updated(self, section_names: list[str]) -> None:
         self.update()
 
     def update(self) -> None:
@@ -127,7 +125,7 @@ class PunchSourceMeos(MeosPunchListener, _PunchSourceBase):
     def reset_tracking(self) -> None:
         MeosInfoServer().reset()
 
-    def meos_punch_received(self, punch: Dict) -> None:
+    def meos_punch_received(self, punch: dict) -> None:
         if not self._running:
             return
         if punch.get(PUNCH_KEY_CONTROL_CODE) not in self._control_codes:

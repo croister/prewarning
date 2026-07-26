@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-
-from abc import abstractmethod, ABC
 import logging
-from typing import Dict, Callable, List
+from abc import ABC, abstractmethod
+from collections.abc import Callable
 
 import wx
 
@@ -23,13 +21,12 @@ class PunchListener(ABC):
 
         self.logger = logging.getLogger(self.__class__.__name__)
 
-    def punch_received(self, punch: Dict[str, str]):
+    def punch_received(self, punch: dict[str, str]):
         """Called when a punch is received.
 
         The punch dict follows the contract documented in
         ``_PunchSourceBase._notify_punch_listeners``.
         """
-        pass
 
 
 _NOT_OVERRIDDEN = object()
@@ -59,7 +56,7 @@ class _PunchSourceBase(ConfigConsumer):
         self.logger = logging.getLogger(self.__class__.__name__)
 
         self.punch_listeners: set[PunchListener] = set()
-        self._tracking_listeners: List[Callable] = []
+        self._tracking_listeners: list[Callable] = []
 
     @abstractmethod
     def start(self):
@@ -80,7 +77,7 @@ class _PunchSourceBase(ConfigConsumer):
         """
         self.punch_listeners.add(listener)
 
-    def _notify_punch_listeners(self, punch: Dict[str, str]):
+    def _notify_punch_listeners(self, punch: dict[str, str]):
         """Notifies all Punch Listeners that a punch has been received.
 
         The punch dict must contain these keys:
@@ -122,13 +119,13 @@ class _PunchSourceBase(ConfigConsumer):
         for callback in self._tracking_listeners:
             wx.CallAfter(callback, state)
 
-    def _get_tracking_state(self) -> Dict[str, str]:
+    def _get_tracking_state(self) -> dict[str, str]:
         """Override in subclasses to return current tracking values by name."""
         return {}
 
     def get_runtime_value(self, option_definition: ConfigOptionDefinition):
         """Return the current runtime value for the given option definition, or None."""
-        return None
+        return
 
     def set_runtime_value(self, option_definition: ConfigOptionDefinition, value: str):
         """Set a runtime tracking value. Override in subclasses."""

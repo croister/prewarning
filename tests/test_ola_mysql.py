@@ -1,27 +1,27 @@
 from unittest.mock import MagicMock, patch
 
 from utils.ola_mysql import (
-    _generate_in_format_str,
     EventForm,
     EventFormType,
+    _generate_in_format_str,
+    _select_database,
+    _select_event,
+    _select_event_race,
+    _verify_connection_parameters,
+    _verify_database,
+    _verify_event,
+    _verify_event_race,
+    are_valid_event_race_control_ids,
     connect,
     get_database_names,
-    is_ola_database,
-    get_ola_db_version,
-    get_events,
     get_event,
-    is_valid_event,
-    is_relay_event,
     get_event_races,
+    get_events,
+    get_ola_db_version,
+    is_ola_database,
+    is_relay_event,
+    is_valid_event,
     is_valid_event_race,
-    are_valid_event_race_control_ids,
-    _verify_connection_parameters,
-    _select_database,
-    _verify_database,
-    _select_event,
-    _verify_event,
-    _select_event_race,
-    _verify_event_race,
 )
 
 
@@ -103,7 +103,7 @@ class TestConnect:
             result = connect("host1", "user1", "pass1", "db1")
 
             assert result is mock_conn
-            args, kwargs = mock_connect.call_args
+            _args, kwargs = mock_connect.call_args
             assert kwargs["host"] == "host1"
             assert kwargs["user"] == "user1"
             assert kwargs["database"] == "db1"
@@ -119,7 +119,7 @@ class TestConnect:
             result = connect("host1", "user1", "pass1")
 
             assert result is mock_conn
-            args, kwargs = mock_connect.call_args
+            _args, kwargs = mock_connect.call_args
             assert kwargs["host"] == "host1"
             assert kwargs["database"] is None
 

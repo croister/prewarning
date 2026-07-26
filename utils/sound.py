@@ -1,35 +1,31 @@
-# -*- coding: utf-8 -*-
-
 import logging
 import os
 from threading import Event, Lock
 
 import miniaudio
 from natsort import natsorted
-from typing import List
-
 from watchdog.events import (
-    LoggingEventHandler,
-    DirMovedEvent,
-    FileMovedEvent,
     DirCreatedEvent,
-    FileCreatedEvent,
     DirDeletedEvent,
-    FileDeletedEvent,
     DirModifiedEvent,
+    DirMovedEvent,
+    FileCreatedEvent,
+    FileDeletedEvent,
     FileModifiedEvent,
+    FileMovedEvent,
+    LoggingEventHandler,
 )
 from watchdog.observers import Observer
 
 from utils.config import (
-    ConfigConsumer,
-    ConfigSectionDefinition,
-    ConfigOptionDefinition,
     Config,
+    ConfigConsumer,
+    ConfigOptionDefinition,
+    ConfigSectionDefinition,
 )
 from utils.config_definitions import Path, VerificationResult
-from utils.i18n import N_
 from utils.constants import AUDIO_EXTENSION, DING_FILENAME
+from utils.i18n import N_
 from utils.singleton import Singleton
 
 SOUNDS_DIR = "sounds"
@@ -114,9 +110,9 @@ class SoundFolder(LoggingEventHandler, Singleton):
     def _path_sort_key(path: Path) -> str:
         return path.as_posix()
 
-    def get_all_sounds(self) -> List[Path]:
+    def get_all_sounds(self) -> list[Path]:
 
-        def _get_all_sounds_rec(current_dir: Path) -> List[Path]:
+        def _get_all_sounds_rec(current_dir: Path) -> list[Path]:
             all_sounds = []
             files = []
             directories = []
@@ -222,7 +218,7 @@ class Sound(ConfigConsumer, Singleton, metaclass=_SoundMeta):
         return cls.SOUND_CONFIG_SECTION_DEFINITION
 
     @classmethod
-    def get_config_section_definitions(cls) -> List[ConfigSectionDefinition]:
+    def get_config_section_definitions(cls) -> list[ConfigSectionDefinition]:
         from utils.voice_manager_dialog import VOICEMANAGER_SECTION
 
         return [cls.config_section_definition(), VOICEMANAGER_SECTION]
@@ -240,9 +236,7 @@ class Sound(ConfigConsumer, Singleton, metaclass=_SoundMeta):
 
         if LOGGER_NAME != self.__class__.__name__:
             raise ValueError(
-                "LOGGER_NAME not correct: {} vs {}".format(
-                    LOGGER_NAME, self.__class__.__name__
-                )
+                f"LOGGER_NAME not correct: {LOGGER_NAME} vs {self.__class__.__name__}"
             )
 
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -259,7 +253,7 @@ class Sound(ConfigConsumer, Singleton, metaclass=_SoundMeta):
 
         self._initialized = True
 
-    def config_updated(self, section_names: List[str]):
+    def config_updated(self, section_names: list[str]):
         self._parse_config()
 
     def _parse_config(self):
@@ -314,9 +308,7 @@ class Sound(ConfigConsumer, Singleton, metaclass=_SoundMeta):
                 self.logger.debug("Sound playback disabled, not playing.")
 
     def resolve_voice(self, runner_country: str | None) -> str | None:
-        if not runner_country:
-            return self.default_voice or None
-        elif runner_country.upper() == self.default_country.upper():
+        if not runner_country or runner_country.upper() == self.default_country.upper():
             return self.default_voice or None
         return self.fallback_voice or None
 
@@ -345,7 +337,7 @@ def verify_sound(sound: str):
 
         section = Config().get_section(_VM_SECTION_NAME)
         voice = section.get(_VM_KEY_DEFAULT_VOICE, None)
-    except Exception:
+    except Exception:  # noqa: BLE001, S110 - best-effort operation, failure is non-critical
         pass
     resolved = resolve_sound_for_voice(sound, voice)
     folder = SoundFolder()
@@ -356,7 +348,7 @@ def verify_sound(sound: str):
     try:
         Sound.play(resolved, True)
         return True
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
         logging.getLogger(LOGGER_NAME).debug("verify_sound: %s", e)
         return False
 

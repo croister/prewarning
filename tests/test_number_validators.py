@@ -1,9 +1,9 @@
 from validators.number_validators import (
     is_int,
-    is_positive_int,
     is_negative_int,
     is_not_negative_int,
     is_not_positive_int,
+    is_positive_int,
 )
 
 

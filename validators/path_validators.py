@@ -1,11 +1,8 @@
-# -*- coding: utf-8 -*-
-
 import logging
 from pathlib import Path
 
 from validators import LOGGER_NAME
 from validators.validator_decorator import validator
-
 
 BASE_DIR = Path(__file__).resolve().parent.parent.absolute()
 
@@ -45,7 +42,7 @@ def is_path(value: str | Path) -> bool:
     """
     try:
         _to_path(value)
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
         logging.getLogger(LOGGER_NAME).debug("is_path: %s", e)
         return False
 
@@ -61,14 +58,11 @@ def path_exists(value: str | Path) -> bool:
     """
     try:
         path = _to_path(value)
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
         logging.getLogger(LOGGER_NAME).debug("path_exists: %s", e)
         return False
 
-    if not path.exists():
-        return False
-
-    return True
+    return path.exists()
 
 
 @validator(message="The file does not exist.")
@@ -80,17 +74,14 @@ def file_exists(value: str | Path) -> bool:
     """
     try:
         path = _to_path(value)
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
         logging.getLogger(LOGGER_NAME).debug("file_exists: %s", e)
         return False
 
     if not path.exists():
         return False
 
-    if not path.is_file():
-        return False
-
-    return True
+    return path.is_file()
 
 
 @validator(message="The directory does not exist.")
@@ -102,14 +93,11 @@ def directory_exists(value: str | Path) -> bool:
     """
     try:
         path = _to_path(value)
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
         logging.getLogger(LOGGER_NAME).debug("directory_exists: %s", e)
         return False
 
     if not path.exists():
         return False
 
-    if not path.is_dir():
-        return False
-
-    return True
+    return path.is_dir()

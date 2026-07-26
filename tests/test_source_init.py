@@ -1,5 +1,5 @@
-from abc import ABC, abstractmethod
 import inspect
+from abc import ABC, abstractmethod
 
 
 def add_sources(classes, sources_dict, subclass_map=None):

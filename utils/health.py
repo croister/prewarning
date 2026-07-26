@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """Application health monitoring."""
 
 from collections.abc import Callable

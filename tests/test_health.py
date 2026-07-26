@@ -10,7 +10,7 @@ class TestHealthMonitor:
 
     def test_check_with_no_issues_returns_ok(self):
         monitor = HealthMonitor()
-        monitor.register_check(lambda: [])
+        monitor.register_check(list)
         status, issues = monitor.evaluate()
         assert status == HealthStatus.OK
         assert issues == []
