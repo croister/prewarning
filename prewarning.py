@@ -39,6 +39,10 @@ from utils.config_dialog import ConfigDialog
 from utils.constants import (
     APPLICATION_DIR,
     AUDIO_EXTENSION,
+    COLOUR_ERROR,
+    COLOUR_OK,
+    COLOUR_OK_TEXT,
+    COLOUR_WARNING,
     CONFIGURATION_DIR,
     DING_FILENAME,
     PUNCH_KEY_BIB_NUMBER,
@@ -781,7 +785,7 @@ class PreWarning(
         # Create the health indicator
         self.health_indicator = wx.StaticText(self.header_panel, label=" \u2b24 ")
         self.health_indicator.SetBackgroundColour(self.header_color)
-        self.health_indicator.SetForegroundColour(wx.Colour(0, 180, 0))
+        self.health_indicator.SetForegroundColour(COLOUR_OK)
         self.health_indicator.SetToolTip(_("All systems OK"))
         self.health_indicator.Bind(wx.EVT_LEFT_DOWN, self._on_health_indicator_click)
         self.header_panel_sizer.Add(
@@ -1435,14 +1439,14 @@ class PreWarning(
 
         # Build tooltip
         if status == HealthStatus.OK:
-            self.health_indicator.SetForegroundColour(wx.Colour(0, 180, 0))
+            self.health_indicator.SetForegroundColour(COLOUR_OK)
             tooltip = _("All systems OK") + "\n\n" + "\n".join(stats_lines)
         elif status == HealthStatus.WARNING:
-            self.health_indicator.SetForegroundColour(wx.Colour(220, 160, 0))
+            self.health_indicator.SetForegroundColour(COLOUR_WARNING)
             issue_lines = "\n".join(f"\u2022 {i.message}" for i in issues)
             tooltip = issue_lines + "\n\n" + "\n".join(stats_lines)
         else:
-            self.health_indicator.SetForegroundColour(wx.Colour(220, 0, 0))
+            self.health_indicator.SetForegroundColour(COLOUR_ERROR)
             issue_lines = "\n".join(f"\u2022 {i.message}" for i in issues)
             tooltip = issue_lines + "\n\n" + "\n".join(stats_lines)
 
@@ -1559,12 +1563,12 @@ class PreWarning(
         punch_issues = self._check_punch_source_health()
         if punch_issues:
             colour = (
-                wx.Colour(220, 0, 0)
+                COLOUR_ERROR
                 if punch_issues[0].status == HealthStatus.ERROR
-                else wx.Colour(220, 160, 0)
+                else COLOUR_WARNING
             )
         else:
-            colour = wx.Colour(0, 150, 0)
+            colour = COLOUR_OK_TEXT
         health_items.append(
             (
                 _("Punch source"),
@@ -1575,9 +1579,7 @@ class PreWarning(
         )
         for issue in punch_issues:
             issue_colour = (
-                wx.Colour(220, 0, 0)
-                if issue.status == HealthStatus.ERROR
-                else wx.Colour(220, 160, 0)
+                COLOUR_ERROR if issue.status == HealthStatus.ERROR else COLOUR_WARNING
             )
             health_items.append(
                 (
@@ -1602,12 +1604,12 @@ class PreWarning(
         sls_issues = self._check_start_list_source_health()
         if sls_issues:
             colour = (
-                wx.Colour(220, 0, 0)
+                COLOUR_ERROR
                 if sls_issues[0].status == HealthStatus.ERROR
-                else wx.Colour(220, 160, 0)
+                else COLOUR_WARNING
             )
         else:
-            colour = wx.Colour(0, 150, 0)
+            colour = COLOUR_OK_TEXT
         health_items.append(
             (
                 _("Start list source"),
@@ -1618,9 +1620,7 @@ class PreWarning(
         )
         for issue in sls_issues:
             issue_colour = (
-                wx.Colour(220, 0, 0)
-                if issue.status == HealthStatus.ERROR
-                else wx.Colour(220, 160, 0)
+                COLOUR_ERROR if issue.status == HealthStatus.ERROR else COLOUR_WARNING
             )
             health_items.append(
                 (
@@ -1646,7 +1646,7 @@ class PreWarning(
                 (
                     _("Screen sleep"),
                     _("Prevented"),
-                    wx.Colour(0, 150, 0),
+                    COLOUR_OK_TEXT,
                     _("Whether the display is prevented from turning off."),
                 )
             )
@@ -1693,14 +1693,10 @@ class PreWarning(
 
         voice_issues = self._check_voice_health()
 
-        green = wx.Colour(0, 150, 0)
-
         if voice_issues:
             issue = voice_issues[0]
             colour = (
-                wx.Colour(220, 0, 0)
-                if issue.status == HealthStatus.ERROR
-                else wx.Colour(220, 160, 0)
+                COLOUR_ERROR if issue.status == HealthStatus.ERROR else COLOUR_WARNING
             )
             health_items.append(
                 (
@@ -1715,7 +1711,7 @@ class PreWarning(
                 (
                     _("Voice check"),
                     _("OK"),
-                    green,
+                    COLOUR_OK_TEXT,
                     _("Checks that voices are installed and complete."),
                 )
             )
@@ -1838,13 +1834,13 @@ class PreWarning(
 
         # Status dot (reuses status/issues from above)
         if status == HealthStatus.OK:
-            dot_colour = wx.Colour(0, 180, 0)
+            dot_colour = COLOUR_OK
             dot_tooltip = _("All systems OK")
         elif status == HealthStatus.WARNING:
-            dot_colour = wx.Colour(220, 160, 0)
+            dot_colour = COLOUR_WARNING
             dot_tooltip = "\n".join(f"\u2022 {i.message}" for i in issues)
         else:
-            dot_colour = wx.Colour(220, 0, 0)
+            dot_colour = COLOUR_ERROR
             dot_tooltip = "\n".join(f"\u2022 {i.message}" for i in issues)
         self._control_window.update_status_dot(
             dot_colour, dot_tooltip, actionable=status != HealthStatus.OK

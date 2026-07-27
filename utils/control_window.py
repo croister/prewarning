@@ -5,6 +5,7 @@ from collections.abc import Callable
 
 import wx
 
+from utils.constants import COLOUR_OK
 from utils.i18n import N_, _
 
 # Column indices for recent pre-warnings
@@ -111,7 +112,7 @@ class ControlWindow(wx.Frame):
         dot_font.SetPointSize(48)
         self._status_dot.SetFont(dot_font)
         self._status_dot.SetMinSize(wx.Size(70, 80))
-        self._status_dot.SetForegroundColour(wx.Colour(0, 180, 0))
+        self._status_dot.SetForegroundColour(COLOUR_OK)
         self._status_dot.Bind(wx.EVT_LEFT_DOWN, self._on_status_dot_click)
         health_content_sizer.Add(
             self._status_dot,
