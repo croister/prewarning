@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import wx
+
 # The directory where this file is located
 APPLICATION_DIR = Path(__file__).resolve().parent.parent.absolute()
 
@@ -39,3 +41,11 @@ DING_FILENAME = f"ding{AUDIO_EXTENSION}"
 
 # The file name for the Testing onem two, three sound
 TESTING_FILENAME = f"Testing{AUDIO_EXTENSION}"
+
+# -- Health status colours -----------------------------------------------------
+# Used by the main window health indicator and the control window.
+
+COLOUR_OK = wx.Colour(0, 180, 0)
+COLOUR_OK_TEXT = wx.Colour(0, 140, 0)
+COLOUR_WARNING = wx.Colour(220, 160, 0)
+COLOUR_ERROR = wx.Colour(220, 0, 0)
