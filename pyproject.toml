@@ -13,7 +13,7 @@ dependencies = [
     "pymysql==1.2.0",
     "ruamel.yaml==0.19.1",
     "watchdog==6.0.0",
-    "wxpython==4.2.5",
+    "wxpython==4.3.1",
     "miniaudio>=1.71",
 ]
 
