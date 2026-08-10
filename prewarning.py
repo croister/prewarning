@@ -169,6 +169,67 @@ def _language_display_name(code: str) -> str:
     return english
 
 
+class _NoHighlightGrid(wx.grid.Grid):
+    """A wx.Grid subclass that never highlights column labels.
+
+    Newer wxPython versions (4.3+/wxWidgets 3.3+) draw the column header of
+    the grid cursor's column with a different (highlighted) background when
+    the grid has focus. Since DrawColLabel is not virtual in the Python
+    bindings, this subclass uses a custom EVT_PAINT handler on the column
+    label window to draw all headers uniformly.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.GetGridColLabelWindow().Bind(wx.EVT_PAINT, self._on_paint_col_labels)
+
+    def _on_paint_col_labels(self, event: wx.PaintEvent) -> None:
+        """Paint column labels without any focus/current-column highlight."""
+        win = self.GetGridColLabelWindow()
+        dc = wx.PaintDC(win)
+        dc.SetBackground(wx.Brush(self.GetLabelBackgroundColour()))
+        dc.Clear()
+
+        dc.SetFont(self.GetLabelFont())
+        dc.SetTextForeground(self.GetLabelTextColour())
+
+        num_cols = self.GetNumberCols()
+        label_height = self.GetColLabelSize()
+        border_colour = wx.SystemSettings.GetColour(wx.SYS_COLOUR_3DSHADOW)
+
+        for col in range(num_cols):
+            col_left = self.GetColLeft(col) - self.GetScrollPos(wx.HORIZONTAL)
+            col_width = self.GetColSize(col)
+            rect = wx.Rect(col_left, 0, col_width, label_height)
+
+            # Draw border lines
+            dc.SetPen(wx.Pen(border_colour))
+            dc.DrawLine(rect.GetRight(), 0, rect.GetRight(), label_height)
+            dc.DrawLine(
+                rect.GetLeft(), label_height - 1, rect.GetRight(), label_height - 1
+            )
+
+            # Draw label text
+            text = self.GetColLabelValue(col)
+            text_rect = wx.Rect(rect)
+            text_rect.Deflate(4, 0)
+            hAlign, vAlign = self.GetColLabelAlignment()
+            align_flags = 0
+            if hAlign == wx.ALIGN_LEFT:
+                align_flags |= wx.ALIGN_LEFT
+            elif hAlign == wx.ALIGN_RIGHT:
+                align_flags |= wx.ALIGN_RIGHT
+            else:
+                align_flags |= wx.ALIGN_CENTER_HORIZONTAL
+            if vAlign == wx.ALIGN_TOP:
+                align_flags |= wx.ALIGN_TOP
+            elif vAlign == wx.ALIGN_BOTTOM:
+                align_flags |= wx.ALIGN_BOTTOM
+            else:
+                align_flags |= wx.ALIGN_CENTER_VERTICAL
+            dc.DrawLabel(text, text_rect, align_flags)
+
+
 class PreWarningMeta(type(wx.Frame), type(ConfigConsumer)):  # type: ignore[misc]
     pass
 
@@ -822,7 +883,7 @@ class PreWarning(
         self.grid_panel_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
         # Create the pre-warning grid
-        self.prewarning_grid = wx.grid.Grid(self.grid_panel)
+        self.prewarning_grid = _NoHighlightGrid(self.grid_panel)
         self.prewarning_grid.CreateGrid(0, 3)
         self.prewarning_grid.SetColLabelValue(COL_NR_TIME, _("Time"))
         self.prewarning_grid.SetColLabelValue(COL_NR_TEAM, _("Team"))
