@@ -5,34 +5,34 @@ requires-python = ">=3.14"
 dependencies = [
     "console-menu==0.8.0",
     "decorator==5.3.1",
-    "gpytranslate>=2.1.0",
-    "edge-tts>=7.2.8",
+    "gpytranslate==2.1.0",
+    "edge-tts==7.2.8",
     "imurl==0.2.1",
     "natsort==8.4.0",
-    "pycountry>=24.6.1",
+    "pycountry==26.2.16",
     "pymysql==1.2.0",
     "ruamel.yaml==0.19.1",
     "watchdog==6.0.0",
     "wxpython==4.3.1",
-    "miniaudio>=1.71",
+    "miniaudio==1.71",
 ]
 
 [dependency-groups]
 dev = [
-    "babel>=2.16.0",
-    "mypy>=2.1.0",
-    "pyinstaller>=6",
-    "pytest>=9.0.3",
-    "pytest-asyncio>=1.3.0",
-    "ruff>=0.11.0",
-    "types-decorator>=5.2.0.20260508",
-    "types-pymysql>=1.1.0.20260508",
+    "babel==2.18.0",
+    "mypy==2.3.0",
+    "pyinstaller==6.22.0",
+    "pytest==9.1.1",
+    "pytest-asyncio==1.4.0",
+    "ruff==0.16.2",
+    "types-decorator==5.2.0.20260712",
+    "types-pymysql==1.2.0.20260807",
 ]
 lint = [
-    "babel>=2.16.0",
-    "codespell>=2.0",
-    "ruff>=0.11.0",
-    "yamllint>=1.0",
+    "babel==2.18.0",
+    "codespell==2.4.3",
+    "ruff==0.16.2",
+    "yamllint==1.38.0",
 ]
 
 [tool.pytest.ini_options]
