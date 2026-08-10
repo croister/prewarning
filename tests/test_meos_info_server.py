@@ -717,3 +717,171 @@ class TestProcessElemReturnValues:
         xml = f'<cmp id="100" xmlns="{MOP_NS}"><radio>31,12340</radio></cmp>'
         server._process_cmp_elem(ET.fromstring(xml))
         assert server._process_cmp_elem(ET.fromstring(xml)) is False
+
+
+class TestFetchStatus:
+    """Tests for _fetch_status and eventId extraction."""
+
+    @patch("utils.meos_info_server._fetch_xml")
+    def test_extracts_event_id(self, mock_fetch, server):
+        xml = ET.fromstring(
+            f'<MOPComplete xmlns="{MOP_NS}">'
+            f'<status version="5.0.1807 (U1)" eventNameId="meos_test" '
+            f'onDatabase="1" eventId="42"/>'
+            f"</MOPComplete>"
+        )
+        mock_fetch.return_value = xml
+        server._fetch_status("http://localhost:2009")
+        assert server._event_id == 42
+
+    @patch("utils.meos_info_server._fetch_xml")
+    def test_missing_event_id_attribute_sets_none(self, mock_fetch, server):
+        """Older MeOS versions do not include eventId."""
+        xml = ET.fromstring(
+            f'<MOPComplete xmlns="{MOP_NS}">'
+            f'<status version="4.1.123" eventNameId="meos_test" onDatabase="1"/>'
+            f"</MOPComplete>"
+        )
+        mock_fetch.return_value = xml
+        server._event_id = 99  # pre-set to verify it gets cleared
+        server._fetch_status("http://localhost:2009")
+        assert server._event_id is None
+
+    @patch("utils.meos_info_server._fetch_xml")
+    def test_empty_event_id_sets_none(self, mock_fetch, server):
+        xml = ET.fromstring(
+            f'<MOPComplete xmlns="{MOP_NS}">'
+            f'<status version="5.0.1807" eventNameId="meos_test" '
+            f'onDatabase="1" eventId=""/>'
+            f"</MOPComplete>"
+        )
+        mock_fetch.return_value = xml
+        server._fetch_status("http://localhost:2009")
+        assert server._event_id is None
+
+    @patch("utils.meos_info_server._fetch_xml")
+    def test_invalid_event_id_sets_none(self, mock_fetch, server):
+        xml = ET.fromstring(
+            f'<MOPComplete xmlns="{MOP_NS}">'
+            f'<status version="5.0.1807" eventNameId="meos_test" '
+            f'onDatabase="1" eventId="abc"/>'
+            f"</MOPComplete>"
+        )
+        mock_fetch.return_value = xml
+        server._fetch_status("http://localhost:2009")
+        assert server._event_id is None
+
+    @patch("utils.meos_info_server._fetch_xml")
+    def test_no_status_element_sets_none(self, mock_fetch, server):
+        xml = ET.fromstring(
+            f'<MOPComplete xmlns="{MOP_NS}">'
+            f'<competition date="2026-06-17" zerotime="03:00:00">Test</competition>'
+            f"</MOPComplete>"
+        )
+        mock_fetch.return_value = xml
+        server._event_id = 99
+        server._fetch_status("http://localhost:2009")
+        assert server._event_id is None
+
+    @patch("utils.meos_info_server._fetch_xml")
+    def test_event_id_zero_is_valid(self, mock_fetch, server):
+        """eventId=0 means no event loaded, should still be stored as 0."""
+        xml = ET.fromstring(
+            f'<MOPComplete xmlns="{MOP_NS}">'
+            f'<status version="5.0.1807 (U1)" eventNameId="" '
+            f'onDatabase="0" eventId="0"/>'
+            f"</MOPComplete>"
+        )
+        mock_fetch.return_value = xml
+        server._fetch_status("http://localhost:2009")
+        assert server._event_id == 0
+
+
+class TestUDPEventIdFiltering:
+    """Tests for UDP packet filtering based on event ID."""
+
+    @patch("socket.socket")
+    def test_matching_event_id_triggers_poll(self, mock_socket, server):
+        import struct
+
+        server._event_id = 42
+        server._use_udp = True
+        server._udp_port = 21338
+
+        mock_sock = MagicMock()
+        mock_socket.return_value = mock_sock
+
+        packet = struct.pack("<5i", 42, 100, 200, 1, 3600)
+
+        call_count = [0]
+
+        def recvfrom_side_effect(*args):
+            call_count[0] += 1
+            if call_count[0] == 1:
+                return (packet, ("192.168.1.1", 12345))
+            server._stop_event.set()
+            raise TimeoutError()
+
+        mock_sock.recvfrom.side_effect = recvfrom_side_effect
+
+        server._udp_loop()
+
+        assert server._poll_event.is_set()
+
+    @patch("socket.socket")
+    def test_mismatched_event_id_does_not_trigger_poll(self, mock_socket, server):
+        import struct
+
+        server._event_id = 42
+        server._use_udp = True
+        server._udp_port = 21338
+
+        mock_sock = MagicMock()
+        mock_socket.return_value = mock_sock
+
+        # Packet from a different competition (cmpId=99)
+        packet = struct.pack("<5i", 99, 100, 200, 1, 3600)
+
+        call_count = [0]
+
+        def recvfrom_side_effect(*args):
+            call_count[0] += 1
+            if call_count[0] == 1:
+                return (packet, ("192.168.1.1", 12345))
+            server._stop_event.set()
+            raise TimeoutError()
+
+        mock_sock.recvfrom.side_effect = recvfrom_side_effect
+
+        server._udp_loop()
+
+        assert not server._poll_event.is_set()
+
+    @patch("socket.socket")
+    def test_no_event_id_accepts_all_packets(self, mock_socket, server):
+        import struct
+
+        server._event_id = None  # older MeOS, no filtering
+        server._use_udp = True
+        server._udp_port = 21338
+
+        mock_sock = MagicMock()
+        mock_socket.return_value = mock_sock
+
+        # Any cmpId should be accepted
+        packet = struct.pack("<5i", 999, 100, 200, 1, 3600)
+
+        call_count = [0]
+
+        def recvfrom_side_effect(*args):
+            call_count[0] += 1
+            if call_count[0] == 1:
+                return (packet, ("192.168.1.1", 12345))
+            server._stop_event.set()
+            raise TimeoutError()
+
+        mock_sock.recvfrom.side_effect = recvfrom_side_effect
+
+        server._udp_loop()
+
+        assert server._poll_event.is_set()

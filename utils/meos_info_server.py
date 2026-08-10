@@ -63,6 +63,7 @@ _TAG_ORG = "org"
 _TAG_BASE = "base"
 _TAG_RADIO = "radio"
 _TAG_RUNNERS = "r"
+_TAG_STATUS = "status"
 
 # MOP XML attribute names
 _ATTR_ID = "id"
@@ -72,6 +73,7 @@ _ATTR_ZEROTIME = "zerotime"
 _ATTR_NEXT_DIFFERENCE = "nextdifference"
 _ATTR_NAT = "nat"
 _ATTR_ORG = "org"
+_ATTR_EVENT_ID = "eventId"
 
 # MOP sentinel value for empty competitor slot
 _MOP_EMPTY_SLOT = "0"
@@ -339,6 +341,7 @@ class MeosInfoServer(
         # Caches
         self._zero_time: datetime | None = None
         self._competition_date: datetime | None = None
+        self._event_id: int | None = None
         self._control_map: dict[int, str] = {}
         self._radio_control_ids: set[int] = set()
         self._org_nat: dict[int, str] = {}
@@ -445,6 +448,12 @@ class MeosInfoServer(
         if self._stop_event.is_set():
             return
         try:
+            self._fetch_status(base)
+        except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
+            self.logger.warning("Failed to fetch event status: %s", e)
+        if self._stop_event.is_set():
+            return
+        try:
             self._fetch_controls(base)
         except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
             self.logger.warning("Failed to prime control cache: %s", e)
@@ -480,6 +489,32 @@ class MeosInfoServer(
                     self._competition_date = datetime.strptime(date_str, "%Y-%m-%d")  # noqa: DTZ007 - parsing timestamps without timezone info
                 except ValueError:
                     pass
+
+    def _fetch_status(self, base: str) -> None:
+        """Fetch the event ID from the MeOS status endpoint.
+
+        The eventId attribute was added in MeOS 5.0 Update 1. Older versions
+        do not include it, in which case self._event_id remains None and UDP
+        filtering is disabled (all packets are accepted).
+        """
+        root = _fetch_xml(f"{base}/meos?get=status")
+        for elem in root:
+            if _strip_ns(elem.tag) == _TAG_STATUS:
+                event_id_str = elem.get(_ATTR_EVENT_ID)
+                if event_id_str:
+                    try:
+                        self._event_id = int(event_id_str)
+                        self.logger.info("Event ID from MeOS: %d", self._event_id)
+                    except ValueError:
+                        self.logger.warning("Invalid eventId value: %s", event_id_str)
+                        self._event_id = None
+                else:
+                    self._event_id = None
+                    self.logger.debug(
+                        "No eventId in status response (older MeOS version)"
+                    )
+                return
+        self._event_id = None
 
     def _fetch_controls(self, base: str) -> None:
         root = _fetch_xml(f"{base}/meos?get=control")
@@ -769,6 +804,15 @@ class MeosInfoServer(
                     cmp_id, runner_id, i_hash_type, status, time_val = (
                         struct.unpack_from("<5i", data)
                     )
+                    # Filter packets by event ID if known
+                    if self._event_id is not None and cmp_id != self._event_id:
+                        self.logger.debug(
+                            "UDP from %s: ignoring (eventId %d != %d)",
+                            addr,
+                            cmp_id,
+                            self._event_id,
+                        )
+                        continue
                     self.logger.debug(
                         "UDP from %s: cmpId=%d runnerId=%d iHashType=%d status=%d time=%d",
                         addr,
