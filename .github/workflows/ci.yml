@@ -160,6 +160,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v7
       - uses: actions/download-artifact@v8
@@ -200,10 +201,17 @@ jobs:
               f.write(f"version={next_ver}\n")
           '
       - name: Commit and push version bump
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           uv lock
+          git checkout -b auto/bump-${{ steps.bump.outputs.version }}
           git add pyproject.toml uv.lock
           git commit -m "Bump version to ${{ steps.bump.outputs.version }}"
-          git push
+          git push -u origin auto/bump-${{ steps.bump.outputs.version }}
+          gh pr create \
+            --title "Bump version to ${{ steps.bump.outputs.version }}" \
+            --body "Automated version bump after release ${{ github.ref_name }}." \
+            --base master
