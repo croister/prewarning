@@ -639,7 +639,7 @@ wheels = [
 
 [[package]]
 name = "prewarning"
-version = "2.3.0.dev0"
+version = "2.3.0"
 source = { editable = "." }
 dependencies = [
     { name = "console-menu" },
