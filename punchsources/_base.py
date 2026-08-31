@@ -5,7 +5,7 @@ from collections.abc import Callable
 import wx
 
 from utils.config import ConfigConsumer
-from utils.config_definitions import ConfigOptionDefinition
+from utils.config_definitions import ConfigOptionDefinition, VerificationResult
 from utils.health import HealthStatus
 
 
@@ -74,6 +74,37 @@ class _PunchSourceBase(ConfigConsumer):
     @abstractmethod
     def is_running(self) -> bool:
         """Returns if the PunchSource is running."""
+
+    def get_control_codes(self) -> list[str]:
+        """Returns the control codes used to select punches for pre-warning.
+
+        Depending on the source these are used either to fetch only the
+        relevant punches (e.g. OLA MySQL) or to filter received punches
+        (e.g. MeOS, OLResultat.se).
+
+        Override in subclasses that use control codes. The default returns an
+        empty list (not applicable).
+        """
+        return []
+
+    def verify_control_codes(self) -> VerificationResult | None:
+        """Verifies that the configured control codes exist in the source.
+
+        Override in subclasses that can check control existence against the
+        source (e.g. MeOS controls, OLA database). Returns:
+          - VerificationResult with status True if the controls are valid
+          - VerificationResult with status False and a message if invalid
+          - None if the source cannot verify controls (e.g. OLResultat.se)
+        """
+        return None
+
+    def control_codes_config_location(self) -> tuple[str, str] | None:
+        """Returns the (section name, option name) of the control codes option.
+
+        Used to reveal and re-verify the option in the settings dialog when
+        control code verification fails. Returns None if not applicable.
+        """
+        return None
 
     def register_punch_listener(self, listener: PunchListener):
         """Registers a Punch Listener that will be notified when a Punch is received.

@@ -416,6 +416,93 @@ class TestPunchSourceMeos:
             )
             assert listener.punch_received.call_count == 1  # unchanged
 
+    def test_get_control_codes(self):
+        from punchsources.punch_source_meos import PunchSourceMeos
+
+        with patch.object(PunchSourceMeos, "_parse_config"):
+            source = PunchSourceMeos()
+            source._control_codes = ["50", "100"]
+            assert source.get_control_codes() == ["50", "100"]
+
+    def test_verify_control_codes_no_url(self):
+        from punchsources.punch_source_meos import PunchSourceMeos
+
+        with patch.object(PunchSourceMeos, "_parse_config"):
+            source = PunchSourceMeos()
+            source._control_codes = ["50"]
+            with patch("punchsources.punch_source_meos.Config") as mock_config:
+                mock_config().get_section.return_value = {}
+                with patch(
+                    "punchsources.punch_source_meos.MeosInfoServer.CONFIG_OPTION_URL"
+                ) as mock_url:
+                    mock_url.get_value.return_value = None
+                    result = source.verify_control_codes()
+            assert result.status is False
+
+    def test_verify_control_codes_all_valid(self):
+        from punchsources.punch_source_meos import PunchSourceMeos
+
+        with patch.object(PunchSourceMeos, "_parse_config"):
+            source = PunchSourceMeos()
+            source._control_codes = ["50", "100"]
+            with patch("punchsources.punch_source_meos.Config") as mock_config:
+                mock_config().get_section.return_value = {}
+                with (
+                    patch(
+                        "punchsources.punch_source_meos.MeosInfoServer.CONFIG_OPTION_URL"
+                    ) as mock_url,
+                    patch(
+                        "punchsources.punch_source_meos._fetch_control_ids",
+                        return_value={50, 100, 150},
+                    ),
+                ):
+                    mock_url.get_value.return_value = "http://localhost:2009"
+                    result = source.verify_control_codes()
+            assert result.status is True
+
+    def test_verify_control_codes_missing(self):
+        from punchsources.punch_source_meos import PunchSourceMeos
+
+        with patch.object(PunchSourceMeos, "_parse_config"):
+            source = PunchSourceMeos()
+            source._control_codes = ["50", "999"]
+            with patch("punchsources.punch_source_meos.Config") as mock_config:
+                mock_config().get_section.return_value = {}
+                with (
+                    patch(
+                        "punchsources.punch_source_meos.MeosInfoServer.CONFIG_OPTION_URL"
+                    ) as mock_url,
+                    patch(
+                        "punchsources.punch_source_meos._fetch_control_ids",
+                        return_value={50, 100},
+                    ),
+                ):
+                    mock_url.get_value.return_value = "http://localhost:2009"
+                    result = source.verify_control_codes()
+            assert result.status is False
+            assert "999" in result.message
+
+    def test_verify_control_codes_fetch_fails(self):
+        from punchsources.punch_source_meos import PunchSourceMeos
+
+        with patch.object(PunchSourceMeos, "_parse_config"):
+            source = PunchSourceMeos()
+            source._control_codes = ["50"]
+            with patch("punchsources.punch_source_meos.Config") as mock_config:
+                mock_config().get_section.return_value = {}
+                with (
+                    patch(
+                        "punchsources.punch_source_meos.MeosInfoServer.CONFIG_OPTION_URL"
+                    ) as mock_url,
+                    patch(
+                        "punchsources.punch_source_meos._fetch_control_ids",
+                        return_value=None,
+                    ),
+                ):
+                    mock_url.get_value.return_value = "http://localhost:2009"
+                    result = source.verify_control_codes()
+            assert result.status is False
+
 
 class TestStartListSourceMeos:
     def test_delegates_to_meos_info_server(self, server):
@@ -885,3 +972,26 @@ class TestUDPEventIdFiltering:
         server._udp_loop()
 
         assert server._poll_event.is_set()
+
+
+class TestFetchControlIds:
+    def test_returns_control_ids(self):
+        from utils.meos_info_server import _fetch_control_ids
+
+        xml = (
+            f'<MOPControlList xmlns="{MOP_NS}">'
+            f'<control id="50">Control 50</control>'
+            f'<control id="100">Control 100</control>'
+            f"</MOPControlList>"
+        )
+        root = ET.fromstring(xml)
+        with patch("utils.meos_info_server._fetch_xml", return_value=root):
+            result = _fetch_control_ids("http://localhost:2009")
+        assert result == {50, 100}
+
+    def test_returns_none_on_error(self):
+        from utils.meos_info_server import _fetch_control_ids
+
+        with patch("utils.meos_info_server._fetch_xml", side_effect=Exception("fail")):
+            result = _fetch_control_ids("http://localhost:2009")
+        assert result is None

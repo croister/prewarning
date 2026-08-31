@@ -328,3 +328,69 @@ class TestPunchSourceOlaMySql:
                     "Unexpected error fetching punches" in str(c)
                     for c in mock_log.call_args_list
                 ), f"Expected log not found. Calls: {mock_log.call_args_list}"
+
+
+class TestGetControlCodes:
+    def _make_source(self, control_ids):
+        source = object.__new__(PunchSourceOlaMySql)
+        source.control_ids = control_ids
+        source._stop_event = MagicMock()
+        source.punch_fetcher = None
+        return source
+
+    def test_returns_ids_as_strings(self):
+        source = self._make_source([101, 102, 103])
+        assert source.get_control_codes() == ["101", "102", "103"]
+
+    def test_returns_empty_when_none(self):
+        source = self._make_source(None)
+        assert source.get_control_codes() == []
+
+    def test_returns_empty_when_empty(self):
+        source = self._make_source([])
+        assert source.get_control_codes() == []
+
+
+class TestVerifyControlCodes:
+    def _make_source(self, control_ids, split_time_controls=None, raises=False):
+        source = object.__new__(PunchSourceOlaMySql)
+        source.control_ids = control_ids
+        source.logger = MagicMock()
+        source._stop_event = MagicMock()
+        source.punch_fetcher = None
+        ola_mysql = MagicMock()
+        if raises:
+            ola_mysql.get_event_race_split_time_controls.side_effect = Exception("fail")
+        else:
+            ola_mysql.get_event_race_split_time_controls.return_value = (
+                split_time_controls or []
+            )
+        source.ola_mysql = ola_mysql
+        return source
+
+    def test_no_control_ids_fails(self):
+        source = self._make_source(None)
+        result = source.verify_control_codes()
+        assert result.status is False
+
+    def test_all_valid_passes(self):
+        source = self._make_source(
+            [101, 102],
+            split_time_controls=[{"ID": 101}, {"ID": 102}, {"ID": 103}],
+        )
+        result = source.verify_control_codes()
+        assert result.status is True
+
+    def test_missing_control_fails(self):
+        source = self._make_source(
+            [101, 999],
+            split_time_controls=[{"ID": 101}, {"ID": 102}],
+        )
+        result = source.verify_control_codes()
+        assert result.status is False
+        assert "999" in result.message
+
+    def test_db_error_fails(self):
+        source = self._make_source([101], raises=True)
+        result = source.verify_control_codes()
+        assert result.status is False

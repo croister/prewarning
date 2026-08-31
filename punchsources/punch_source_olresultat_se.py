@@ -472,6 +472,9 @@ class PunchSourceOlresultatSe(StateSaverMixin, _PunchSourceBase):
     def is_running(self) -> bool:
         return not self._stop_event.is_set()
 
+    def get_control_codes(self) -> list[str]:
+        return list(self.control_codes)
+
     def config_updated(self, section_names: list[str]):
         self.update()
 

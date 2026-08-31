@@ -518,3 +518,38 @@ class TestHealthListener:
         source.register_health_listener(callback)
         source._set_health_status(HealthStatus.ERROR, "second")
         callback.assert_called_once()
+
+
+class TestControlCodes:
+    @patch("utils.config.Config.register_config_section_listener")
+    def _make_source(self, _mock_register):
+        with patch("wx.CallAfter"):
+
+            class MySource(_PunchSourceBase):
+                @classmethod
+                def config_section_definition(cls):
+                    from utils.config_definitions import ConfigSectionDefinition
+
+                    return ConfigSectionDefinition("ms", "MS")
+
+                def __init__(self):
+                    super().__init__()
+
+                def start(self):
+                    pass
+
+                def stop(self):
+                    pass
+
+                def is_running(self):
+                    return False
+
+            return MySource()
+
+    def test_get_control_codes_default_empty(self):
+        source = self._make_source()
+        assert source.get_control_codes() == []
+
+    def test_verify_control_codes_default_none(self):
+        source = self._make_source()
+        assert source.verify_control_codes() is None

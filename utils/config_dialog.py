@@ -805,61 +805,115 @@ class ConfigSectionPanel(wx.Panel):
                 self.update()
 
             elif function == "verify":
-                if option_definition.verifier is None:
-                    return
-                if getattr(button, "_working", False):
-                    return
-                verifier = option_definition.verifier
-                button._working = True  # type: ignore[attr-defined]
-                button.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
-                button.SetBackgroundColour(wx.NullColour)
-                button.SetToolTip(_(TOOLTIP_WORKING))
-                button.Refresh()
-
-                def _do_verify():
-                    result = verifier.verify()
-                    wx.CallAfter(self._on_verify_done, button, result)
-
-                threading.Thread(target=_do_verify, daemon=True).start()
+                self._trigger_verify(option_definition, button)
 
             elif function == "select":
-                valid_values = option_definition.get_valid_values()
-                if valid_values is None:
-                    valid_values = []
-                if option_definition.selector is not None:
-                    if getattr(button, "_working", False):
-                        return
-                    selector = option_definition.selector
-                    button._working = True  # type: ignore[attr-defined]
-                    button.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
-                    button.SetBackgroundColour(wx.NullColour)
-                    button.SetToolTip(_(TOOLTIP_WORKING))
-                    button.Refresh()
+                self._trigger_select(option_definition, name, button)
 
-                    def _do_select():
-                        select_result = selector.select(parent=self.GetParent())
-                        wx.CallAfter(
-                            self._on_select_done,
-                            button,
-                            name,
-                            option_definition,
-                            select_result,
-                        )
+    def _trigger_select(self, option_definition, name: str, button: wx.Button) -> None:
+        """Open the value selector for an option and apply the result."""
+        valid_values = option_definition.get_valid_values()
+        if valid_values is None:
+            valid_values = []
+        if option_definition.selector is not None:
+            if getattr(button, "_working", False):
+                return
+            selector = option_definition.selector
+            button._working = True  # type: ignore[attr-defined]
+            button.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
+            button.SetBackgroundColour(wx.NullColour)
+            button.SetToolTip(_(TOOLTIP_WORKING))
+            button.Refresh()
 
-                    threading.Thread(target=_do_select, daemon=True).start()
-                elif ConfigSectionPanel._use_selector_for(valid_values):
-                    select_result = SelectionResult(
-                        caption=_(DLG_VALID_VALUES_CAPTION),
-                        message=_(DLG_SELECT_VALUE_LABEL),
-                    )
-                    for value in valid_values:
-                        select_result.add_value(SelectionData(value, value))
-                    self._handle_select_result(
-                        button, name, option_definition, select_result
-                    )
-                else:
-                    self.logger.error(ERR_UNKNOWN_SELECT_METHOD)
-                    raise ValueError(ERR_UNKNOWN_SELECT_METHOD)
+            def _do_select():
+                select_result = selector.select(parent=self.GetParent())
+                wx.CallAfter(
+                    self._on_select_done,
+                    button,
+                    name,
+                    option_definition,
+                    select_result,
+                )
+
+            threading.Thread(target=_do_select, daemon=True).start()
+        elif ConfigSectionPanel._use_selector_for(valid_values):
+            select_result = SelectionResult(
+                caption=_(DLG_VALID_VALUES_CAPTION),
+                message=_(DLG_SELECT_VALUE_LABEL),
+            )
+            for value in valid_values:
+                select_result.add_value(SelectionData(value, value))
+            self._handle_select_result(button, name, option_definition, select_result)
+        else:
+            self.logger.error(ERR_UNKNOWN_SELECT_METHOD)
+            raise ValueError(ERR_UNKNOWN_SELECT_METHOD)
+
+    def _trigger_verify(self, option_definition, button: wx.Button) -> None:
+        """Run the verifier for an option and show the result on its button."""
+        if option_definition.verifier is None:
+            return
+        if getattr(button, "_working", False):
+            return
+        verifier = option_definition.verifier
+        button._working = True  # type: ignore[attr-defined]
+        button.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
+        button.SetBackgroundColour(wx.NullColour)
+        button.SetToolTip(_(TOOLTIP_WORKING))
+        button.Refresh()
+
+        def _do_verify():
+            result = verifier.verify()
+            wx.CallAfter(self._on_verify_done, button, result)
+
+        threading.Thread(target=_do_verify, daemon=True).start()
+
+    def assist_option(self, option_name: str) -> bool:
+        """Reveal an option and help the operator fix it.
+
+        Scrolls the option into view and focuses it. If the option has a
+        value selector, the selector is opened so the operator can pick from
+        the currently valid values (the most direct way to fix an invalid
+        value). Otherwise, if the option has a verifier, verification is
+        triggered so the failure is shown on its button.
+
+        Returns True if the selector or verifier was triggered, False
+        otherwise.
+        """
+        option_definition = self.config_section_definition.option_definitions.get(
+            option_name
+        )
+        if option_definition is None:
+            return False
+
+        option_input = wx.FindWindowByName(option_name, parent=self)
+        if option_input is not None:
+            section_panel = option_input.GetParent()
+            scrolled_panel = section_panel.GetParent()
+            scrolled_panel.ScrollChildIntoView(section_panel)
+            if option_input.IsShownOnScreen() and option_input.IsEnabled():
+                option_input.SetFocus()
+
+        # Prefer the selector: it fetches the currently valid values and lets
+        # the operator pick, which is the most direct way to fix bad values.
+        if option_definition.selector is not None or self._use_selector_for(
+            option_definition.get_valid_values() or []
+        ):
+            button = wx.FindWindowByName(
+                self._select_button_name(option_name), parent=self
+            )
+            if isinstance(button, wx.Button):
+                self._trigger_select(option_definition, option_name, button)
+                return True
+
+        if option_definition.verifier is not None:
+            button = wx.FindWindowByName(
+                self._verify_button_name(option_name), parent=self
+            )
+            if isinstance(button, wx.Button):
+                self._trigger_verify(option_definition, button)
+                return True
+
+        return False
 
     def _on_verify_done(self, button: wx.Button, result) -> None:
         if not button:
@@ -874,7 +928,8 @@ class ConfigSectionPanel(wx.Panel):
                 button.SetToolTip(_(result.message))
             else:
                 button.SetToolTip(_(MSG_VERIFY_FAILED))
-            button.SetFocus()
+            if button.IsShownOnScreen() and button.IsEnabled():
+                button.SetFocus()
             button.Refresh()
         else:
             message = _(MSG_SUCCESS)
@@ -903,7 +958,8 @@ class ConfigSectionPanel(wx.Panel):
         if isinstance(select_result, SelectionError):
             button.SetBackgroundColour(wx.Colour("pink"))
             button.SetToolTip(_(select_result.message))
-            button.SetFocus()
+            if button.IsShownOnScreen() and button.IsEnabled():
+                button.SetFocus()
             button.Refresh()
 
         elif isinstance(select_result, SelectionResult):
@@ -1140,6 +1196,20 @@ class ConfigDialog(wx.Dialog):
         for panel in self._panels:
             panel.refresh_translations()
         self.Layout()
+
+    def assist_option(self, section_name: str, option_name: str) -> bool:
+        """Scroll to an option and help the operator fix it.
+
+        Opens the value selector (preferred) or triggers verification so the
+        operator gets immediate feedback and a way to correct an option that
+        failed verification (e.g. control codes).
+
+        Returns True if the option was found and assistance was triggered.
+        """
+        for panel in self._panels:
+            if panel.config_section_definition.name == section_name:
+                return panel.assist_option(option_name)
+        return False
 
     def on_ok(self, e):
         self.logger.debug("on_ok: %s", e)
