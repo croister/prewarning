@@ -260,3 +260,15 @@ class TestPunchSourceOlresultatSe:
                     "Unexpected error fetching punches" in str(c)
                     for c in mock_log.call_args_list
                 ), f"Expected log not found. Calls: {mock_log.call_args_list}"
+
+    def test_get_control_codes(self):
+        with patch("punchsources.punch_source_olresultat_se.Config"):
+            source = PunchSourceOlresultatSe()
+            source.control_codes = ["101", "102"]
+            assert source.get_control_codes() == ["101", "102"]
+
+    def test_verify_control_codes_returns_none(self):
+        with patch("punchsources.punch_source_olresultat_se.Config"):
+            source = PunchSourceOlresultatSe()
+            # OLResultat.se has no control-list API, so verification is skipped.
+            assert source.verify_control_codes() is None

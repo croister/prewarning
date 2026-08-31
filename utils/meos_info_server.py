@@ -189,6 +189,27 @@ def _select_controls(url: str) -> SelectionResult | bool:
         return False
 
 
+def _fetch_control_ids(url: str) -> set[int] | None:
+    """Fetch the set of valid control IDs from a MeOS Information Server.
+
+    Returns None if the controls could not be fetched (e.g. server
+    unreachable), so callers can distinguish "no controls" from "unknown".
+    """
+    try:
+        base = url.rstrip("/")
+        root = _fetch_xml(
+            f"{base}/meos?get=control", timeout=_HTTP_SELECTOR_TIMEOUT_SECONDS
+        )
+        control_ids: set[int] = set()
+        for elem in root:
+            if _strip_ns(elem.tag) == _TAG_CONTROL:
+                control_ids.add(int(elem.get(_ATTR_ID, 0)))
+        return control_ids
+    except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
+        logging.getLogger(_MODULE_LOGGER_NAME).debug("_fetch_control_ids: %s", e)
+        return None
+
+
 class MeosPunchListener(ABC):
     """Internal listener interface between MeosInfoServer and MeOS-based punch sources.
     Distinct from PunchListener which is the external interface on _PunchSourceBase."""

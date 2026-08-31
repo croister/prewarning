@@ -19,7 +19,7 @@ from utils.config_definitions import (
 )
 from utils.constants import FETCH_INTERVAL_VALID_VALUES, PUNCH_KEY_ID
 from utils.health import HealthStatus
-from utils.i18n import N_
+from utils.i18n import N_, _
 from utils.ola_mysql import (
     _KEY_CLASS_COUNT,
     _KEY_CLASS_NAMES,
@@ -529,6 +529,47 @@ class PunchSourceOlaMySql(StateSaverMixin, _PunchSourceBase):
 
     def is_running(self) -> bool:
         return not self._stop_event.is_set()
+
+    def get_control_codes(self) -> list[str]:
+        if not self.control_ids:
+            return []
+        return [str(c) for c in self.control_ids]
+
+    def control_codes_config_location(self) -> tuple[str, str] | None:
+        return (
+            self.name,
+            self.CONFIG_OPTION_PUNCH_SOURCE_OLA_MYSQL_CONTROL_IDS.name,
+        )
+
+    def verify_control_codes(self) -> VerificationResult | None:
+        if not self.control_ids:
+            return VerificationResult(
+                message=_("No control codes are configured."),
+                status=False,
+            )
+        try:
+            split_time_controls = self.ola_mysql.get_event_race_split_time_controls()
+        except Exception as e:  # noqa: BLE001 - broad catch intentional; libraries raise diverse exceptions
+            self.logger.debug("verify_control_codes: %s", e)
+            return VerificationResult(
+                message=_("Unable to verify control codes against the OLA database."),
+                status=False,
+            )
+        valid_ids = {control[_KEY_CONTROL_ID] for control in split_time_controls}
+        missing = [str(c) for c in self.control_ids if c not in valid_ids]
+        if missing:
+            return VerificationResult(
+                message=_(
+                    "Control codes not found for this event race: {codes}"
+                ).format(codes=" ".join(missing)),
+                status=False,
+            )
+        return VerificationResult(
+            message=_("{count} control codes verified.").format(
+                count=len(self.control_ids)
+            ),
+            status=True,
+        )
 
     def config_updated(self, section_names: list[str]):
         self.update()

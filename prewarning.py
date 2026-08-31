@@ -736,6 +736,9 @@ class PreWarning(
 
         self.update_sources()
 
+        # Verify the configured control codes exist in the punch source
+        self._verify_control_codes_at_startup()
+
         # Register health checks
         self.health_monitor.register_check(self._check_punch_source_health)
         self.health_monitor.register_check(self._check_start_list_source_health)
@@ -1175,7 +1178,11 @@ class PreWarning(
         self.prewarning_grid.SetColLabelValue(COL_NR_TEAM, _("Team"))
         self.prewarning_grid.SetColLabelValue(COL_NR_LEG, _("Leg"))
 
-    def _config_dialog(self, perform_validation: bool = False):
+    def _config_dialog(
+        self,
+        perform_validation: bool = False,
+        assist_option_location: tuple[str, str] | None = None,
+    ):
         start = time()
         state_providers = {}
 
@@ -1239,6 +1246,10 @@ class PreWarning(
 
         if perform_validation:
             settings_dialog.Validate()
+
+        if assist_option_location is not None:
+            section_name, option_name = assist_option_location
+            wx.CallAfter(settings_dialog.assist_option, section_name, option_name)
 
         res = settings_dialog.ShowModal()
 
@@ -1651,6 +1662,19 @@ class PreWarning(
                 )
             )
 
+        # Control codes used for pre-warning
+        control_codes = (
+            self.punch_source.get_control_codes() if self.punch_source else []
+        )
+        health_items.append(
+            (
+                _("Control codes"),
+                " ".join(control_codes) if control_codes else "-",
+                None,
+                _("The control codes used to select punches for pre-warning."),
+            )
+        )
+
         # Start list source — always show name and status
         sls_name = (
             _(type(self.start_list_source).display_name)
@@ -2050,6 +2074,28 @@ class PreWarning(
             self.start_list_source.start()
         self._apply_screen_sleep_setting()
         self._refresh_health()
+
+    def _verify_control_codes_at_startup(self) -> None:
+        """Verify the configured control codes exist in the punch source.
+
+        Mirrors the config validation loop: in interactive mode the operator
+        is shown the settings dialog to correct the configuration and the
+        check is repeated; in non-interactive mode a failure raises.
+
+        Sources that cannot verify controls (e.g. OLResultat.se) return None
+        and are skipped.
+        """
+        while self.punch_source is not None:
+            result = self.punch_source.verify_control_codes()
+            if result is None or result.status:
+                break
+            self.logger.error("Control code verification failed: %s", result.message)
+            if self.interactive_mode:
+                location = self.punch_source.control_codes_config_location()
+                self._config_dialog(True, assist_option_location=location)
+                self.update_sources()
+            else:
+                raise ValueError(f"Control code verification failed: {result.message}")
 
     def update_sources(self):
         if self.punch_source_name not in PUNCH_SOURCES:

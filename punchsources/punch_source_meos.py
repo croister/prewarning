@@ -5,10 +5,16 @@ from utils.config_definitions import (
     ConfigSectionEnableType,
     ConfigSectionOptionDefinition,
     ConfigSelectorDefinition,
+    VerificationResult,
 )
 from utils.constants import PUNCH_KEY_CONTROL_CODE
-from utils.i18n import N_
-from utils.meos_info_server import MeosInfoServer, MeosPunchListener, _select_controls
+from utils.i18n import N_, _
+from utils.meos_info_server import (
+    MeosInfoServer,
+    MeosPunchListener,
+    _fetch_control_ids,
+    _select_controls,
+)
 from validators.regex_validators import is_control_ids
 
 from ._base import _PunchSourceBase
@@ -112,6 +118,41 @@ class PunchSourceMeos(MeosPunchListener, _PunchSourceBase):
 
     def is_running(self) -> bool:
         return self._running
+
+    def get_control_codes(self) -> list[str]:
+        return list(self._control_codes)
+
+    def control_codes_config_location(self) -> tuple[str, str] | None:
+        return (self.name, self.CONFIG_OPTION_CONTROL_CODES.name)
+
+    def verify_control_codes(self) -> VerificationResult | None:
+        section = Config().get_section(MeosInfoServer.CONFIG_SECTION_MEOS)
+        url = MeosInfoServer.CONFIG_OPTION_URL.get_value(section)
+        if not url:
+            return VerificationResult(
+                message=_("MeOS Information Server URL is not configured."),
+                status=False,
+            )
+        valid_ids = _fetch_control_ids(url)
+        if valid_ids is None:
+            return VerificationResult(
+                message=_("Unable to fetch controls from the MeOS Information Server."),
+                status=False,
+            )
+        missing = [c for c in self._control_codes if int(c) not in valid_ids]
+        if missing:
+            return VerificationResult(
+                message=_("Control codes not found in MeOS: {codes}").format(
+                    codes=" ".join(missing)
+                ),
+                status=False,
+            )
+        return VerificationResult(
+            message=_("{count} control codes verified.").format(
+                count=len(self._control_codes)
+            ),
+            status=True,
+        )
 
     def config_updated(self, section_names: list[str]) -> None:
         self.update()
