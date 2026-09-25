@@ -10,7 +10,7 @@ dependencies = [
     "imurl==0.2.1",
     "natsort==8.4.0",
     "pycountry==26.2.16",
-    "pymysql==1.2.0",
+    "pymysql==1.2.3",
     "ruamel.yaml==0.19.1",
     "watchdog==6.0.0",
     "wxpython==4.3.1",
@@ -24,14 +24,14 @@ dev = [
     "pyinstaller==6.22.3",
     "pytest==9.1.1",
     "pytest-asyncio==1.4.0",
-    "ruff==0.16.8",
+    "ruff==0.16.9",
     "types-decorator==5.2.0.20260712",
-    "types-pymysql==1.2.0.20260807",
+    "types-pymysql==1.2.0.20260923",
 ]
 lint = [
     "babel==2.18.0",
     "codespell==2.4.3",
-    "ruff==0.16.8",
+    "ruff==0.16.9",
     "yamllint==1.38.0",
 ]
 
